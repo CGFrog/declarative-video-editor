@@ -49,8 +49,8 @@ When your code is ready to be merged:
   <li> When your feature is complete and completely in `dev`, create a merge request to prod, add Kyle and one other reviewer to the pull request. </li>
   <li> Make any changes, merge to `dev` again (no need for another review), then once the reviewers have approved, merge to `prod`. </li>
 </ul>
- and have 1 reviewer conduct an initial code review. Once this is done, you may merge into `prod`.
 
 > [!WARNING]
 > Always ensure that changes that are merged into `prod` have already been merged into `dev`. `prod` acts as our backup to `dev`. 
+
 
