@@ -15,7 +15,8 @@ There are several clear advantages of this methodology:
 <h3>Example</h3>
 <p>
 Let's say a user wishes to add an intro and a watermark to all of their videos. Our language will conceptually do the following:
- 
+
+> [!NOTE]
 > The following is not the syntax we will want to use for this project, but serves as an example of functionality using a Pythonic style.
   
 ```
