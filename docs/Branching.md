@@ -1,7 +1,7 @@
 
 <h3>Git Strategies</h3>
 <h5>Branching</h5>
-Branch names should be kebab case, for example, "syntax-highlighting." When creating a new branch, always branch off `prod`.
+Branch names should be kebab case, for example, "syntax-highlighting." When creating a new branch, always branch off of `prod`.
 
 To branch locally, follow these steps:
 
@@ -42,7 +42,15 @@ git push
 ```
 
 <h5> Pull Requests </h5>
-When your code is ready to be merged, merge into `dev` and have 1 reviewer conduct an initial code review. Once this is done, you may merge into `prod`.
+When your code is ready to be merged:
+<ul>
+  <li> Create a pull request into `dev`. Have one reviewer (anyone) review the code. </li>
+  <li> Make any necessary changes and complete the merge into dev. </li>
+  <li> When your feature is complete and completely in `dev`, create a merge request to prod, add Kyle and one other reviewer to the pull request. </li>
+  <li> Make any changes, merge to `dev` again (no need for another review), then once the reviewers have approved, merge to `prod`. </li>
+</ul>
+ and have 1 reviewer conduct an initial code review. Once this is done, you may merge into `prod`.
 
 > [!WARNING]
-> Always ensure that changes that are merged into prod have previously been already merged into dev.
+> Always ensure that changes that are merged into `prod` have already been merged into `dev`. `prod` acts as our backup to `dev`. 
+
