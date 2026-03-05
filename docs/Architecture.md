@@ -67,3 +67,6 @@ dvel/
 <ul>
     <li>Runs the entire system</li>
 </ul>
+
+<h3>Diagram</h3>
+<img src="arch_diagram.png" alt="System Diagram">
