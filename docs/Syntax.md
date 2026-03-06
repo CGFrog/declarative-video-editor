@@ -11,7 +11,7 @@ This can be read as, create a video called v_1 that is the first 45 seconds of `
 We can similarly do the same for audio and images:
 
 > [!NOTE]
-> Use `hh:mm:ss.ms` format for time. This is subject to change.
+> Use `hh:mm:ss.ms` or `mm:ss.ms` or `ss.ms` or `ss` format for time. 
 
 ```
 audio a_1 = "epic_song.mp3" (0,1:45.42)
@@ -44,6 +44,8 @@ We define the `pipe` operator `|>` as an operator that uses function composition
 ```
 video v_1 = "cool_video.mp4" (0,e) |> blur(5) |> saturation(5)
 <var name> |> <last effect> |> ... |> <first effect>
+
+# this is similar to blur(saturation(video,5),5)
 ```
 
 <h3> Timeline </h3>
@@ -55,9 +57,26 @@ video v_1 = "my_cool_lets_play.mp4" ()
 
 timeline
 v_1 (0)
-<media variable name> <start time>
+<media variable name> <start time> <z layer>
 .
 .
 .
-render "file.mp4" (1920,1080)
+render "file.mp4" [1920,1080]
+```
+
+<h3> Example </h3>
+
+```
+video intro = "intro.mp4" (0,e) |> saturation(3) |> speed(1.5)
+audio music = "music.mp3" (0,e) |> volume(2) |> noise_filter(-60)
+video game_footage = "game_footage.mp4" (0,30) + (35,49)
+video webcam_footage = "webcam_footage.mp4" (0,30) + (35,49) |> transform(1000,320) |> scale(0.2,0.2)
+
+timeline
+intro 0 z=1
+game_footage after intro z=1
+music 0 z=1
+webcam_footage after intro z=2
+
+render "lets_play.mp4" [1920,1080]
 ```
