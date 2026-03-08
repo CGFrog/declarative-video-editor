@@ -1,4 +1,4 @@
 import ffmpeg
 
 def trim(stream: ffmpeg.Stream)->ffmpeg.Stream:
-    pass 
+    raise NotImplementedError('Trim is not implemented')
