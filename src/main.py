@@ -1,8 +1,14 @@
+from ui.Window import Window
+
 def main():
     """
     Init UI class in here.
     """
-    print("DVET")
+
+    window = Window()
+    window.CreateWindow()
+
+    print("DVEL")
 
 
 try:
