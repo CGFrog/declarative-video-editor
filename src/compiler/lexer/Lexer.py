@@ -17,7 +17,7 @@ token_types = (
     # BRACKETS & MISC.
     ('LPAREN', '('),
     ('RPAREN', ')'),
-    ('QOUTES', '"'),
+    ('QUOTES', '"'),
     ('COMMA', ','),
     ('COLON', ':')#,
     #('NUMBER', '0') # need to figure this one out - example: timestamps, effect values
@@ -26,10 +26,11 @@ token_types = (
     #('END', '') # end of text
 )
 
+media_types = ['video', 'audio', 'image']
+effects = ['blur', 'saturation', 'chroma']
+
 token_map = dict(token_types)
-#print(token_map)
-#symbols = list(token_map.values())
-#print(symbols)
+symbols = list(token_map.values())
 
 class Token():
 
@@ -68,10 +69,18 @@ class Lexer():
     
     def build_word(self):
         word = ''
-        while self.current_char is not None and not self.current_char.isspace():
+        while self.current_char is not None and not self.current_char.isspace() and self.current_char not in symbols:
             word += self.current_char
             self.forward()
-        return Token(word.upper(), word.lower())
+        
+        if word in media_types:
+            key = 'TYPE'
+        elif word in effects:
+            key = 'EFFECT'
+        else:
+            key = 'IDENTIFIER'
+
+        return Token(key, word)
     
     def get_val(self, key):
         for token in token_types:
@@ -94,15 +103,32 @@ class Lexer():
             elif self.current_char == self.get_val('UNION'):
                 tokens.append(Token('UNION', self.get_val('UNION')))
                 self.forward()
+            elif self.current_char == self.get_val('FUNC_COMP'):
+                tokens.append(Token('FUNC_COMP', self.get_val('FUNC_COMP')))
+                self.forward()
+            elif self.current_char == self.get_val('LPAREN'):
+                tokens.append(Token('LPAREN', self.get_val('LPAREN')))
+                self.forward()
+            elif self.current_char == self.get_val('RPAREN'):
+                tokens.append(Token('RPAREN', self.get_val('RPAREN')))
+                self.forward()
+            elif self.current_char == self.get_val('QUOTES'):
+                tokens.append(Token('QUOTES', self.get_val('QUOTES')))
+                self.forward()
+            elif self.current_char == self.get_val('COMMA'):
+                tokens.append(Token('COMMA', self.get_val('COMMA')))
+                self.forward()
+            elif self.current_char == self.get_val('COLON'):
+                tokens.append(Token('COLON', self.get_val('COLON')))
+                self.forward()
             else:
-                break
+                raise Exception(f"Illegal input: {self.current_char}")
 
         tokens.append(Token('END', self.get_val('END')))
         return tokens
-    
 
 if __name__ == '__main__': # Test usage
-    text_input = 'video = image + audio'
+    text_input = 'video v_1 = "intro.mp4" (0,0:45)'
     lex = Lexer(text_input)
     token_stream = lex.build_tokens()
     for token in token_stream:
