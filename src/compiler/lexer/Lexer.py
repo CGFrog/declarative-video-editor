@@ -19,7 +19,8 @@ token_types = (
     ('RPAREN', ')'),
     ('QUOTES', '"'),
     ('COMMA', ','),
-    ('COLON', ':')#,
+    ('COLON', ':'),
+    ('PERIOD', '.')
     #('NUMBER', '0') # need to figure this one out - example: timestamps, effect values
     #('LITERAL', 'x'), # need to figure this one out - example: variable filepaths (user defined)
     #('IDENTIFIER', 'x'), # need to figure this one out - example: video variable name (user defined)
@@ -28,6 +29,7 @@ token_types = (
 
 media_types = ['video', 'audio', 'image']
 effects = ['blur', 'saturation', 'chroma']
+timestamp_symbols = [')', ',']
 
 token_map = dict(token_types)
 symbols = list(token_map.values())
@@ -57,15 +59,21 @@ class Lexer():
             self.current_char = None
 
     def skip_space(self):
-        while self.current_char.isspace() and self.current_char is not None:
+        while self.current_char is not None and self.current_char.isspace():
             self.forward()
 
     def build_num(self):
         num = ''
-        while self.current_char is not None and self.current_char.isdigit():
+        while self.current_char is not None and self.current_char not in timestamp_symbols:
             num += self.current_char
             self.forward()
-        return Token('NUMBER', int(num)) # may need to change NUMBER to search through token array or soemthing?
+        
+        if ':' in num:
+            key = 'TIMESTAMP'
+        else:
+            key = 'NUMBER'
+
+        return Token(key, num) # may need to change NUMBER to search through token array or soemthing?
     
     def build_word(self):
         word = ''
@@ -81,6 +89,14 @@ class Lexer():
             key = 'IDENTIFIER'
 
         return Token(key, word)
+    
+    def build_definition(self):
+        definition = ''
+        while self.current_char is not None and not self.current_char.isspace():
+            definition += self.current_char
+            self.forward()
+
+        return Token('DEFINITION', definition)
     
     def get_val(self, key):
         for token in token_types:
@@ -113,13 +129,16 @@ class Lexer():
                 tokens.append(Token('RPAREN', self.get_val('RPAREN')))
                 self.forward()
             elif self.current_char == self.get_val('QUOTES'):
-                tokens.append(Token('QUOTES', self.get_val('QUOTES')))
+                tokens.append(self.build_definition())
                 self.forward()
             elif self.current_char == self.get_val('COMMA'):
                 tokens.append(Token('COMMA', self.get_val('COMMA')))
                 self.forward()
             elif self.current_char == self.get_val('COLON'):
                 tokens.append(Token('COLON', self.get_val('COLON')))
+                self.forward()
+            elif self.current_char == self.get_val('PERIOD'):
+                tokens.append(Token('PERIOD', self.get_val('PERIOD')))
                 self.forward()
             else:
                 raise Exception(f"Illegal input: {self.current_char}")
@@ -128,7 +147,7 @@ class Lexer():
         return tokens
 
 if __name__ == '__main__': # Test usage
-    text_input = 'video v_1 = "intro.mp4" (0,0:45)'
+    text_input = 'audio a_1 = "epic_song.mp3" (0,1:45.42)'
     lex = Lexer(text_input)
     token_stream = lex.build_tokens()
     for token in token_stream:
