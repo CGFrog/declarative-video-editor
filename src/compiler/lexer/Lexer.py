@@ -1,38 +1,7 @@
-token_types = (
-    # OPERATORS
-    ('ASSIGN', '='),         # assignment                
-    ('UNION', '+'),                 # union                    
-    ('FUNC_COMP', '|>'),             # function composition 
-
-    # TYPES
-    #('VIDEO', 'video'), 
-    #('AUDIO', 'audio'), 
-    #('IMAGE', 'image'), 
-
-    # EFFECTS
-    #('BLUR', 'blur'), # blur
-    #('SATURATION', 'saturation'), # saturation
-    #('CHROMA', 'chroma'), # chroma key
-
-    # BRACKETS & MISC.
-    ('LPAREN', '('),
-    ('RPAREN', ')'),
-    ('QUOTES', '"'),
-    ('COMMA', ','),
-    ('COLON', ':'),
-    ('PERIOD', '.')
-    #('NUMBER', '0') # need to figure this one out - example: timestamps, effect values
-    #('LITERAL', 'x'), # need to figure this one out - example: variable filepaths (user defined)
-    #('IDENTIFIER', 'x'), # need to figure this one out - example: video variable name (user defined)
-    #('END', '') # end of text
-)
-
 media_types = ['video', 'audio', 'image']
 effects = ['blur', 'saturation', 'chroma']
+symbols = ['=', '+', '|>', '(', ')', ',']
 timestamp_symbols = [')', ',']
-
-token_map = dict(token_types)
-symbols = list(token_map.values())
 
 class Token():
 
@@ -41,7 +10,7 @@ class Token():
         self.value = value
 
     def toString(self):
-        return f"Token({self.key}, {self.value})"
+        return f"({self.key}, {self.value})"
 
 class Lexer():
 
@@ -73,7 +42,7 @@ class Lexer():
         else:
             key = 'NUMBER'
 
-        return Token(key, num) # may need to change NUMBER to search through token array or soemthing?
+        return Token(key, num)
     
     def build_word(self):
         word = ''
@@ -98,11 +67,6 @@ class Lexer():
 
         return Token('DEFINITION', definition)
     
-    def get_val(self, key):
-        for token in token_types:
-            if token[0] == key:
-                return token[1]
-    
     def build_tokens(self):
         tokens = []
 
@@ -113,41 +77,35 @@ class Lexer():
                 tokens.append(self.build_num())
             elif self.current_char.isalpha():
                 tokens.append(self.build_word())
-            elif self.current_char == self.get_val('ASSIGN'):
-                tokens.append(Token('ASSIGN', self.get_val('ASSIGN')))
+            elif self.current_char == '=':
+                tokens.append(Token('ASSIGN', '='))
                 self.forward()
-            elif self.current_char == self.get_val('UNION'):
-                tokens.append(Token('UNION', self.get_val('UNION')))
+            elif self.current_char == '+':
+                tokens.append(Token('UNION', '+'))
                 self.forward()
-            elif self.current_char == self.get_val('FUNC_COMP'):
-                tokens.append(Token('FUNC_COMP', self.get_val('FUNC_COMP')))
+            elif self.current_char == '|>':
+                tokens.append(Token('FUNC_COMP', '|>'))
                 self.forward()
-            elif self.current_char == self.get_val('LPAREN'):
-                tokens.append(Token('LPAREN', self.get_val('LPAREN')))
+            elif self.current_char == ')':
+                tokens.append(Token('LPAREN', ')'))
                 self.forward()
-            elif self.current_char == self.get_val('RPAREN'):
-                tokens.append(Token('RPAREN', self.get_val('RPAREN')))
+            elif self.current_char == '(':
+                tokens.append(Token('RPAREN', '('))
                 self.forward()
-            elif self.current_char == self.get_val('QUOTES'):
+            elif self.current_char == '"':
                 tokens.append(self.build_definition())
                 self.forward()
-            elif self.current_char == self.get_val('COMMA'):
-                tokens.append(Token('COMMA', self.get_val('COMMA')))
-                self.forward()
-            elif self.current_char == self.get_val('COLON'):
-                tokens.append(Token('COLON', self.get_val('COLON')))
-                self.forward()
-            elif self.current_char == self.get_val('PERIOD'):
-                tokens.append(Token('PERIOD', self.get_val('PERIOD')))
+            elif self.current_char == ',':
+                tokens.append(Token('COMMA', ','))
                 self.forward()
             else:
                 raise Exception(f"Illegal input: {self.current_char}")
 
-        tokens.append(Token('END', self.get_val('END')))
+        tokens.append(Token('END', ''))
         return tokens
 
 if __name__ == '__main__': # Test usage
-    text_input = 'audio a_1 = "epic_song.mp3" (0,1:45.42)'
+    text_input = 'video v_2 = "lecture.mp4" (0:00.00, 1:12:15) + (1:13:52, 1:14:01)'
     lex = Lexer(text_input)
     token_stream = lex.build_tokens()
     for token in token_stream:
