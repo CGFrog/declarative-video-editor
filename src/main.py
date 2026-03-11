@@ -6,9 +6,7 @@ def main():
     """
 
     window = Window()
-    window.CreateWindow()
-
-    print("DVEL")
+    window.run()
 
 
 try:
