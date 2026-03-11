@@ -1,6 +1,7 @@
 media_types = ['video', 'audio', 'image']
-effects = ['blur', 'saturation', 'chroma']
-symbols = ['=', '+', '|>', '(', ')', ',']
+effects = ['blur', 'saturation', 'chroma', 'transform', 'scale', 'noise_filter']
+symbols = ['=', '+', '|>', '(', ')', ',', '|']
+keywords = ['timeline', 'after']
 timestamp_symbols = [')', ',']
 
 class Token():
@@ -54,6 +55,8 @@ class Lexer():
             key = 'TYPE'
         elif word in effects:
             key = 'EFFECT'
+        elif word in keywords:
+            key = 'KEYWORD'
         else:
             key = 'IDENTIFIER'
 
@@ -65,7 +68,7 @@ class Lexer():
             definition += self.current_char
             self.forward()
 
-        return Token('DEFINITION', definition)
+        return Token('NAME', definition)
     
     def build_tokens(self):
         tokens = []
@@ -83,14 +86,18 @@ class Lexer():
             elif self.current_char == '+':
                 tokens.append(Token('UNION', '+'))
                 self.forward()
-            elif self.current_char == '|>':
-                tokens.append(Token('FUNC_COMP', '|>'))
+            elif self.current_char == '|':
                 self.forward()
+                if self.current_char == '>':
+                    tokens.append(Token('FUNC_COMP', '|>'))
+                    self.forward()
+                else:
+                    raise Exception(f"Illegal input: {self.current_char}")
             elif self.current_char == ')':
-                tokens.append(Token('LPAREN', ')'))
+                tokens.append(Token('LPAREN', '('))
                 self.forward()
             elif self.current_char == '(':
-                tokens.append(Token('RPAREN', '('))
+                tokens.append(Token('RPAREN', ')'))
                 self.forward()
             elif self.current_char == '"':
                 tokens.append(self.build_definition())
@@ -105,7 +112,7 @@ class Lexer():
         return tokens
 
 if __name__ == '__main__': # Test usage
-    text_input = 'video v_2 = "lecture.mp4" (0:00.00, 1:12:15) + (1:13:52, 1:14:01)'
+    text_input = 'game_footage after intro 1'
     lex = Lexer(text_input)
     token_stream = lex.build_tokens()
     for token in token_stream:
