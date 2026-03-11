@@ -20,17 +20,19 @@ tokens = (
     ('QOUTES', '"'),
     ('COMMA', ','),
     ('COLON', ':'),
-    ('NUMBER', '0') # need to figure this one out
+    ('NUMBER', '0') # need to figure this one out - example: timestamps, effect values
+    ('LITERAL', 'x') # need to figure this one out - example: variable filepaths (user defined)
+    ('IDENTIFIER', 'x') # need to figure this one out - example: video variable name (user defined)
 )
 
 class Token():
 
-    def __init__(self, category, value):
-        self.category = category
+    def __init__(self, key, value):
+        self.key = key
         self.value = value
 
     def toString(self):
-        return f"Token({self.category}, {self.value})"
+        return f"Token({self.key}, {self.value})"
 
 class Lexer():
 
