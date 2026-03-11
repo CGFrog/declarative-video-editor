@@ -1,8 +1,7 @@
 media_types = ['video', 'audio', 'image']
 effects = ['blur', 'saturation', 'chroma', 'transform', 'scale', 'noise_filter']
-symbols = ['=', '+', '|>', '(', ')', ',', '|']
-keywords = ['timeline', 'after']
-timestamp_symbols = [')', ',']
+symbols = ['=', '+', '|', '(', ')', ',']
+keywords = ['timeline', 'after', 'render']
 
 class Token():
 
@@ -34,16 +33,11 @@ class Lexer():
 
     def build_num(self):
         num = ''
-        while self.current_char is not None and self.current_char not in timestamp_symbols:
+        while self.current_char.isdigit():
             num += self.current_char
             self.forward()
-        
-        if ':' in num:
-            key = 'TIMESTAMP'
-        else:
-            key = 'NUMBER'
 
-        return Token(key, num)
+        return Token('NUMBER', num)
     
     def build_word(self):
         word = ''
@@ -68,9 +62,9 @@ class Lexer():
             definition += self.current_char
             self.forward()
 
-        return Token('NAME', definition)
+        return Token('DEFINITION', definition)
     
-    def build_tokens(self):
+    def build_tokens(self): 
         tokens = []
 
         while self.current_char is not None:
@@ -93,10 +87,10 @@ class Lexer():
                     self.forward()
                 else:
                     raise Exception(f"Illegal input: {self.current_char}")
-            elif self.current_char == ')':
+            elif self.current_char == '(':
                 tokens.append(Token('LPAREN', '('))
                 self.forward()
-            elif self.current_char == '(':
+            elif self.current_char == ')':
                 tokens.append(Token('RPAREN', ')'))
                 self.forward()
             elif self.current_char == '"':
@@ -105,6 +99,18 @@ class Lexer():
             elif self.current_char == ',':
                 tokens.append(Token('COMMA', ','))
                 self.forward()
+            elif self.current_char == ':':
+                tokens.append(Token('COLON', ':'))
+                self.forward()
+            elif self.current_char == '.':
+                tokens.append(Token('PERIOD', '.'))
+                self.forward()
+            elif self.current_char == '[':
+                tokens.append(Token('LBRACK', '['))
+                self.forward()
+            elif self.current_char == ']':
+                tokens.append(Token('RBRACK', ']'))
+                self.forward()
             else:
                 raise Exception(f"Illegal input: {self.current_char}")
 
@@ -112,7 +118,7 @@ class Lexer():
         return tokens
 
 if __name__ == '__main__': # Test usage
-    text_input = 'game_footage after intro 1'
+    text_input = 'render "lets_play.mp4" [1920,1080]'
     lex = Lexer(text_input)
     token_stream = lex.build_tokens()
     for token in token_stream:
