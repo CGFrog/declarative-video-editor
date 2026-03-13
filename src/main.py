@@ -4,9 +4,16 @@ def main():
     """
     Init UI class in here.
     """
-
     window = Window()
     window.run()
+
+    """
+    Creation of tkinter widgets would go here (make sure to import classes at the top)
+    e.x. textEditor.CreateTextBox(window.left_frame)
+         videoPlayer.ShowMediaViewer(window.right_frame)
+    """
+
+    window.root.mainloop()
 
 
 try:
