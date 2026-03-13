@@ -10,9 +10,11 @@ token_symbols = {
     ':': 'COLON'
 }
 symbols = list(token_symbols.keys())
-media_types = ['video', 'audio', 'image']
-effects = ['blur', 'saturation', 'chroma', 'transform', 'scale', 'noise_filter']
-keywords = ['timeline', 'after', 'render']
+labels = {
+    'TYPE': ['video', 'audio', 'image'],
+    'EFFECT': ['blur', 'saturation', 'chroma', 'transform', 'scale', 'noise_filter', 'volume'],
+    'KEYWORD': ['timeline', 'after', 'render']
+}
 
 class Token():
 
@@ -44,7 +46,7 @@ class Lexer():
 
     def build_num(self):
         num = ''
-        while self.current_char.isdigit():
+        while self.current_char.isdigit() or self.current_char == '-':
             num += self.current_char
             self.forward()
 
@@ -55,17 +57,17 @@ class Lexer():
         while self.current_char is not None and not self.current_char.isspace() and self.current_char not in symbols:
             word += self.current_char
             self.forward()
-        
-        if word in media_types:
-            key = 'TYPE'
-        elif word in effects:
-            key = 'EFFECT'
-        elif word in keywords:
-            key = 'KEYWORD'
-        else:
-            key = 'IDENTIFIER'
 
-        return Token(key, word)
+        token_key = None
+
+        for key, value in labels.items():
+            if word in value:
+                token_key = key
+
+        if token_key is None:
+            token_key = 'IDENTIFIER'
+
+        return Token(token_key, word)
     
     def build_definition(self):
         definition = ''
@@ -81,7 +83,7 @@ class Lexer():
         while self.current_char is not None:
             if self.current_char.isspace():
                 self.skip_space()
-            elif self.current_char.isdigit():
+            elif self.current_char.isdigit() or self.current_char == '-':
                 tokens.append(self.build_num())
             elif self.current_char.isalpha():
                 tokens.append(self.build_word())
@@ -107,7 +109,7 @@ class Lexer():
         return tokens
 
 if __name__ == '__main__': # Test usage
-    text_input = 'video game_footage = "game_footage.mp4" (0,30) + (35,49)'
+    text_input = 'audio music = "music.mp3" (0,5) |> volume(2) |> noise_filter(-60)'
     lex = Lexer(text_input)
     token_stream = lex.build_tokens()
     for token in token_stream:
