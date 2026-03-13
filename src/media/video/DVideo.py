@@ -4,7 +4,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
     def __init__(self, name : str, file_path : str)-> None:
         super()
 
-    def trim(start : str, duration :str):
+    def trim(self, start : str, duration :str):
         """
         Trims a video starting at a specific time in seconds throughout a given duration:
         Args:
@@ -13,5 +13,8 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         """
         ffmpeg.input(self.cache_path, ss=start, duration=duration).output(cache_path).run()
 
-    def concat():
+    def union(self, media):
+        pass
+
+    def overlay(self, media):
         pass

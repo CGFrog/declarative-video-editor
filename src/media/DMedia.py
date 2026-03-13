@@ -9,7 +9,7 @@ class DMedia():
 
     Constructor Args:
         name: DVEL media variable name.
-        file_path: 
+        file_path: path to file
     """
     def __init__(self, name : str, file_path : str) -> None:
         self.name = name
@@ -17,11 +17,14 @@ class DMedia():
         self.cache_path = f"cache/name_{uuid.uuid4()}.mp4"
         ffmpeg.input(self.file_path).output(self.cache_path).run()
 
-
     @abc.abstractclassmethod
     def trim(self, time1, time2)->None:
         pass
 
     @abc.abstractclassmethod
-    def concat(self, media)->None:
+    def union(self, media)->None:
+        pass
+
+    @abc.abstractclassmethod
+    def overlay(self, media)->None:
         pass
