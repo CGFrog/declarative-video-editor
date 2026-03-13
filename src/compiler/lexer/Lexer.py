@@ -1,3 +1,4 @@
+# --- Single character symbols used in our language --- #
 token_symbols = {
     '=': 'ASSIGN',
     '+': 'UNION',
@@ -10,12 +11,15 @@ token_symbols = {
     ':': 'COLON'
 }
 symbols = list(token_symbols.keys())
+
+# --- Types, effects, and keywords used in our language --- #
 labels = {
     'TYPE': ['video', 'audio', 'image'],
-    'EFFECT': ['blur', 'saturation', 'chroma', 'transform', 'scale', 'noise_filter', 'volume'],
+    'EFFECT': ['blur', 'saturation', 'chroma', 'transform', 'scale', 'noise_filter', 'volume', 'speed'],
     'KEYWORD': ['timeline', 'after', 'render']
 }
 
+# --- Token Class --- #
 class Token():
 
     def __init__(self, key, value):
@@ -25,6 +29,7 @@ class Token():
     def toString(self):
         return f"({self.key}, {self.value})"
 
+# --- Lexer Class --- #
 class Lexer():
 
     def __init__(self, text):
@@ -64,6 +69,8 @@ class Lexer():
             if word in value:
                 token_key = key
 
+        if word == 's': token_key = 'START_OF_VID'
+        if word == 'e': token_key = 'END_OF_VID'
         if token_key is None: token_key = 'IDENTIFIER'
 
         return Token(token_key, word)
@@ -80,23 +87,23 @@ class Lexer():
         tokens = []
 
         while self.current_char is not None:
-            if self.current_char.isspace():
+            if self.current_char.isspace(): # Check for space
                 self.skip_space()
-            elif self.current_char.isdigit() or self.current_char == '-':
+            elif self.current_char.isdigit() or self.current_char == '-': # Check for numbers (supports negatives)
                 tokens.append(self.build_num())
-            elif self.current_char.isalpha():
+            elif self.current_char.isalpha(): # Check for words (types, effects, keywords, identifiers)
                 tokens.append(self.build_word())
-            elif self.current_char == '"':
+            elif self.current_char == '"': # Check for filepath definitions
                 tokens.append(self.build_definition())
                 self.forward()
-            elif self.current_char == '|':
+            elif self.current_char == '|': # Check for function composition |>
                 self.forward()
                 if self.current_char == '>':
                     tokens.append(Token('FUNC_COMP', '|>'))
                     self.forward()
                 else:
                     raise Exception(f"Illegal input: {self.current_char}")
-            elif self.current_char in symbols:
+            elif self.current_char in symbols: # Check for all other characters in the langauge
                 for key, value in token_symbols.items():
                     if self.current_char == key:
                         tokens.append(Token(value, key))
@@ -104,11 +111,12 @@ class Lexer():
             else:
                 raise Exception(f"Illegal input: {self.current_char}")
 
-        tokens.append(Token('END', ''))
+        tokens.append(Token('END_OF_LINE', '')) # Indicates end of line
         return tokens
 
-if __name__ == '__main__': # Test usage
-    text_input = 'video webcam_footage = "webcam_footage.mp4" (0,30) + (35,49) |> transform(1000,320) |> scale(0.2,0.2)'
+# --- Test Usage --- #
+if __name__ == '__main__':
+    text_input = 'video intro = "intro.mp4" (1:45.33,e) |> saturation(3) |> speed(1.5)'
     lex = Lexer(text_input)
     token_stream = lex.build_tokens()
     for token in token_stream:
