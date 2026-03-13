@@ -46,7 +46,7 @@ class Lexer():
 
     def build_num(self):
         num = ''
-        while self.current_char.isdigit() or self.current_char == '-':
+        while self.current_char.isdigit() or self.current_char == '-' or self.current_char == '.':
             num += self.current_char
             self.forward()
 
@@ -64,8 +64,7 @@ class Lexer():
             if word in value:
                 token_key = key
 
-        if token_key is None:
-            token_key = 'IDENTIFIER'
+        if token_key is None: token_key = 'IDENTIFIER'
 
         return Token(token_key, word)
     
@@ -109,7 +108,7 @@ class Lexer():
         return tokens
 
 if __name__ == '__main__': # Test usage
-    text_input = 'audio music = "music.mp3" (0,5) |> volume(2) |> noise_filter(-60)'
+    text_input = 'video webcam_footage = "webcam_footage.mp4" (0,30) + (35,49) |> transform(1000,320) |> scale(0.2,0.2)'
     lex = Lexer(text_input)
     token_stream = lex.build_tokens()
     for token in token_stream:
