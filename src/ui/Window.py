@@ -22,14 +22,17 @@ class Window:
     def textEditorView(self):
         self.left_frame = tk.Frame(self.main_frame, bg="BLUE")
         self.left_frame.grid(row=0, rowspan=2, column=0, sticky="nsew")
+        # create and initialize text box and other elements from textEditor class
 
     def videoDisplayView(self):
         self.right_frame = tk.Frame(self.main_frame, bg="GREEN")
         self.right_frame.grid(row=0, column=1, sticky="nsew")
+        # create and initialize media player and other elements from videoPlayer class
 
     def consoleView(self):
         self.bottom_frame = tk.Frame(self.main_frame, bg="RED")
         self.bottom_frame.grid(row=1, column=1, sticky="nsew")
+        # create and initialize console and other elements from console class
 
     def run(self):
         self.createWindow()
@@ -37,3 +40,4 @@ class Window:
         self.textEditorView()
         self.videoDisplayView()
         self.consoleView()
+        self.root.mainloop()
