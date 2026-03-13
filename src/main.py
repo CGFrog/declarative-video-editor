@@ -1,10 +1,7 @@
 from ui.Window import Window
 
-def main():
-    """
-    Init UI class in here.
-    """
 
+def main()->None:
     window = Window()
     window.run()
 
