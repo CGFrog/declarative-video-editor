@@ -1,5 +1,5 @@
 # --- Single character symbols used in our language --- #
-token_symbols = {
+symbols = {
     '=': 'ASSIGN',
     '+': 'UNION',
     '(': 'LPAREN',
@@ -10,26 +10,28 @@ token_symbols = {
     '.': 'PERIOD',
     ':': 'COLON'
 }
-symbols = list(token_symbols.keys())
 
 # --- Types, effects, and keywords used in our language --- #
 labels = {
-    'TYPE': ['video', 'audio', 'image'],
-    'EFFECT': ['blur', 'saturation', 'chroma', 'transform', 'scale', 'noise_filter', 'volume', 'speed'],
-    'KEYWORD': ['timeline', 'after', 'render']
+    'video': 'TYPE',
+    'audio': 'TYPE',
+    'image': 'TYPE',
+    'blur': 'EFFECT',
+    'saturation': 'EFFECT',
+    'chroma': 'EFFECT',
+    'transform': 'EFFECT',
+    'scale': 'EFFECT',
+    'noise_filter': 'EFFECT',
+    'volume': 'EFFECT',
+    'speed': 'EFFECT',
+    'timeline': 'KEYWORD',
+    'after': 'KEYWORD',
+    'render': 'KEYWORD'
 }
 
-# --- Token Class --- #
-class Token():
+# Import token class
+from Token import Token
 
-    def __init__(self, key, value):
-        self.key = key
-        self.value = value
-
-    def toString(self):
-        return f"({self.key}, {self.value})"
-
-# --- Lexer Class --- #
 class Lexer():
 
     def __init__(self, text):
@@ -65,9 +67,8 @@ class Lexer():
 
         token_key = None
 
-        for key, value in labels.items():
-            if word in value:
-                token_key = key
+        if word in labels:
+            token_key = labels[word]
 
         if word == 's': token_key = 'START_OF_VID'
         if word == 'e': token_key = 'END_OF_VID'
@@ -104,7 +105,7 @@ class Lexer():
                 else:
                     raise Exception(f"Illegal input: {self.current_char}")
             elif self.current_char in symbols: # Check for all other characters in the langauge
-                for key, value in token_symbols.items():
+                for key, value in symbols.items():
                     if self.current_char == key:
                         tokens.append(Token(value, key))
                         self.forward()
