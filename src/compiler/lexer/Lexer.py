@@ -105,10 +105,9 @@ class Lexer():
                 else:
                     raise Exception(f"Illegal input: {self.current_char}")
             elif self.current_char in symbols: # Check for all other characters in the langauge
-                for key, value in symbols.items():
-                    if self.current_char == key:
-                        tokens.append(Token(value, key))
-                        self.forward()
+                key = symbols[self.current_char]
+                tokens.append(Token(key, self.current_char))
+                self.forward()
             else:
                 raise Exception(f"Illegal input: {self.current_char}")
 
