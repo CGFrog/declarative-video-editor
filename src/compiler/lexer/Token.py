@@ -1,9 +1,9 @@
 from enum import Enum
 
 class TokenLabel(Enum):
-    TYPE = 1
+    MEDIA = 1
     EFFECT = 2
-    KEYWORD = 3
+    END_OF_LINE = 3
     ASSIGN = 4
     UNION = 5
     LPAREN = 6
@@ -19,7 +19,9 @@ class TokenLabel(Enum):
     END_OF_VID = 16
     IDENTIFIER = 17
     FUNC_COMP = 18
-
+    TIMELINE= 19
+    RENDER = 20
+    AFTER = 21
 
 class Token():
 

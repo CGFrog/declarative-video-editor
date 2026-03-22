@@ -16,9 +16,9 @@ symbols = {
 
 # --- Types, effects, and keywords used in our language --- #
 labels = {
-    'video': TL.TYPE,
-    'audio': TL.TYPE,
-    'image': TL.TYPE,
+    'video': TL.MEDIA,
+    'audio': TL.MEDIA,
+    'image': TL.MEDIA,
 
     'blur': TL.EFFECT,
     'saturation': TL.EFFECT,
@@ -29,9 +29,9 @@ labels = {
     'volume': TL.EFFECT,
     'speed': TL.EFFECT,
 
-    'timeline': TL.KEYWORD,
-    'after': TL.KEYWORD,
-    'render': TL.KEYWORD
+    'timeline': TL.TIMELINE,
+    'after': TL.AFTER,
+    'render': TL.RENDER
 }
 
 class Lexer():
@@ -115,7 +115,7 @@ class Lexer():
             else:
                 raise Exception(f"Illegal input: {self.current_char}")
 
-        tokens.append(Token('END_OF_LINE', '')) # Indicates end of line
+        tokens.append(Token(TL.END_OF_LINE, '')) # Indicates end of line
         return tokens
 
 # --- Test Usage --- #
