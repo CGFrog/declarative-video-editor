@@ -1,3 +1,21 @@
+from enum import Enum
+
+
+class Label(Enum):
+    TYPE = 1
+    EFFECT = 2
+    KEYWORD = 3
+    ASSIGN = 4
+    UNION = 5
+    LPAREN = 6
+    RPAREN = 7
+    LBRACK = 8
+    RBRACK = 9
+    COMMA = 10
+    PERIOD = 11
+    COLON = 12
+
+
 # --- Single character symbols used in our language --- #
 symbols = {
     '=': 'ASSIGN',
@@ -34,36 +52,36 @@ from Token import Token
 
 class Lexer():
 
-    def __init__(self, text):
-        self.text = text
+    def __init__(self):
         self.pos = -1
-        self.current_char = None
-        self.forward()
+        self.current_char : str | None = None
+        self.text: str = ""
 
-    def forward(self):
+    def __forward(self):
         self.pos += 1
         if self.pos < len(self.text):
             self.current_char = self.text[self.pos]
         else:
             self.current_char = None
 
-    def skip_space(self):
+    def __skip_space(self):
         while self.current_char is not None and self.current_char.isspace():
-            self.forward()
+            self.__forward()
 
-    def build_num(self):
+    def __build_num(self):
         num = ''
+        assert(self.current_char is not None)
         while self.current_char.isdigit() or self.current_char == '-' or self.current_char == '.':
             num += self.current_char
-            self.forward()
+            self.__forward()
 
         return Token('NUMBER', num)
     
-    def build_word(self):
+    def __build_word(self):
         word = ''
         while self.current_char is not None and not self.current_char.isspace() and self.current_char not in symbols:
             word += self.current_char
-            self.forward()
+            self.__forward()
 
         token_key = None
 
@@ -76,38 +94,40 @@ class Lexer():
 
         return Token(token_key, word)
     
-    def build_definition(self):
+    def __build_definition(self):
         definition = ''
         while self.current_char is not None and not self.current_char.isspace():
             definition += self.current_char
-            self.forward()
+            self.__forward()
 
         return Token('DEFINITION', definition)
     
-    def build_tokens(self):
+    def build_tokens(self, text : str) -> list[Token]:
         tokens = []
+        self.text = text
+        self.__forward()
 
         while self.current_char is not None:
             if self.current_char.isspace(): # Check for space
-                self.skip_space()
+                self.__skip_space()
             elif self.current_char.isdigit() or self.current_char == '-': # Check for numbers (supports negatives)
-                tokens.append(self.build_num())
+                tokens.append(self.__build_num())
             elif self.current_char.isalpha(): # Check for words (types, effects, keywords, identifiers)
-                tokens.append(self.build_word())
+                tokens.append(self.__build_word())
             elif self.current_char == '"': # Check for filepath definitions
-                tokens.append(self.build_definition())
-                self.forward()
+                tokens.append(self.__build_definition())
+                self.__forward()
             elif self.current_char == '|': # Check for function composition |>
-                self.forward()
+                self.__forward()
                 if self.current_char == '>':
                     tokens.append(Token('FUNC_COMP', '|>'))
-                    self.forward()
+                    self.__forward()
                 else:
                     raise Exception(f"Illegal input: {self.current_char}")
             elif self.current_char in symbols: # Check for all other characters in the langauge
                 key = symbols[self.current_char]
                 tokens.append(Token(key, self.current_char))
-                self.forward()
+                self.__forward()
             else:
                 raise Exception(f"Illegal input: {self.current_char}")
 
@@ -117,7 +137,7 @@ class Lexer():
 # --- Test Usage --- #
 if __name__ == '__main__':
     text_input = 'video intro = "intro.mp4" (1:45.33,e) |> saturation(3) |> speed(1.5)'
-    lex = Lexer(text_input)
-    token_stream = lex.build_tokens()
+    lex = Lexer()
+    token_stream = lex.build_tokens(text=text_input)
     for token in token_stream:
         print(token.toString())
