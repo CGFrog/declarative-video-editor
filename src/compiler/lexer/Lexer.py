@@ -1,54 +1,38 @@
-from enum import Enum
-
-
-class Label(Enum):
-    TYPE = 1
-    EFFECT = 2
-    KEYWORD = 3
-    ASSIGN = 4
-    UNION = 5
-    LPAREN = 6
-    RPAREN = 7
-    LBRACK = 8
-    RBRACK = 9
-    COMMA = 10
-    PERIOD = 11
-    COLON = 12
-
+from Token import TokenLabel as TL
+from Token import Token
 
 # --- Single character symbols used in our language --- #
 symbols = {
-    '=': 'ASSIGN',
-    '+': 'UNION',
-    '(': 'LPAREN',
-    ')': 'RPAREN',
-    '[': 'LBRACK',
-    ']': 'RBRACK',
-    ',': 'COMMA',
-    '.': 'PERIOD',
-    ':': 'COLON'
+    '=': TL.ASSIGN,
+    '+': TL.UNION,
+    '(': TL.LPAREN,
+    ')': TL.RPAREN,
+    '[': TL.LBRACK,
+    ']': TL.RBRACK,
+    ',': TL.COMMA,
+    '.': TL.PERIOD,
+    ':': TL.COLON
 }
 
 # --- Types, effects, and keywords used in our language --- #
 labels = {
-    'video': 'TYPE',
-    'audio': 'TYPE',
-    'image': 'TYPE',
-    'blur': 'EFFECT',
-    'saturation': 'EFFECT',
-    'chroma': 'EFFECT',
-    'transform': 'EFFECT',
-    'scale': 'EFFECT',
-    'noise_filter': 'EFFECT',
-    'volume': 'EFFECT',
-    'speed': 'EFFECT',
-    'timeline': 'KEYWORD',
-    'after': 'KEYWORD',
-    'render': 'KEYWORD'
-}
+    'video': TL.TYPE,
+    'audio': TL.TYPE,
+    'image': TL.TYPE,
 
-# Import token class
-from Token import Token
+    'blur': TL.EFFECT,
+    'saturation': TL.EFFECT,
+    'chroma': TL.EFFECT,
+    'transform': TL.EFFECT,
+    'scale': TL.EFFECT,
+    'noise_filter': TL.EFFECT,
+    'volume': TL.EFFECT,
+    'speed': TL.EFFECT,
+
+    'timeline': TL.KEYWORD,
+    'after': TL.KEYWORD,
+    'render': TL.KEYWORD
+}
 
 class Lexer():
 
@@ -75,7 +59,7 @@ class Lexer():
             num += self.current_char
             self.__forward()
 
-        return Token('NUMBER', num)
+        return Token(TL.NUMBER, num)
     
     def __build_word(self):
         word = ''
@@ -88,9 +72,9 @@ class Lexer():
         if word in labels:
             token_key = labels[word]
 
-        if word == 's': token_key = 'START_OF_VID'
-        if word == 'e': token_key = 'END_OF_VID'
-        if token_key is None: token_key = 'IDENTIFIER'
+        if word == 's': token_key = TL.START_OF_VID
+        if word == 'e': token_key = TL.END_OF_VID
+        if token_key is None: token_key = TL.IDENTIFIER
 
         return Token(token_key, word)
     
@@ -100,7 +84,7 @@ class Lexer():
             definition += self.current_char
             self.__forward()
 
-        return Token('DEFINITION', definition)
+        return Token(TL.DEFINITION, definition)
     
     def build_tokens(self, text : str) -> list[Token]:
         tokens = []
@@ -120,7 +104,7 @@ class Lexer():
             elif self.current_char == '|': # Check for function composition |>
                 self.__forward()
                 if self.current_char == '>':
-                    tokens.append(Token('FUNC_COMP', '|>'))
+                    tokens.append(Token(TL.FUNC_COMP, '|>'))
                     self.__forward()
                 else:
                     raise Exception(f"Illegal input: {self.current_char}")
