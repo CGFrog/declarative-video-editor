@@ -1,4 +1,5 @@
 import tkinter as tk
+from VideoPlayer import VideoPlayer
 
 class Window:
     def __init__(self):
@@ -28,6 +29,7 @@ class Window:
         self.right_frame = tk.Frame(self.main_frame, bg="GREEN")
         self.right_frame.grid(row=0, column=1, sticky="nsew")
         # create and initialize media player and other elements from videoPlayer class
+        self.video_player = VideoPlayer(self.right_frame)
 
     def consoleView(self):
         self.bottom_frame = tk.Frame(self.main_frame, bg="RED")
