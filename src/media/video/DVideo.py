@@ -25,7 +25,22 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
 
         # Output final video
         ffmpeg.output(v3[0], v3[1], self.cache_path).run()
-        
+
+    def location(self, x, y):
+
+        # Load video file
+        v = ffmpeg.input(self.cache_path)
+
+        pass
+
+    def rotation(self, angle_deg):
+        pass
+
+    def scale(self, pct):
+        pass
+
+    def crop(self, width, height, x_offset, y_offset):
+        pass
 
     def overlay(self, media):
         pass
