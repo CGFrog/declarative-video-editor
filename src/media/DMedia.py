@@ -16,7 +16,7 @@ class DMedia():
         self.file_path = file_path
         self.cache_path = f"cache/name_{uuid.uuid4()}.mp4"
         ffmpeg.input(self.file_path).output(self.cache_path).run()
-
+    
     @abc.abstractclassmethod
     def trim(self, time1, time2)->None:
         pass

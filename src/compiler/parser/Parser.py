@@ -5,9 +5,9 @@ from lexer.Token import TokenLabel as TL
 class Parser():
     def __init__(self, lexer : Lexer):
         self.lexer : Lexer = lexer
-        self.state: dict = {}
-        self.timeline : dict = {}
-        self.line_number = 1
+        self.state: dict = {} # Holds all media variables, i.e. videos, audio, and images, as well as their attributes such as effects applied and durations.
+        self.timeline : dict = {} # Tells the compiler how to organize our video.
+        self.line_number : int = 1
 
     def parse_source(self, source_code : str):
         lines_of_code : list[str] = source_code.splitlines()
@@ -18,7 +18,7 @@ class Parser():
             
             token = tokens[0].key
             # There are only four things a line might do, create media, signal start of the timeline, add media to timeline, or signal render.
-            match token:  
+            match token:
                 case TL.END_OF_LINE:
                     # White space, just ignore.
                     break
@@ -36,12 +36,34 @@ class Parser():
                     break
 
                 case TL.RENDER:
+                    self.__parse_render()
                     # signal to compiler we are ready to compile the video.
                     break
             
             self.line_number += 1
 
+    def __parse_render(self, tokens: list[Token]):
+        index : int = 0
+        while tokens[index] != TL.END_OF_LINE:
+            match tokens[index].key:
+                case TL.LBRACK:
+                    # Determines final output render resolution, maybe some other stuff later idk I just work here.
+                    end_bracket: int = self.__get_nest_termination_index(tokens, index, TL.RBRACK)
+                    return self.__parse_resolution(tokens[index:end_bracket-1:])
+                case _:
+                    raise Exception(f"Unexpected argument: {tokens[index].value} on line {self.line_number}")
+
+
     def __parse_media(self, tokens : list[Token]):
+        """
+        When the parser detects a line dedicated to instantiating a media object, parse media determines:
+        <ul>
+            <li> Unions </li>
+            <li> Trims </li>
+            <li> Effects </li>
+        </ul> 
+        onto the specific media object.        
+        """
         index : int = 0
         current_operator : TL | None = None
         while tokens[index].key != TL.END_OF_LINE:
@@ -53,7 +75,7 @@ class Parser():
                     current_operator = TL.DEFINITION
                     break
                 case TL.LPAREN:
-                    end_parenthesis = self.__get_parenthesis_termination_index(tokens, index)
+                    end_parenthesis: int = self.__get_nest_termination_index(tokens, index, TL.RPAREN)
                     # gets the time or function input
                     self.__parse_parenthesis(tokens[index+1:end_parenthesis-1:],current_operator)
                     index = end_parenthesis + 1
@@ -68,21 +90,25 @@ class Parser():
     def __parse_timeline_instance(self, tokens : list[Token]):
         pass
 
-    def __get_parenthesis_termination_index(self, tokens: list[Token], current_index)-> int:
+    def __get_nest_termination_index(self, tokens: list[Token], current_index, termination_symbol: TL)-> int:
+        """
+        Helper function that determines 
+        
+        """
         for t in range(current_index+1, len(tokens)):
-            if tokens[t].key == TL.RPAREN:
+            if tokens[t].key == termination_symbol:
                 return t
         raise Exception("Missing right parenthesis")
 
     def __parse_parenthesis(self, tokens : list[Token], current_operator : TL | None):
         match current_operator:
             case None:
-                raise Exception(f"No valid operator found before parenthesis.")
+                raise Exception(f"No valid operator found after parenthesis.")
             case TL.UNION:
                 return self.__construct_time(tokens)
             case TL.DEFINITION:
                 return self.__construct_time(tokens)
-            case TL.FUNC_COMP:
+            case TL.FUNC_COMP:    
                 return self.__construct_function_input(tokens)
             
     def __construct_time(self, tokens : list[Token]):
@@ -91,5 +117,9 @@ class Parser():
     def __construct_function_input(self, tokens : list[Token]):
         pass
 
-    def __parse_brackets(self, tokens : list[Token]):
-        pass
+    def __parse_resolution(self, tokens : list[Token]):
+        # Inside of the brackets, we may have things such as resolution,
+        for token in tokens:
+            if token == TL.RBRACK:
+                break
+            
