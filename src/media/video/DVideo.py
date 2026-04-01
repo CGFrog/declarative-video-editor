@@ -35,7 +35,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             y: y coordinate of the video's anchor point
         """
         v_repositioned = ffmpeg.input(self.cache_path)
-        ffmpeg.overlay(self.cache_path, repositioned=v_repositioned, x=x, y=y).output(self.cache_path).run()
+        ffmpeg.overlay(self.cache_path, repositioned=v_repositioned, new_x=x, new_y=y).output(self.cache_path).run()
 
     def rotation(self, angle : float):
         """
@@ -54,7 +54,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         scale = f'iw*{pct}:ih*{pct}'
         ffmpeg.input(self.cache_path).filter('scale', scale_pct=scale).output(self.cache_path).run()
 
-    def crop(self, width, height, x_offset, y_offset):
+    def crop(self, width : float, height : float, x_offset : float, y_offset : float):
         """
         Cut content from the video frame (width & height)
         Args:
