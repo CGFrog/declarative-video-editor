@@ -1,5 +1,6 @@
 from src.media.DMedia import DMedia
 import ffmpeg
+import math
 
 class DVideo(DMedia): #D just seems like a reasonable way to distinguish between our video wrapper class and the ffmpeg video class. I.e. the D in DVET.
     def __init__(self, name : str, file_path : str)-> None:
@@ -26,21 +27,43 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         # Output final video
         ffmpeg.output(v3[0], v3[1], self.cache_path).run()
 
-    def location(self, x, y):
-
-        # Load video file
+    def location(self, x : float, y : float):
+        """
+        Moves the x, y coordinates of the anchor point of a video:
+        Args:
+            x: x coordinate of the video's anchor point
+            y: y coordinate of the video's anchor point
+        """
         v = ffmpeg.input(self.cache_path)
+        ffmpeg.overlay(self.cache_path, v, x, y).output(self.cache_path).run()
 
-        pass
+    def rotation(self, angle : float):
+        """
+        Rotates the video clockwise by degrees:
+        Args:
+            angle: degree amount to rotate video by
+        """
+        ffmpeg.input(self.cache_path).filter('rotate', angle * math.pi / 180).output(self.cache_path).run()
 
-    def rotation(self, angle_deg):
-        pass
-
-    def scale(self, pct):
-        pass
+    def scale(self, pct : float):
+        """
+        Increases/decreases the size (length & width) of the video
+        Args:
+            pct: percentage increase/decrease in the video's scale
+        """
+        scale = f'iw*{pct}:ih*{pct}'
+        ffmpeg.input(self.cache_path).filter('scale', scale).output(self.cache_path).run()
 
     def crop(self, width, height, x_offset, y_offset):
-        pass
+        """
+        Cut content from the video frame (width & height)
+        Args:
+            width: cropped video width
+            height: cropped video height
+            x_offset: amount of pixels to crop from the x-axis
+            y_offset: amount of pixels to crop from the y-axis
+        """
+        ffmpeg.input(self.cache_path).filter('crop', width, height, x_offset, y_offset).output(self.cache_path).run()
 
     def overlay(self, media):
         pass
