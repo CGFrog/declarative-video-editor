@@ -27,15 +27,16 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         # Output final video
         ffmpeg.output(v3[0], v3[1], self.cache_path).run()
 
-    def location(self, x : float, y : float):
+    def location(self, new_x : float, new_y : float, resolution_w : float, resolution_h : float):
         """
         Moves the x, y coordinates of the anchor point of a video:
         Args:
-            x: x coordinate of the video's anchor point
-            y: y coordinate of the video's anchor point
+            new_x: x coordinate of the video's anchor point
+            new_y: y coordinate of the video's anchor point
+            resolution_w: video "canvas" width
+            resolution_h: video "canvas" height
         """
-        v_repositioned = ffmpeg.input(self.cache_path)
-        ffmpeg.overlay(self.cache_path, repositioned=v_repositioned, new_x=x, new_y=y).output(self.cache_path).run()
+        ffmpeg.input(self.cache_path).filter('pad', w=resolution_w, h=resolution_h, new_x=new_x, new_y=new_y).output(self.cache_path).run()
 
     def rotation(self, angle : float):
         """
@@ -58,8 +59,8 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         """
         Cut content from the video frame (width & height)
         Args:
-            width: cropped video width
-            height: cropped video height
+            width: cropped area of video width
+            height: cropped area of video height
             x_offset: amount of pixels to crop from the x-axis
             y_offset: amount of pixels to crop from the y-axis
         """
