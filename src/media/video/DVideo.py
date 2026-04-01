@@ -34,8 +34,8 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             x: x coordinate of the video's anchor point
             y: y coordinate of the video's anchor point
         """
-        v = ffmpeg.input(self.cache_path)
-        ffmpeg.overlay(self.cache_path, v, x, y).output(self.cache_path).run()
+        v_repositioned = ffmpeg.input(self.cache_path)
+        ffmpeg.overlay(self.cache_path, repositioned=v_repositioned, x=x, y=y).output(self.cache_path).run()
 
     def rotation(self, angle : float):
         """
@@ -43,7 +43,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         Args:
             angle: degree amount to rotate video by
         """
-        ffmpeg.input(self.cache_path).filter('rotate', angle * math.pi / 180).output(self.cache_path).run()
+        ffmpeg.input(self.cache_path).filter('rotate', rotation_angle=(angle * math.pi / 180)).output(self.cache_path).run()
 
     def scale(self, pct : float):
         """
@@ -52,7 +52,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             pct: percentage increase/decrease in the video's scale
         """
         scale = f'iw*{pct}:ih*{pct}'
-        ffmpeg.input(self.cache_path).filter('scale', scale).output(self.cache_path).run()
+        ffmpeg.input(self.cache_path).filter('scale', scale_pct=scale).output(self.cache_path).run()
 
     def crop(self, width, height, x_offset, y_offset):
         """
@@ -63,7 +63,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             x_offset: amount of pixels to crop from the x-axis
             y_offset: amount of pixels to crop from the y-axis
         """
-        ffmpeg.input(self.cache_path).filter('crop', width, height, x_offset, y_offset).output(self.cache_path).run()
+        ffmpeg.input(self.cache_path).filter('crop', width=width, height=height, x_off=x_offset, y_off=y_offset).output(self.cache_path).run()
 
     def overlay(self, media):
         pass
