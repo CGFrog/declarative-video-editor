@@ -1,4 +1,5 @@
 import tkinter as tk
+from ui.TextEditor import textEditor
 
 class Window:
     def __init__(self):
@@ -22,6 +23,11 @@ class Window:
     def textEditorView(self):
         self.left_frame = tk.Frame(self.main_frame, bg="BLUE")
         self.left_frame.grid(row=0, rowspan=2, column=0, sticky="nsew")
+        self.left_frame.rowconfigure(0, weight=1)
+        self.left_frame.columnconfigure(0, weight=1)
+
+        self.editor = textEditor(self.left_frame)
+        self.editor.textEditorView()
         # create and initialize text box and other elements from textEditor class
 
     def videoDisplayView(self):
