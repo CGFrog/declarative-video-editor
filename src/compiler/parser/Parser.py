@@ -92,15 +92,21 @@ class Parser():
 
     def __get_nest_termination_index(self, tokens: list[Token], current_index, termination_symbol: TL)-> int:
         """
-        Helper function that determines 
-        
+        Helper function that determines the final index of the internals of parenthesis of brackets.        
         """
         for t in range(current_index+1, len(tokens)):
             if tokens[t].key == termination_symbol:
                 return t
         raise Exception("Missing right parenthesis")
 
-    def __parse_parenthesis(self, tokens : list[Token], current_operator : TL | None):
+def __parse_parenthesis(self, tokens : list[Token], current_operator : TL | None):
+        """
+        Helper function that returns the clean values of the parenthesis internals:
+        <ul>
+            <li> Time duration </li>
+            <li> Effect parameter </li>
+        </ul>        
+        """
         match current_operator:
             case None:
                 raise Exception(f"No valid operator found after parenthesis.")
