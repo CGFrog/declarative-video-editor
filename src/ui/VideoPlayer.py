@@ -1,10 +1,12 @@
 import tkinter as tk
-from tkVideoPlayer import TkinterVideo
+import vlc
 
 class VideoPlayer:
     def __init__(self, parent_frame):
-        self.parent_frame = parent_frame
+        self.instance = vlc.Instance()
+        self.player = self.instance.media_player_new()
 
+        self.parent_frame = parent_frame
         self.parent_frame.rowconfigure(0, weight=1)
         self.parent_frame.rowconfigure(1, weight=0)
         self.parent_frame.columnconfigure(0, weight=1)
@@ -18,16 +20,10 @@ class VideoPlayer:
         self.build_ui()
 
     def build_ui(self):
-        if TkinterVideo is None:
-            self.status_label = tk.Label(
-                self.parent_frame,
-                text="tkVideoPlayer is not installed."
-            )
-            self.status_label.grid(row=0, column=0, sticky="nsew")
-            return
-
-        self.video_widget = TkinterVideo(self.parent_frame, scaled=True)
+        self.video_widget = tk.Frame(self.parent_frame, bg="black")
         self.video_widget.grid(row=0, column=0, sticky="nsew")
+
+        # SOLUTION ONLY WORKS ON WINDOWS RN
 
         controls_frame = tk.Frame(self.parent_frame)
         controls_frame.grid(row=1, column=0, sticky="ew")
@@ -35,6 +31,8 @@ class VideoPlayer:
         controls_frame.columnconfigure(0, weight=1)
         controls_frame.columnconfigure(1, weight=1)
         controls_frame.columnconfigure(2, weight=1)
+
+        #self.player.set_hwnd(controls_frame.winfo_id())
 
         self.play_button = tk.Button(controls_frame, text="Play", command=self.play)
         self.play_button.grid(row=0, column=0, sticky="ew")
@@ -46,17 +44,14 @@ class VideoPlayer:
         self.stop_button.grid(row=0, column=2, sticky="ew")
 
     def load(self, file_path):
-        if self.video_widget is not None:
-            self.video_widget.load(file_path)
+        media = self.instance.media_new(file_path)
+        self.player.set_media(media)
 
     def play(self):
-        if self.video_widget is not None:
-            self.video_widget.play()
+        self.player.play()
 
     def pause(self):
-        if self.video_widget is not None:
-            self.video_widget.pause()
+        self.player.pause()
 
     def stop(self):
-        if self.video_widget is not None:
-            self.video_widget.stop()
+        self.player.stop()

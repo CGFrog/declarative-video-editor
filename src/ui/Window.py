@@ -1,5 +1,5 @@
 import tkinter as tk
-from VideoPlayer import VideoPlayer
+from .VideoPlayer import VideoPlayer
 
 class Window:
     def __init__(self):
