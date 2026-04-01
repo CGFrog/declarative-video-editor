@@ -1,6 +1,8 @@
 from lexer.Lexer import Lexer
 from lexer.Token import Token
 from lexer.Token import TokenLabel as TL
+from StateVariable import StateVariable
+from TimelineVariable import TimelineVariable
 
 class Parser():
     def __init__(self, lexer : Lexer):
@@ -36,10 +38,9 @@ class Parser():
                     break
 
                 case TL.RENDER:
-                    self.__parse_render()
+                    self.__parse_render(tokens)
                     # signal to compiler we are ready to compile the video.
                     break
-            
             self.line_number += 1
 
     def __parse_render(self, tokens: list[Token]):
@@ -61,8 +62,9 @@ class Parser():
             <li> Unions </li>
             <li> Trims </li>
             <li> Effects </li>
-        </ul> 
-        onto the specific media object.        
+        </ul>
+
+        returns StateVariable        
         """
         index : int = 0
         current_operator : TL | None = None
@@ -99,25 +101,25 @@ class Parser():
                 return t
         raise Exception("Missing right parenthesis")
 
-def __parse_parenthesis(self, tokens : list[Token], current_operator : TL | None):
-        """
-        Helper function that returns the clean values of the parenthesis internals:
-        <ul>
-            <li> Time duration </li>
-            <li> Effect parameter </li>
-        </ul>        
-        """
-        match current_operator:
-            case None:
-                raise Exception(f"No valid operator found after parenthesis.")
-            case TL.UNION:
-                return self.__construct_time(tokens)
-            case TL.DEFINITION:
-                return self.__construct_time(tokens)
-            case TL.FUNC_COMP:    
-                return self.__construct_function_input(tokens)
-            
-    def __construct_time(self, tokens : list[Token]):
+    def __parse_parenthesis(self, tokens : list[Token], current_operator : TL | None):
+            """
+            Helper function that returns the clean values of the parenthesis internals:
+            <ul>
+                <li> Time duration </li>
+                <li> Effect parameter </li>
+            </ul>        
+            """
+            match current_operator:
+                case None:
+                    raise Exception(f"No valid operator found after parenthesis.")
+                case TL.UNION:
+                    return self.__construct_time(tokens)
+                case TL.DEFINITION:
+                    return self.__construct_time(tokens)
+                case TL.FUNC_COMP:    
+                    return self.__construct_function_input(tokens)
+                
+    def __construct_time(self, tokens : list[Token])->str:
         return "".join([t.value for t in tokens])
 
     def __construct_function_input(self, tokens : list[Token]):
