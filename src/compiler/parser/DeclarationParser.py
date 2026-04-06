@@ -8,16 +8,18 @@ class DeclarationParser():
         self.state: dict = {} # Holds all media variables, i.e. videos, audio, and images, as well as their attributes such as effects applied and durations.
         self.line_number : int = 1
 
-    def parse_source(self, lines_of_tokens):
+    def parse_source(self, lines_of_tokens : list[list[Token]]):
         for tokens in lines_of_tokens:
+            print(self.line_number)
             if len(tokens) == 0:
                 continue
             
-            token = tokens[0].key
+            token: TL = tokens[0].key
             match token:
                 case TL.MEDIA:
                     if tokens[1].key != TL.IDENTIFIER: 
                         raise Exception(f"Invalid identifier after type declaration.")
+                    print(tokens[1].value)
                     self.state[tokens[1].value] = self.__parse_media(tokens)
                     break
             self.line_number += 1
