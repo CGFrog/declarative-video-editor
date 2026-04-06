@@ -36,6 +36,7 @@ class Parser():
         # generate state step here
         # generate timeline step here
 
+# Test Case
 def main():
     source_code =   """video intro = \"intro.mp4\" (0,e) |> saturation(3) |> speed(1.5)
                     audio music = \"music.mp3\" (0,e) |> volume(2) |> noise_filter(-60)
