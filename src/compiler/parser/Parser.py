@@ -32,7 +32,10 @@ class Parser():
                 timeline_tokens.append(tokens)
             self.line_number += 1
 
-        declaration_parser = DeclarationParser(declaration_tokens)
-        timeline_parser = TimelineParser(timeline_tokens)
+        declaration_parser = DeclarationParser()
+        timeline_parser = TimelineParser()
 
-        declaration_parser.parse_source()
+        self.state = declaration_parser.parse_source(declaration_tokens)
+        # generate state step here
+        # generate timeline step here
+        

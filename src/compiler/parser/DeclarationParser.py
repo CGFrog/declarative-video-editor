@@ -23,9 +23,10 @@ class DeclarationParser():
                 case TL.MEDIA:
                     if tokens[1].key != TL.IDENTIFIER: 
                         raise Exception(f"Invalid identifier after type declaration.")
-                    self.state[tokens[1].value] =  self.__parse_media(tokens)
+                    self.state[tokens[1].value] = self.__parse_media(tokens)
                     break
             self.line_number += 1
+        return self.state
 
     def __parse_media(self, tokens : list[Token]):
         """
