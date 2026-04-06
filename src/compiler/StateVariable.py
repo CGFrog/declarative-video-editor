@@ -1,9 +1,9 @@
 from src.compiler.Effect import Effect
 
 class Clip:
-    def __init__(self, path : str, duration : str):
+    def __init__(self, path : str, duration : list[str]):
         self.path: str = path
-        self.duration: str = duration
+        self.duration: list[int] = duration
 
 class StateVariable:
         def __init__(self):

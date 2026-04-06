@@ -18,7 +18,6 @@ class Parser():
         timeline_tokens = []
         timeline_index = 0
         for line in lines_of_code:
-            print(line)
             lexer : Lexer = Lexer()
             tokens = lexer.build_tokens(line)
             if len(tokens) == 0:
@@ -53,7 +52,14 @@ def main():
                     render \"lets_play.mp4\" [1920,1080]"""
     parser = Parser()
     parser.parse_source(source_code)
-    print(parser.state)
+    for name in parser.state.keys():
+        print(f"Name = {name}: ")
+        print("Clips")
+        for clip in parser.state[name].clips:
+            print(f"    Path: {clip.path}, Duration: {clip.duration}")
+        print("Effects")
+        for effect in parser.state[name].effects:
+            print(f"    Type: {effect.type}, Params: {effect.param}")
 
 if __name__ == '__main__':
     main()

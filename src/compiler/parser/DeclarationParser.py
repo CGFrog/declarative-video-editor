@@ -14,12 +14,10 @@ class DeclarationParser():
                 continue
             
             token: TL = tokens[0].key
-            print(tokens[0].value)
             match token:
                 case TL.MEDIA:
                     if tokens[1].key != TL.IDENTIFIER: 
                         raise Exception(f"Invalid identifier after type declaration.")
-                    print(tokens[1].value)
                     self.state.update({tokens[1].value : self.__parse_media(tokens)})
             self.line_number += 1
         return self.state
@@ -39,12 +37,12 @@ class DeclarationParser():
         start_of_def: int = self.__first_of_token(tokens, TL.DEFINITION)
         start_of_func: int = self.__first_of_token(tokens,TL.FUNC_COMP)
 
-        state_var.clips = self.__generate_clips(tokens[start_of_def:start_of_func-1:])
+        state_var.clips = self.__generate_clips(tokens[start_of_def:start_of_func:])
         state_var.effects = self.__generate_effects(tokens[start_of_func::])
         return state_var
     
-    def __first_of_token(self, tokens: list[Token], token: TL):
-        for (i, t) in enumerate(tokens, 0):
+    def __first_of_token(self, tokens: list[Token], token: TL)-> int:
+        for (i, t) in enumerate(tokens, start=0):
             if t.key == token:
                 return i
         return len(tokens)
@@ -59,7 +57,7 @@ class DeclarationParser():
                     input_len: int = self.__first_of_token(tokens[index::], TL.RPAREN)
                     if input_len < 0:
                         raise(Exception(f"Invalid function composition on {self.line_number}"))
-                    effects.append(Effect(token.value, self.__extract_function_parameters(tokens[index+1:input_len:])))
+                    effects.append(Effect(token.value, self.__extract_function_parameters(tokens[index+1:index+ input_len:])))
                     index=input_len
                     break
             index+=1
@@ -76,20 +74,21 @@ class DeclarationParser():
         index : int = 0
         clips: list[Clip] = []
         path: str = ""
+    
+
         while index < len(tokens):
             token = tokens[index]
             match token.key:
                 case TL.DEFINITION:
                     path = token.value
-                    break
                 case TL.LPAREN:
-                    rparen = self.__first_of_token(tokens[index::], TL.RPAREN)
-                    duration = self.__extract_duration(tokens[index:rparen:])
+                    rparen: int = self.__first_of_token(tokens[index+1::], TL.RPAREN)
+                    duration: list[str] = self.__extract_duration(tokens[index+1:index + rparen+1:]).split(',')
                     clips.append(Clip(path, duration))
-                    index = rparen
+                    index = index + rparen
             index += 1
         return clips
     
-    def __extract_duration(self, tokens: list[Token]):
+    def __extract_duration(self, tokens: list[Token])-> str:
         return "".join(t.value for t in tokens)
     
