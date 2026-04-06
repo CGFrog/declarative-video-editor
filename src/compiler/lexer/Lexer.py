@@ -54,11 +54,10 @@ class Lexer():
 
     def __build_num(self):
         num = ''
-        assert(self.current_char is not None)
-        while self.current_char.isdigit() or self.current_char == '-' or self.current_char == '.':
+        
+        while self.current_char != None and (self.current_char.isdigit() or self.current_char == '-' or self.current_char == '.'):
             num += self.current_char
             self.__forward()
-
         return Token(TL.NUMBER, num)
     
     def __build_word(self):

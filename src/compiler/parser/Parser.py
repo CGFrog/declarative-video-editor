@@ -23,7 +23,6 @@ class Parser():
             tokens = lexer.build_tokens(line)
             if len(tokens) == 0:
                 continue
-            print(line)
             if tokens[0].key == TL.TIMELINE:
                 timeline_index = self.line_number
             elif timeline_index == 0:
@@ -35,7 +34,6 @@ class Parser():
         declaration_parser = DeclarationParser()
         # timeline_parser = TimelineParser()
         self.state = declaration_parser.parse_source(declaration_tokens)
-        print(len(declaration_tokens))
         # generate state step here
         # generate timeline step here
 
@@ -53,10 +51,10 @@ def main():
                     webcam_footage after intro 2
                     
                     render \"lets_play.mp4\" [1920,1080]"""
+
     parser = Parser()
     parser.parse_source(source_code)
     print(parser.state)
-
 
 if __name__ == '__main__':
     main()
