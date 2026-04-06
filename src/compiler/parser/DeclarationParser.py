@@ -10,18 +10,17 @@ class DeclarationParser():
 
     def parse_source(self, lines_of_tokens : list[list[Token]]):
         for tokens in lines_of_tokens:
-            print(self.line_number)
             if len(tokens) == 0:
                 continue
             
             token: TL = tokens[0].key
+            print(tokens[0].value)
             match token:
                 case TL.MEDIA:
                     if tokens[1].key != TL.IDENTIFIER: 
                         raise Exception(f"Invalid identifier after type declaration.")
                     print(tokens[1].value)
-                    self.state[tokens[1].value] = self.__parse_media(tokens)
-                    break
+                    self.state.update({tokens[1].value : self.__parse_media(tokens)})
             self.line_number += 1
         return self.state
 

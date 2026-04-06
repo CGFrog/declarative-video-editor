@@ -16,9 +16,9 @@ class Parser():
         lines_of_code = [i.strip() for i in lines_of_code]
         declaration_tokens: list[list[Token]] = []
         timeline_tokens = []
-
         timeline_index = 0
         for line in lines_of_code:
+            print(line)
             lexer : Lexer = Lexer()
             tokens = lexer.build_tokens(line)
             if len(tokens) == 0:
@@ -51,7 +51,6 @@ def main():
                     webcam_footage after intro 2
                     
                     render \"lets_play.mp4\" [1920,1080]"""
-
     parser = Parser()
     parser.parse_source(source_code)
     print(parser.state)
