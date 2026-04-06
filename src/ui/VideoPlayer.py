@@ -106,14 +106,14 @@ class VideoPlayer:
 
         self.setVideoOutput()
         self.player.play()
-        self.file_label.config(text="Playing")
+        #self.file_label.config(text="Playing")
 
     def pause(self):
         if self.player.get_media() is None:
             return
 
         self.player.pause()
-        self.file_label.config(text="Paused")
+        #self.file_label.config(text="Paused")
 
     def stop(self):
         if self.player.get_media() is None:
@@ -122,7 +122,7 @@ class VideoPlayer:
         self.player.stop()
         self.progress_scale.set(0)
         self.time_label.config(text="00:00 / 00:00")
-        self.file_label.config(text="Stopped")
+        #self.file_label.config(text="Stopped")
 
     def on_progress_press(self, event):
         self.is_dragging_progress = True
