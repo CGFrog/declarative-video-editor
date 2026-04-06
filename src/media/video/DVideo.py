@@ -24,11 +24,12 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         v2 = ffmpeg.input(media.cache_path)
 
         # Grab audio and video streams from V1 and V2 --> Concatenate them!
-        joined = ffmpeg.concat(v1.video, v1.audio, v2.video, v2.audio, v=1, a=1).node
+        v3 = ffmpeg.concat(v1.video, v1.audio, v2.video, v2.audio, v=1, a=1).node
 
         # Output final video
-
         ffmpeg.output(v3[0], v3[1], self.cache_path).run()
+
+        self.cache_path = new_version_path
 
     def location(self, new_x : float, new_y : float, resolution_w : float, resolution_h : float):
         """
@@ -93,5 +94,5 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             .run()
         )
 
-        self_cache_path = new_version_path
+        self.cache_path = new_version_path
 
