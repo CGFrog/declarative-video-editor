@@ -1,3 +1,3 @@
 class TimelineParser():
-    def __init__(self, tokens):
+    def __init__(self):
         pass
