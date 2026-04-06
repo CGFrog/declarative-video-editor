@@ -27,16 +27,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         joined = ffmpeg.concat(v1.video, v1.audio, v2.video, v2.audio, v=1, a=1).node
 
         # Output final video
-<<<<<<< HEAD
-        (
-            ffmpeg
-            .output(joined[0], joined[1], new_version_path)
-            .run()
-        )
-        
-        self.cache_path = new_version_path
-        
-=======
+
         ffmpeg.output(v3[0], v3[1], self.cache_path).run()
 
     def location(self, new_x : float, new_y : float, resolution_w : float, resolution_h : float):
@@ -77,7 +68,6 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             y_offset: amount of pixels to crop from the y-axis
         """
         ffmpeg.input(self.cache_path).filter('crop', width=width, height=height, x_off=x_offset, y_off=y_offset).output(self.cache_path).run()
->>>>>>> f599f4dcbbece2222bb866d59f8b5cdab743d24c
 
     def overlay(self, media):
         pass
@@ -104,3 +94,4 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         )
 
         self_cache_path = new_version_path
+
