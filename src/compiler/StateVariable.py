@@ -1,10 +1,15 @@
 from Effect import Effect
 
+class Clip:
+    def __init__(self, path : str, duration : str):
+        self.path: str = path
+        self.duration: str = duration
+
 class StateVariable:
-        def __init__(self, clip: tuple):
+        def __init__(self):
             self.effects: list[Effect] = []
-            self.clips = clip 
-            self.duration: list[str] | None = None 
+            self.clips: list[Clip] = []
+            self.duration: list[str] = [] 
 
         def add_effect(self, effect):
             self.effects.append(effect)
