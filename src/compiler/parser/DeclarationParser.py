@@ -1,12 +1,7 @@
-from token import NUMBER
-
-from torch import clip
-
-from compiler import Effect
-from lexer.Lexer import Lexer
-from lexer.Token import Token
-from lexer.Token import TokenLabel as TL
-from StateVariable import Clip, StateVariable, Effect
+from src.compiler.lexer.Token import Token
+from src.compiler.lexer.Token import TokenLabel as TL
+from src.compiler.StateVariable import Clip, StateVariable
+from src.compiler.Effect import Effect
 
 class DeclarationParser():
     def __init__(self):

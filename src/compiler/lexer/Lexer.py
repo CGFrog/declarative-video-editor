@@ -1,5 +1,5 @@
-from Token import TokenLabel as TL
-from Token import Token
+from src.compiler.lexer.Token import TokenLabel as TL
+from src.compiler.lexer.Token import Token
 
 # --- Single character symbols used in our language --- #
 symbols = {

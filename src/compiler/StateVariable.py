@@ -1,4 +1,4 @@
-from Effect import Effect
+from src.compiler.Effect import Effect
 
 class Clip:
     def __init__(self, path : str, duration : str):

@@ -1,9 +1,7 @@
-from compiler.lexer.Lexer import Lexer
-from compiler.parser.TimelineParser import TimelineParser
-from compiler.parser.DeclarationParser import DeclarationParser
-from compiler.lexer.Token import Token
-from compiler.lexer.Token import TokenLabel as TL
-
+from src.compiler.lexer.Lexer import Lexer
+from src.compiler.parser.DeclarationParser import DeclarationParser
+from src.compiler.lexer.Token import Token
+from src.compiler.lexer.Token import TokenLabel as TL
 class Parser():
     def __init__(self, lexer : Lexer):
         self.lexer : Lexer = lexer
@@ -13,7 +11,7 @@ class Parser():
 
     def parse_source(self, source_code : str):
         lines_of_code : list[str] = source_code.splitlines()
-        declaration_tokens = []
+        declaration_tokens: list[list[Token]] = []
         timeline_tokens = []
 
         timeline_index = 0
