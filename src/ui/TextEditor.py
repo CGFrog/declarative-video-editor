@@ -1,11 +1,11 @@
 import tkinter as tk
 
 # blue window in left half of screen with text editor.
-class textEditor:
+class TextEditor:
     def __init__(self, parent):
         self.parent = parent
 
-    def textEditorView(self):
+    def TextEditorView(self):
         self.main_frame = tk.Frame(self.parent, bg="white")
         self.main_frame.grid(row=0, column=0, sticky="nsew")
 
@@ -15,7 +15,11 @@ class textEditor:
         self.main_frame.rowconfigure(0, weight=1)
         self.main_frame.columnconfigure(1, weight=1)
 
-        # Line numbers
+        self._lineNumbers()
+        self._scrollbar()
+        
+
+    def _lineNumbers(self):  
         self.line_numbers = tk.Text(
             self.main_frame,
             width=4,
@@ -25,7 +29,7 @@ class textEditor:
             background="lightgray",
             state="disabled",
             font=("Courier", 12),
-            wrap="none"
+            wrap="none",
         )
         self.line_numbers.grid(row=0, column=0, sticky="ns")
 
@@ -34,15 +38,15 @@ class textEditor:
             self.main_frame,
             font=("Courier", 12),
             wrap="none",
-            undo=True
+            undo=True,
         )
         self.text_editor.grid(row=0, column=1, sticky="nsew")
 
-        # Scrollbar
+    def _scrollbar(self):
         self.scrollbar = tk.Scrollbar(
             self.main_frame,
             orient="vertical",
-            command=self.on_scroll
+            command=self.on_scroll,
         )
         self.scrollbar.grid(row=0, column=2, sticky="ns")
 
@@ -56,7 +60,7 @@ class textEditor:
             padx=6,
             font=("Courier", 10),
             bg="lightgray",
-            fg="black"
+            fg="black",
         )
         self.status_bar.grid(row=1, column=0, columnspan=3, sticky="we")
 
@@ -114,16 +118,3 @@ class textEditor:
     def on_textscroll(self, *args):
         self.scrollbar.set(*args)
         self.line_numbers.yview_moveto(args[0])
-
-    def run(self):
-        self.root = tk.Tk()
-        self.root.title("Text Editor")
-        self.root.geometry("400x300")
-        self.root.rowconfigure(0, weight=1)
-        self.root.columnconfigure(0, weight=1)
-        self.textEditorView()
-        self.root.mainloop()
-
-if __name__ == "__main__":
-    editor = textEditor(None)
-    editor.run()
