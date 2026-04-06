@@ -60,6 +60,7 @@ class DeclarationParser():
                     effects.append(Effect(token.value, self.__extract_function_parameters(tokens[index+1:index+ input_len:])))
                     index=input_len+ index
             index+=1
+        effects.reverse()
         return effects
     
     def __extract_function_parameters(self, tokens: list[Token]) ->list:
