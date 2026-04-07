@@ -18,7 +18,7 @@ class LexerUnitTest():
 if __name__ == "__main__":
     ut = LexerUnitTest()
 
-    with open('tests\lexer\LexerTests.yml', 'r') as file:
+    with open('tests/lexer/LexerTests.yml', 'r') as file:
         data = yaml.safe_load(file)
         last_test = next(reversed(data))
         last_test_num = int("".join(filter(str.isdigit, last_test)))
