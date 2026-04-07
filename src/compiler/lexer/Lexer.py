@@ -30,7 +30,7 @@ labels = {
 }
 
 # Import token class
-from Token import Token
+from src.compiler.lexer.Token import Token
 
 class Lexer():
 
@@ -53,7 +53,7 @@ class Lexer():
 
     def build_num(self):
         num = ''
-        while self.current_char.isdigit() or self.current_char == '-' or self.current_char == '.':
+        while self.current_char != None and (self.current_char.isdigit() or self.current_char == '-' or self.current_char == '.'):
             num += self.current_char
             self.forward()
 
