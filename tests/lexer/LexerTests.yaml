@@ -1,0 +1,31 @@
+test1: 'video intro = "intro.mp4" (0,e) |> saturation(3) |> speed(1.5)'
+expected1: 
+  - '(TYPE, video)'
+  - '(IDENTIFIER, intro)'
+  - '(ASSIGN, =)'
+  - '(DEFINITION, "intro.mp4")'
+  - '(LPAREN, ()'
+  - '(NUMBER, 0)'
+  - '(COMMA, ,)'
+  - '(END_OF_VID, e)'
+  - '(RPAREN, ))'
+  - '(FUNC_COMP, |>)'
+  - '(EFFECT, saturation)'
+  - '(LPAREN, ()'
+  - '(NUMBER, 3)'
+  - '(RPAREN, ))'
+  - '(FUNC_COMP, |>)'
+  - '(EFFECT, speed)'
+  - '(LPAREN, ()'
+  - '(NUMBER, 1.5)'
+  - '(RPAREN, ))'
+  - '(END_OF_LINE, )'
+
+test2: 'video webcam_footage = "webcam_footage.mp4" (0,30) + (35,49) |> transform(1000,320) |> scale(0.2,0.2)'
+expected2:
+
+test3: 'game_footage after intro 1'
+expected3:
+
+test4: 'render "lets_play.mp4" [1920,1080]'
+expected4:

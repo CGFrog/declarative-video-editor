@@ -1,3 +1,5 @@
+import yaml
+
 from src.compiler.lexer.Lexer import Lexer
 
 lines_to_test = [
@@ -12,19 +14,20 @@ class LexerUnitTest():
     def __init__(self):
         pass
 
-    def run_tests(self, lines_to_test):
+    def run_tests(self, line):
         output_stream = []
-        for i, line in enumerate(lines_to_test):
-            print(f"RUNNING LINE {i+1}: {line}\n")
-            lexer = Lexer(line)
-            token_stream = lexer.build_tokens();
-            for token in token_stream:
-                output_stream.append(token.toString())
-                #print(token.toString())
-            print("-------------------------\n")
+        print(f"RUNNING LINE {line}\n")
+        lexer = Lexer(line)
+        token_stream = lexer.build_tokens();
+        for token in token_stream:
+            output_stream.append(token.toString())
         
         return output_stream
 
 if __name__ == "__main__":
     ut = LexerUnitTest()
-    print(ut.run_tests(lines_to_test))
+
+    with open('tests\lexer\LexerTests.yaml', 'r') as file:
+        data = yaml.safe_load(file)
+        print(data)
+        #print(ut.run_tests(lines_to_test[0]))
