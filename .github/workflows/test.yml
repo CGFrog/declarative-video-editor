@@ -23,4 +23,4 @@ jobs:
         run: pip install pyyaml
 
       - name: Run Tests
-        run: python tests/lexer/LexerUnitTest.py # Unit test script
+        run: python -m tests.lexer.LexerUnitTest # Unit test script
