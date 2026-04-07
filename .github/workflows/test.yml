@@ -1,0 +1,26 @@
+name: Run Tests
+
+on:
+  push:
+    paths: # Only trigger when changes are made to these files:
+      - 'src\compiler\lexer\Token.py'
+      - 'src\compiler\lexer\Lexer.py'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install yaml reader
+        run: pip install pyyaml
+
+      - name: Run Tests
+        run: python tests\lexer\LexerUnitTest.py # Unit test script
