@@ -3,8 +3,8 @@ name: Run Tests
 on:
   push:
     paths: # Only trigger when changes are made to these files:
-      - 'src\compiler\lexer\Token.py'
-      - 'src\compiler\lexer\Lexer.py'
+      - 'src/compiler/lexer/Token.py'
+      - 'src/compiler/lexer/Lexer.py'
 
 jobs:
   test:
