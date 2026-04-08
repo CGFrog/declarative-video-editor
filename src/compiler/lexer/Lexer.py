@@ -25,7 +25,6 @@ labels = {
     'volume': 'EFFECT',
     'speed': 'EFFECT',
     'timeline': 'KEYWORD',
-    'after': 'KEYWORD',
     'render': 'KEYWORD'
 }
 
