@@ -119,9 +119,9 @@ class Lexer():
 
 # --- Test Usage --- #
 if __name__ == '__main__':
-    text_input = 'video intro = "intro.mp4" (1:45.33,e) |> saturation(3) |> speed(1.5)'
+    text_input = 'render "file.mp4" [1920,1080]'
     lex = Lexer()
     # token_stream = lex.build_tokens(text=text_input)
-    token_stream = lex.build_tokens(text='video game_footage = "game_footage.mp4" (0,30) + (35,49)')
+    token_stream = lex.build_tokens(text='render "file.mp4" [1920,1080]')
     for token in token_stream:
         print(token.toString())

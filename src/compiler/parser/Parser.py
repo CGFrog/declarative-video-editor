@@ -4,11 +4,15 @@ from src.compiler.parser.DeclarationParser import DeclarationParser
 from src.compiler.lexer.Token import Token
 from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.StateVariable import StateVariable
+from src.compiler.parser.TimelineElement import TimelineElement
 
+
+
+from src.compiler.parser.TimelineParser import TimelineParser
 class Parser():
     def __init__(self):
         self.state: dict[str,StateVariable] = {} # Holds all media variables, i.e. videos, audio, and images, as well as their attributes such as effects applied and durations.
-        self.timeline : dict = {} # Tells the compiler how to organize our video.
+        self.timeline : list[TimelineElement] = [] # Tells the compiler how to organize our video.
         self.line_number : int = 1
 
     def parse_source(self, source_code : str):
@@ -31,8 +35,16 @@ class Parser():
             self.line_number += 1
 
         declaration_parser = DeclarationParser()
-        # timeline_parser = TimelineParser()
-        self.state = declaration_parser.parse_source(declaration_tokens)
+        timeline_parser = TimelineParser()
+
+        declaration_parser.parse_source(declaration_tokens)
+        timeline_parser.parse_source(timeline_tokens)
+
+        self.state = declaration_parser.state
+        self.timeline = timeline_parser.timeline_elements
+
+
+
         # generate state step here
         # generate timeline step here
 

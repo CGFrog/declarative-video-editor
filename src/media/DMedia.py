@@ -14,17 +14,18 @@ class DMedia():
     def __init__(self, name : str, file_path : str) -> None:
         self.name = name
         self.file_path = file_path
+        self.duration: str = ""
         self.cache_path = f"cache/name_{uuid.uuid4()}.mp4"
         ffmpeg.input(self.file_path).output(self.cache_path).run()
     
-    @abc.abstractclassmethod
+    @classmethod
     def trim(self, time1, time2)->None:
         pass
 
-    @abc.abstractclassmethod
+    @classmethod
     def union(self, media)->None:
         pass
 
-    @abc.abstractclassmethod
+    @classmethod
     def overlay(self, media)->None:
         pass

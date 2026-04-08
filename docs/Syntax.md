@@ -72,7 +72,6 @@ audio music = "music.mp3" (0,e) |> volume(2) |> noise_filter(-60)
 video game_footage = "game_footage.mp4" (0,30) + (35,49)
 video webcam_footage = "webcam_footage.mp4" (0,30) + (35,49) |> transform(1000,320) |> scale(0.2,0.2)
 
-
 timeline
 intro 0 1
 game_footage after intro 1
