@@ -9,7 +9,6 @@ class Menu(tk.Menu):
         file_menu = tk.Menu(menu, tearoff=0)
 
         file_menu.add_command(label="Open", command=self.open)
-        file_menu.add_separator()
         file_menu.add_command(label="Save", command=self.save)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.quit)
