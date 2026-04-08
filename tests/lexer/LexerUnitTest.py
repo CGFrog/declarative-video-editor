@@ -87,8 +87,8 @@ class LexerUnitTest():
 
     def get_token_stream(self, line : str):
         output_stream = []
-        lexer = Lexer(line)
-        token_stream = lexer.build_tokens();
+        lexer = Lexer()
+        token_stream = lexer.build_tokens(line);
         for token in token_stream:
             output_stream.append(token.toString())
         
