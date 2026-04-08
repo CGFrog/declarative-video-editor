@@ -25,10 +25,9 @@ class Window:
         self.left_frame.grid(row=0, rowspan=2, column=0, sticky="nsew")
         self.left_frame.rowconfigure(0, weight=1)
         self.left_frame.columnconfigure(0, weight=1)
-
+        # create and initialize text box and other elements from textEditor class
         self.editor = TextEditor(self.left_frame)
         self.editor.TextEditorView()
-        # create and initialize text box and other elements from textEditor class
 
     def videoDisplayView(self):
         self.right_frame = tk.Frame(self.main_frame, bg="GREEN")
