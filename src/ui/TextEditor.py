@@ -1,9 +1,11 @@
 import tkinter as tk
+from tkinter import filedialog, messagebox
 
 # blue window in left half of screen with text editor.
 class TextEditor:
     def __init__(self, parent):
         self.parent = parent
+        self.current_file = None
 
     def TextEditorView(self):
         self.main_frame = tk.Frame(self.parent, bg="white")
@@ -17,7 +19,7 @@ class TextEditor:
 
         self._lineNumbers()
         self._scrollbar()
-        
+        self._bind_shortcuts()
 
     def _lineNumbers(self):  
         self.line_numbers = tk.Text(
@@ -78,6 +80,13 @@ class TextEditor:
         self.text_editor.bind("<Button-5>", self.on_update)
 
         self.update_line_numbers()
+        self.highlight_current_line()
+        self.update_status_bar()
+
+    def _bind_shortcuts(self):
+        self.text_editor.bind("<Control-s>", self.save_file)
+        self.text_editor.bind("<Control-o>", self.open_file)
+        self.text_editor.bind("<Control-S>", self.save_file_as)
 
     def on_update(self, event=None):
         self.update_line_numbers()
@@ -107,8 +116,10 @@ class TextEditor:
         content = self.text_editor.get("1.0", "end-1c")
         words = len(content.split()) if content.strip() else 0
 
+        file_name = self.current_file if self.current_file else "Untitled"
+
         self.status_bar.config(
-            text=f"Ln {line} | Col {column} | Words: {words}"
+            text=f"{file_name} | Ln {line} | Col {column} | Words: {words}"
         )
 
     def on_scroll(self, *args):
@@ -118,3 +129,53 @@ class TextEditor:
     def on_textscroll(self, *args):
         self.scrollbar.set(*args)
         self.line_numbers.yview_moveto(args[0])
+
+    def save_File(self, event=None):
+        if self.current_file:
+            try:
+                with open(self.current_file, "w", encoding="utf-8") as f:
+                    content = self.text_editor.get("1.0", "end-1c")
+                    f.write(content)
+                messagebox.showinfo("Save File", "File saved successfully.")
+            except Exception as e:
+                messagebox.showerror("Save File", f"Error saving file: {e}")
+        else:
+            self.save_file_as()
+
+        return "break"  # Prevent default behavior
+
+    def save_File_As(self, event=None):
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".txt",
+            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")],
+        )
+        if file_path:
+            try:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    content = self.text_editor.get("1.0", "end-1c")
+                    f.write(content)
+                self.current_file = file_path
+                messagebox.showinfo("Save File As", "File saved successfully.")
+            except Exception as e:
+                messagebox.showerror("Save File As", f"Error saving file: {e}")
+
+        return "break"  # Prevent default behavior
+    
+    def open_file(self, event=None):
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+        )
+        if file_path:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                self.text_editor.delete("1.0", "end")
+                self.text_editor.insert("1.0", content)
+                self.current_file = file_path
+                self.update_line_numbers()
+                self.update_status_bar()
+                messagebox.showinfo("Open File", "File opened successfully.")
+            except Exception as e:
+                messagebox.showerror("Open File", f"Error opening file: {e}")
+
+        return "break"  # Prevent default behavior
