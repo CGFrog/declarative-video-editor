@@ -85,7 +85,7 @@ class LexerUnitTest():
     def __init__(self):
         pass
 
-    def get_token_stream(self, line):
+    def get_token_stream(self, line : str):
         output_stream = []
         lexer = Lexer(line)
         token_stream = lexer.build_tokens();
@@ -94,7 +94,7 @@ class LexerUnitTest():
         
         return output_stream
     
-    def get_test(self, test_num):
+    def get_test(self, test_num : int):
         match test_num:
             case 1: 
                 input_line = test1
@@ -114,9 +114,10 @@ class LexerUnitTest():
 
 if __name__ == "__main__":
 
-    test_num = sys.argv[1]
+    test_num : int = int(sys.argv[1])
     ut = LexerUnitTest()
     test_input, expected_output = ut.get_test(test_num)
     user_output = ut.get_token_stream(test_input)
 
     assert user_output == expected_output
+    print("TEST PASSED")
