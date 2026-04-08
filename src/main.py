@@ -1,6 +1,6 @@
 from ui.Window import Window
 
-#test
+
 def main()->None:
     window = Window()
     window.run()
