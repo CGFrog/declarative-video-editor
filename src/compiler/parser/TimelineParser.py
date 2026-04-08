@@ -24,8 +24,6 @@ class TimelineParser:
                 case TL.RENDER:
                     self.render_settings= self.__parse_render_line(tokens)
 
-
-
     def __parse_render_line(self, tokens : list[Token]):
         index: int = 0       
         params : tuple[str, str] | None = None 
@@ -36,8 +34,9 @@ class TimelineParser:
                     export_path = tokens[index].value
                 case TL.LBRACK:
                     rbrack: int = first_of_token(tokens[index + 1::], TL.RBRACK) + index
-                    render_params = extract_function_parameters(tokens[index + 1:rbrack:])
+                    render_params = extract_function_parameters(tokens[index + 1:rbrack+1:])
                     params = tuple(render_params)
+            index += 1
         if export_path == None or params == None:
             raise Exception("Invalid render settings specified.")
         return RenderSettings(export_path, params)
@@ -55,10 +54,10 @@ class TimelineParser:
                     if after:
                         z = token.value
                     else:
-                        if z=="":
-                            z = token.value
-                        else:
+                        if start_time=="":
                             start_time = token.value
+                        else:
+                            z= token.value
                 case TL.AFTER:
                     after = True
                     try:

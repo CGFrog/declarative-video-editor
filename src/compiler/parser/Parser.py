@@ -44,10 +44,6 @@ class Parser():
         self.timeline = timeline_parser.timeline_elements
 
 
-
-        # generate state step here
-        # generate timeline step here
-
 # Test Case
 def main():
     source_code =   """video intro = \"intro.mp4\" (0,e) |> saturation(3) |> speed(1.5)
@@ -67,12 +63,17 @@ def main():
     parser.parse_source(source_code)
     for name in parser.state.keys():
         print(f"Name = {name}: ")
+        
         print("Clips")
         for clip in parser.state[name].clips:
             print(f"    Path: {clip.path}, Duration: {clip.duration}")
+        
         print("Effects")
         for effect in parser.state[name].effects:
             print(f"    Type: {effect.type}, Params: {effect.param}")
-
+        
+        print("Timeline Parser")
+        for t in parser.timeline:
+            print(f"    Identifier: {t.identifier}, Start Time: {t.start_time}, z: {t.z}")
 if __name__ == '__main__':
     main()
