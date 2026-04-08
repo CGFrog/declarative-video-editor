@@ -119,5 +119,10 @@ if __name__ == "__main__":
     test_input, expected_output = ut.get_test(test_num)
     user_output = ut.get_token_stream(test_input)
 
+    print("\nTEST CASE:\n")
+    print(f"Input: {test_input}\n")
+    for token in user_output:
+        print(token)
+
     assert user_output == expected_output
-    print("TEST PASSED")
+    print("\nTEST PASSED")
