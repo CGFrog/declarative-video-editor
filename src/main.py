@@ -5,7 +5,6 @@ def main()->None:
     window = Window()
     window.run()
 
-
 try:
     if __name__ == "__main__":
         main()
