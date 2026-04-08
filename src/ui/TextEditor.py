@@ -130,7 +130,7 @@ class TextEditor:
         self.scrollbar.set(*args)
         self.line_numbers.yview_moveto(args[0])
 
-    def save_File(self, event=None):
+    def save_file(self, event=None):
         if self.current_file:
             try:
                 with open(self.current_file, "w", encoding="utf-8") as f:
@@ -142,12 +142,12 @@ class TextEditor:
         else:
             self.save_file_as()
 
-        return "break"  # Prevent default behavior
+        return "break"  # Prevents default behavior
 
-    def save_File_As(self, event=None):
+    def save_file_as(self, event=None):
         file_path = filedialog.asksaveasfilename(
-            defaultextension=".txt",
-            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")],
+            defaultextension=".DVEL",
+            filetypes=[("DVEL Files", "*.DVEL"), ("All Files", "*.*")],
         )
         if file_path:
             try:
