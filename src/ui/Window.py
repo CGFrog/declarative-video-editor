@@ -1,5 +1,6 @@
 import tkinter as tk
 from ui.TextEditor import TextEditor
+from ui.Menu import Menu
 
 class Window:
     def __init__(self):
@@ -10,6 +11,10 @@ class Window:
         self.root.geometry("400x300")
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
+
+    def createMenu(self):
+        self.menu = Menu(self.root)
+        self.root.config(menu=self.menu)
 
     def windowLayout(self):
         self.main_frame = tk.Frame(self.root, bg="YELLOW")
@@ -45,4 +50,5 @@ class Window:
         self.TextEditorView()
         self.videoDisplayView()
         self.consoleView()
+        self.createMenu()
         self.root.mainloop()
