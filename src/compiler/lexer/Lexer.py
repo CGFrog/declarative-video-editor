@@ -1,4 +1,4 @@
-# --- Single character symbols used in our language --- ##
+# --- Single character symbols used in our language --- #
 symbols = {
     '=': 'ASSIGN',
     '+': 'UNION',
@@ -25,6 +25,7 @@ labels = {
     'volume': 'EFFECT',
     'speed': 'EFFECT',
     'timeline': 'KEYWORD',
+    'after': 'KEYWORD',
     'render': 'KEYWORD'
 }
 
