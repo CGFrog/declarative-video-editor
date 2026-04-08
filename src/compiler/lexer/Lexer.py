@@ -34,6 +34,9 @@ labels = {
     'render': TL.RENDER
 }
 
+# Import token class
+from src.compiler.lexer.Token import Token
+
 class Lexer():
 
     def __init__(self):
@@ -54,7 +57,6 @@ class Lexer():
 
     def __build_num(self):
         num = ''
-        
         while self.current_char != None and (self.current_char.isdigit() or self.current_char == '-' or self.current_char == '.'):
             num += self.current_char
             self.__forward()
