@@ -1,0 +1,29 @@
+name: Run Lexer Tests
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Test Case 1
+        run: python -m tests.lexer.LexerUnitTest 1
+
+      - name: Run Test Case 2
+        run: python -m tests.lexer.LexerUnitTest 2
+
+      - name: Run Test Case 3
+        run: python -m tests.lexer.LexerUnitTest 3
+
+      - name: Run Test Case 4
+        run: python -m tests.lexer.LexerUnitTest 4
