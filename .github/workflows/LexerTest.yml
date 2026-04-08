@@ -1,4 +1,4 @@
-name: Run Tests
+name: Run Lexer Tests
 
 on:
   push:
@@ -19,8 +19,14 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install yaml reader
-        run: pip install pyyaml
+      - name: Run Test Case 1
+        run: python -m tests.lexer.LexerUnitTest 1
 
-      - name: Run Tests
-        run: python -m tests.lexer.LexerUnitTest # Unit test script
+      - name: Run Test Case 2
+        run: python -m tests.lexer.LexerUnitTest 2
+
+      - name: Run Test Case 3
+        run: python -m tests.lexer.LexerUnitTest 3
+
+      - name: Run Test Case 4
+        run: python -m tests.lexer.LexerUnitTest 4

@@ -1,4 +1,3 @@
-import yaml
 import sys
 from src.compiler.lexer.Lexer import Lexer
 
@@ -117,7 +116,7 @@ if __name__ == "__main__":
 
     test_num = sys.argv[1]
     ut = LexerUnitTest()
-    test_input, expected_output = ut.get_expected(test_num)
+    test_input, expected_output = ut.get_test(test_num)
     user_output = ut.get_token_stream(test_input)
 
     assert user_output == expected_output
