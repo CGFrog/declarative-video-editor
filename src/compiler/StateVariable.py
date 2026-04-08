@@ -3,7 +3,7 @@ from src.compiler.Effect import Effect
 class Clip:
     def __init__(self, path : str, duration : list[str]):
         self.path: str = path
-        self.duration: list[int] = duration
+        self.duration: list[str] = duration
 
 class StateVariable:
         def __init__(self):
