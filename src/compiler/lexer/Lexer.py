@@ -80,11 +80,12 @@ class Lexer():
         return Token(token_key, word)
     
     def __build_definition(self):
-        definition = ''
-        while self.current_char is not None and not self.current_char.isspace():
+        definition: str = ''
+        self.__forward()
+        while self.current_char is not None and not self.current_char.isspace() and not self.current_char =='"':
             definition += self.current_char
             self.__forward()
-
+        definition.removeprefix('"')
         return Token(TL.DEFINITION, definition)
     
     def build_tokens(self, text : str) -> list[Token]:
