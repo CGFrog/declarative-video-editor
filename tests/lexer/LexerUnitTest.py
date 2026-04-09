@@ -1,4 +1,3 @@
-from ast import compare
 import sys
 from src.compiler.lexer.Lexer import Lexer
 from src.compiler.lexer.Token import Token
