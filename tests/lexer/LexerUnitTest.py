@@ -82,8 +82,7 @@ expected4 = [
 ]
 
 test5='% This is a comment'
-expected5:list[Token] = []
-
+expected5:list[Token] = [Token(TL.END_OF_LINE, '')]
 
 def get_token_stream(line : str):
     return Lexer().build_tokens(line);
