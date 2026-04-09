@@ -27,3 +27,6 @@ jobs:
 
       - name: Run Test Case 4
         run: python -m tests.lexer.LexerUnitTest 4
+
+      - name: Run Test Case 5
+        run: python -m tests.parser.ParserTest 
