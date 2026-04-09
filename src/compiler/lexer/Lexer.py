@@ -93,7 +93,7 @@ class Lexer():
         self.text = text
         self.__forward()
 
-        while self.current_char is not None:
+        while self.current_char is not None and self.current_char != '%':
             if self.current_char.isspace(): # Check for space
                 self.__skip_space()
             elif self.current_char.isdigit() or self.current_char == '-': # Check for numbers (supports negatives)
