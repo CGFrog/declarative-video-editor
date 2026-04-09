@@ -106,6 +106,8 @@ def compare_output(stream1 : list[Token], stream2: list[Token])-> bool:
     if len(stream1) != len(stream2):
         return False
     for i, (t1, t2) in enumerate(zip(stream1, stream2)):
+        print(f"Expected: ({t1.key}, {t1.value})")
+        print(f"Got:      ({t2.key}, {t2.value})")
         if t1.value != t2.value:
             return False
         if t1.key != t2.key:
