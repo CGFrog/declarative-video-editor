@@ -1,7 +1,5 @@
-from src.compiler.StateVariable import StateVariable
 from src.compiler.lexer.Token import Token
 from src.compiler.lexer.Token import TokenLabel as TL
-from src.media.DMedia import DMedia
 from src.compiler.parser.ParsingUtils import first_of_token, extract_function_parameters
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.parser.RenderSettings import RenderSettings
