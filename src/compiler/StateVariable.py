@@ -5,14 +5,17 @@ class Clip:
         self.path: str = path
         self.duration: list[str] = duration
 
-class StateVariable:
-        def __init__(self):
-            self.effects: list[Effect] = []
-            self.clips: list[Clip] = []
-            self.duration: list[str] = [] 
+    def __eq__(self, other)-> bool:
+        if isinstance(other, Clip):
+            return self.path == other.path and self.duration == other.duration
+        return False
 
-        def add_effect(self, effect):
-            self.effects.append(effect)
-        
-        def set_duration(self, timestamp: str):
-            self.duration.append(timestamp)
+class StateVariable:
+    def __init__(self):
+        self.effects: list[Effect] = []
+        self.clips: list[Clip] = []
+
+    def __eq__(self, other)-> bool:
+        if isinstance(other, StateVariable):
+            return self.effects == other.effects and self.clips == other.clips
+        return False

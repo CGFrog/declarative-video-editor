@@ -24,10 +24,14 @@ class TokenLabel(Enum):
     AFTER = 21
 
 class Token():
-
     def __init__(self, key, value):
         self.key : TokenLabel = key
         self.value : str = value
 
     def toString(self):
         return f"({self.key}, {self.value})"
+    
+    def __eq__(self, other)->bool:
+        if isinstance(other, Token):
+            return self.key == other.key and self.value == other.value
+        return False
