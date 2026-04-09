@@ -81,7 +81,7 @@ class Lexer():
     
     def __build_definition(self):
         definition: str = ''
-        self.__forward()
+        self.__forward() # Assumes we enter build definition on some indicator token like "
         while self.current_char is not None and not self.current_char.isspace() and not self.current_char =='"':
             definition += self.current_char
             self.__forward()
