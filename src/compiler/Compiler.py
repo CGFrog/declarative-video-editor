@@ -12,4 +12,3 @@ def Compiler():
         folder_path.mkdir(parents=True, exist_ok=True)
         folder_path = Path("cache")
         folder_path.mkdir(parents=True, exist_ok=True)
-    
