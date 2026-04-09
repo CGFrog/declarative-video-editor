@@ -71,7 +71,7 @@ expected3 = [
 
 test4 = 'render "lets_play.mp4" [1920,1080]'
 expected4 = [
-    Token(TL.AFTER, 'render'),
+    Token(TL.RENDER, 'render'),
     Token(TL.DEFINITION, "lets_play.mp4"),
     Token(TL.LBRACK, '['),
     Token(TL.NUMBER, '1920'),
