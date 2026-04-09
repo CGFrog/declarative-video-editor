@@ -81,6 +81,10 @@ expected4 = [
     Token(TL.END_OF_LINE, '')
 ]
 
+test5='% This is a comment'
+expected5:list[Token] = []
+
+
 def get_token_stream(line : str):
     return Lexer().build_tokens(line);
     
@@ -98,6 +102,9 @@ def get_test(test_num : int):
         case 4: 
             input_line = test4
             expected_result = expected4
+        case 5:
+            input_line = test5
+            expected_result=expected5
         case _: raise Exception("Unknown Test")
 
     return input_line, expected_result
