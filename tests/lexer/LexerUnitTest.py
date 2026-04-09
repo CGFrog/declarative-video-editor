@@ -102,13 +102,13 @@ def get_test(test_num : int):
 
     return input_line, expected_result
 
-def compare_output(stream1, stream2)-> bool:
+def compare_output(stream1 : list[Token], stream2: list[Token])-> bool:
     if len(stream1) != len(stream2):
         return False
-    for i in range(len(stream1)):
-        if stream1[i].value != stream2[i].value:
+    for i, (t1, t2) in enumerate(zip(stream1, stream2)):
+        if t1.value != t2.value:
             return False
-        if stream1[i].key != stream2[i].key:
+        if t1.key != t2.key:
             return False
     return True
 
@@ -117,6 +117,5 @@ if __name__ == "__main__":
     test_num : int = int(sys.argv[1])
     test_input, expected_output = get_test(test_num)
     user_output = get_token_stream(test_input)
-
-    assert compare_output(expected_output, user_output) is True
+    assert compare_output(stream1=expected_output, stream2=user_output)
     print("\nTEST PASSED")
