@@ -1,3 +1,4 @@
+from ast import compare
 import sys
 from src.compiler.lexer.Lexer import Lexer
 from src.compiler.lexer.Token import Token
@@ -102,10 +103,21 @@ def get_test(test_num : int):
 
     return input_line, expected_result
 
+def compare_output(stream1, stream2)-> bool:
+    if len(stream1) != len(stream2):
+        return False
+    for i in range(len(stream1)):
+        if stream1[i].value != stream2[i].value:
+            return False
+        if stream1[i].key != stream2[i].key:
+            return False
+    return True
+
 if __name__ == "__main__":
 
     test_num : int = int(sys.argv[1])
     test_input, expected_output = get_test(test_num)
     user_output = get_token_stream(test_input)
-    assert user_output == expected_output
+
+    assert compare_output(expected_output, user_output) is True
     print("\nTEST PASSED")
