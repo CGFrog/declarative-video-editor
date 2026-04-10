@@ -1,4 +1,4 @@
-name: Run Lexer Tests
+name: Run Parser Tests
 
 on:
   push:
