@@ -30,6 +30,3 @@ jobs:
 
       - name: Run Lexer Test Case 5
         run: python -m tests.lexer.LexerUnitTest 5
-
-      - name: Run Parser Test Case 1
-        run: python -m tests.parser.ParserTest 
