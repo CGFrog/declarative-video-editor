@@ -84,6 +84,20 @@ expected4 = [
 test5='% This is a comment'
 expected5:list[Token] = [Token(TL.END_OF_LINE, '')]
 
+test6 = 'render "lets%_play.mp4" [1920,1080]'
+expected6 = [
+    Token(TL.RENDER, 'render'),
+    Token(TL.DEFINITION, "lets%_play.mp4"),
+    Token(TL.LBRACK, '['),
+    Token(TL.NUMBER, '1920'),
+    Token(TL.COMMA, ','),
+    Token(TL.NUMBER, '1080'),
+    Token(TL.RBRACK, ']'),
+    Token(TL.END_OF_LINE, '')
+]
+
+
+
 def get_token_stream(line : str):
     return Lexer().build_tokens(line);
     
@@ -104,6 +118,9 @@ def get_test(test_num : int):
         case 5:
             input_line = test5
             expected_result=expected5
+        case 6:
+            input_line = test6
+            expected_result = expected6
         case _: raise Exception("Unknown Test")
 
     return input_line, expected_result

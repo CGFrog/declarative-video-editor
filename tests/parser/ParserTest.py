@@ -9,7 +9,7 @@ TEST1 : str =  """
 video intro = \"intro.mp4\" (0,e) |> saturation(3) |> speed(1.5)            
 timeline
 intro 0 1
-% Hey this is a ccomment      
+% Hey this is a comment      
 render \"lets_play.mp4\" [1920,1080] % Comment time!
 """
 
