@@ -13,7 +13,7 @@ class Window:
         self.root.columnconfigure(0, weight=1)
 
     def createMenu(self):
-        self.menu = Menu(self.root)
+        self.menu = Menu(self.root, self.editor)
         self.root.config(menu=self.menu)
 
     def windowLayout(self):
