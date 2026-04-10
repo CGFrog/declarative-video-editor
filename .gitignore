@@ -55,6 +55,7 @@ cover/
 
 # VLC Library
 python_vlc-3.0.21203.dist-info/
+vlc.py
 
 # Translations
 *.mo
