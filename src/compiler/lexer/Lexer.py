@@ -1,123 +1,130 @@
+from src.compiler.lexer.Token import TokenLabel as TL
+from src.compiler.lexer.Token import Token
+
 # --- Single character symbols used in our language --- #
 symbols = {
-    '=': 'ASSIGN',
-    '+': 'UNION',
-    '(': 'LPAREN',
-    ')': 'RPAREN',
-    '[': 'LBRACK',
-    ']': 'RBRACK',
-    ',': 'COMMA',
-    '.': 'PERIOD',
-    ':': 'COLON'
+    '=': TL.ASSIGN,
+    '+': TL.UNION,
+    '(': TL.LPAREN,
+    ')': TL.RPAREN,
+    '[': TL.LBRACK,
+    ']': TL.RBRACK,
+    ',': TL.COMMA,
+    '.': TL.PERIOD,
+    ':': TL.COLON
 }
 
 # --- Types, effects, and keywords used in our language --- #
 labels = {
-    'video': 'TYPE',
-    'audio': 'TYPE',
-    'image': 'TYPE',
-    'blur': 'EFFECT',
-    'saturation': 'EFFECT',
-    'chroma': 'EFFECT',
-    'transform': 'EFFECT',
-    'scale': 'EFFECT',
-    'noise_filter': 'EFFECT',
-    'volume': 'EFFECT',
-    'speed': 'EFFECT',
-    'timeline': 'KEYWORD',
-    'after': 'KEYWORD',
-    'render': 'KEYWORD'
+    'video': TL.MEDIA,
+    'audio': TL.MEDIA,
+    'image': TL.MEDIA,
+
+    'blur': TL.EFFECT,
+    'saturation': TL.EFFECT,
+    'chroma': TL.EFFECT,
+    'transform': TL.EFFECT,
+    'scale': TL.EFFECT,
+    'noise_filter': TL.EFFECT,
+    'volume': TL.EFFECT,
+    'speed': TL.EFFECT,
+
+    'timeline': TL.TIMELINE,
+    'after': TL.AFTER,
+    'render': TL.RENDER
 }
 
 # Import token class
-from Token import Token
+from src.compiler.lexer.Token import Token
 
 class Lexer():
 
-    def __init__(self, text):
-        self.text = text
+    def __init__(self):
         self.pos = -1
-        self.current_char = None
-        self.forward()
+        self.current_char : str | None = None
+        self.text: str = ""
 
-    def forward(self):
+    def __forward(self):
         self.pos += 1
         if self.pos < len(self.text):
             self.current_char = self.text[self.pos]
         else:
             self.current_char = None
 
-    def skip_space(self):
+    def __skip_space(self):
         while self.current_char is not None and self.current_char.isspace():
-            self.forward()
+            self.__forward()
 
-    def build_num(self):
+    def __build_num(self):
         num = ''
-        while self.current_char.isdigit() or self.current_char == '-' or self.current_char == '.':
+        while self.current_char != None and (self.current_char.isdigit() or self.current_char == '-' or self.current_char == '.'):
             num += self.current_char
-            self.forward()
-
-        return Token('NUMBER', num)
+            self.__forward()
+        return Token(TL.NUMBER, num)
     
-    def build_word(self):
+    def __build_word(self):
         word = ''
         while self.current_char is not None and not self.current_char.isspace() and self.current_char not in symbols:
             word += self.current_char
-            self.forward()
+            self.__forward()
 
         token_key = None
 
         if word in labels:
             token_key = labels[word]
 
-        if word == 's': token_key = 'START_OF_VID'
-        if word == 'e': token_key = 'END_OF_VID'
-        if token_key is None: token_key = 'IDENTIFIER'
+        if word == 's': token_key = TL.START_OF_VID
+        if word == 'e': token_key = TL.END_OF_VID
+        if token_key is None: token_key = TL.IDENTIFIER
 
         return Token(token_key, word)
     
-    def build_definition(self):
-        definition = ''
-        while self.current_char is not None and not self.current_char.isspace():
+    def __build_definition(self):
+        definition: str = ''
+        self.__forward() # Assumes we enter build definition on some indicator token like "
+        while self.current_char is not None and not self.current_char.isspace() and not self.current_char =='"':
             definition += self.current_char
-            self.forward()
-
-        return Token('DEFINITION', definition)
+            self.__forward()
+        definition.removeprefix('"')
+        return Token(TL.DEFINITION, definition)
     
-    def build_tokens(self):
+    def build_tokens(self, text : str) -> list[Token]:
         tokens = []
+        self.text = text
+        self.__forward()
 
-        while self.current_char is not None:
+        while self.current_char is not None and self.current_char != '%':
             if self.current_char.isspace(): # Check for space
-                self.skip_space()
+                self.__skip_space()
             elif self.current_char.isdigit() or self.current_char == '-': # Check for numbers (supports negatives)
-                tokens.append(self.build_num())
+                tokens.append(self.__build_num())
             elif self.current_char.isalpha(): # Check for words (types, effects, keywords, identifiers)
-                tokens.append(self.build_word())
+                tokens.append(self.__build_word())
             elif self.current_char == '"': # Check for filepath definitions
-                tokens.append(self.build_definition())
-                self.forward()
+                tokens.append(self.__build_definition())
+                self.__forward()
             elif self.current_char == '|': # Check for function composition |>
-                self.forward()
+                self.__forward()
                 if self.current_char == '>':
-                    tokens.append(Token('FUNC_COMP', '|>'))
-                    self.forward()
+                    tokens.append(Token(TL.FUNC_COMP, '|>'))
+                    self.__forward()
                 else:
                     raise Exception(f"Illegal input: {self.current_char}")
             elif self.current_char in symbols: # Check for all other characters in the langauge
                 key = symbols[self.current_char]
                 tokens.append(Token(key, self.current_char))
-                self.forward()
+                self.__forward()
             else:
                 raise Exception(f"Illegal input: {self.current_char}")
 
-        tokens.append(Token('END_OF_LINE', '')) # Indicates end of line
+        tokens.append(Token(TL.END_OF_LINE, '')) # Indicates end of line
         return tokens
 
 # --- Test Usage --- #
 if __name__ == '__main__':
-    text_input = 'video intro = "intro.mp4" (1:45.33,e) |> saturation(3) |> speed(1.5)'
-    lex = Lexer(text_input)
-    token_stream = lex.build_tokens()
+    text_input = 'render "file.mp4" [1920,1080]'
+    lex = Lexer()
+    # token_stream = lex.build_tokens(text=text_input)
+    token_stream = lex.build_tokens(text='render "file.mp4" [1920,1080]')
     for token in token_stream:
         print(token.toString())
