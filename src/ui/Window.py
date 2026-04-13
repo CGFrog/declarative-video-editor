@@ -1,7 +1,8 @@
 import tkinter as tk
-from .TextEditor import TextEditor
-from .VideoPlayer import VideoPlayer
-from .ConsoleView import ConsoleView
+from src.ui.TextEditor import TextEditor
+from src.ui.VideoPlayer import VideoPlayer
+from src.ui.ConsoleView import ConsoleView
+from src.ui.Menu import Menu
 
 class Window:
     def __init__(self):
@@ -10,6 +11,10 @@ class Window:
     def createWindow(self):
         self.root.title("Declarative Video Editor")
         self.root.geometry("800x600")
+
+    def createMenu(self):
+        self.menu = Menu(self.root, self.editor)
+        self.root.config(menu=self.menu)
 
     def windowLayout(self):
         self.main_pane = tk.PanedWindow(
@@ -65,4 +70,5 @@ class Window:
         self.TextEditorView()
         self.videoDisplayView()
         self.consoleView()
+        self.createMenu()
         self.root.mainloop()
