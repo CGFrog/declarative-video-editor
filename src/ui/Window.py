@@ -1,6 +1,6 @@
 import tkinter as tk
-from ui.TextEditor import TextEditor
-from ui.Menu import Menu
+from src.ui.TextEditor import TextEditor
+from src.ui.Menu import Menu
 
 class Window:
     def __init__(self):

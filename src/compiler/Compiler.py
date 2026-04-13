@@ -1,6 +1,7 @@
 from pathlib import Path
+from src.compiler.lexer.Lexer import Lexer
 
-def Compiler():
+class Compiler():
     def compile(output : str):
         generateFolders()        
 
@@ -13,3 +14,9 @@ def Compiler():
         folder_path = Path("cache")
         folder_path.mkdir(parents=True, exist_ok=True)
     
+def compile_code(content):
+    print(content)
+    lex = Lexer(content)
+    token_stream = lex.build_tokens()
+    for token in token_stream:
+        print(token.toString())

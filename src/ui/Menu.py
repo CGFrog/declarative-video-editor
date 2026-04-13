@@ -1,4 +1,5 @@
 import tkinter as tk
+from src.compiler.Compiler import compile_code
 
 class Menu(tk.Menu):
     def __init__(self, parent, text_editor):
@@ -24,7 +25,7 @@ class Menu(tk.Menu):
 
     def compile(self):
         content = self.text_editor.get_content()
-        print(content)
+        compile_code(content)
 
     def save(self):
         # Route to save function here
