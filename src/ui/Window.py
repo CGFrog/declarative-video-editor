@@ -1,5 +1,6 @@
 import tkinter as tk
 from src.ui.TextEditor import TextEditor
+from src.ui.VideoPlayer import VideoPlayer
 from src.ui.Menu import Menu
 
 class Window:
