@@ -22,6 +22,7 @@ parts/
 sdist/
 var/
 wheels/
+.vscode/
 share/python-wheels/
 *.egg-info/
 .installed.cfg
@@ -52,6 +53,10 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+
+# VLC Library
+python_vlc-3.0.21203.dist-info/
+vlc.py
 
 # Translations
 *.mo
