@@ -1,7 +1,9 @@
 from pathlib import Path
+from src.compiler.lexer.Lexer import Lexer
 
-def Compiler():
+class Compiler():
     def compile(output : str):
+        print("Compiling...\n" + output)
         generateFolders()        
 
     def generateFolders():
@@ -12,3 +14,4 @@ def Compiler():
         folder_path.mkdir(parents=True, exist_ok=True)
         folder_path = Path("cache")
         folder_path.mkdir(parents=True, exist_ok=True)
+    
