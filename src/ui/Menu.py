@@ -1,5 +1,5 @@
 import tkinter as tk
-from src.compiler.Compiler import compile_code
+from src.compiler.Compiler import Compiler
 
 class Menu(tk.Menu):
     def __init__(self, parent, text_editor):
@@ -25,12 +25,12 @@ class Menu(tk.Menu):
 
     def compile(self):
         content = self.text_editor.get_content()
-        compile_code(content)
+        Compiler.compile(content)
 
     def save(self):
-        # Route to save function here
+        # TO DO
         print("Saving...")
 
     def help(self):
-        # Route to help function here
+        # TO DO
         print("Helping...")

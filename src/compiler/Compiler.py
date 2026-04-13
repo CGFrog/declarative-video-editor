@@ -3,6 +3,7 @@ from src.compiler.lexer.Lexer import Lexer
 
 class Compiler():
     def compile(output : str):
+        print("Compiling...\n" + output)
         generateFolders()        
 
     def generateFolders():
@@ -14,9 +15,3 @@ class Compiler():
         folder_path = Path("cache")
         folder_path.mkdir(parents=True, exist_ok=True)
     
-def compile_code(content):
-    print(content)
-    lex = Lexer(content)
-    token_stream = lex.build_tokens()
-    for token in token_stream:
-        print(token.toString())
