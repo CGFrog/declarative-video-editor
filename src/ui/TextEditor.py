@@ -135,8 +135,7 @@ class TextEditor:
             try:
                 with open(self.current_file, "w", encoding="utf-8") as f:
                     content = self.text_editor.get("1.0", "end-1c")
-                    f.write(content)
-                messagebox.showinfo("Save File", "File saved successfully.")
+                    f.write(content)    
             except Exception as e:
                 messagebox.showerror("Save File", f"Error saving file: {e}")
         else:
@@ -154,8 +153,7 @@ class TextEditor:
                 with open(file_path, "w", encoding="utf-8") as f:
                     content = self.text_editor.get("1.0", "end-1c")
                     f.write(content)
-                self.current_file = file_path
-                messagebox.showinfo("Save File As", "File saved successfully.")
+                self.current_file = file_path   
             except Exception as e:
                 messagebox.showerror("Save File As", f"Error saving file: {e}")
 
@@ -163,7 +161,7 @@ class TextEditor:
     
     def open_file(self, event=None):
         file_path = filedialog.askopenfilename(
-            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+            filetypes=[("DVEL Files", "*.DVEL"), ("All Files", "*.*")],
         )
         if file_path:
             try:
@@ -174,7 +172,6 @@ class TextEditor:
                 self.current_file = file_path
                 self.update_line_numbers()
                 self.update_status_bar()
-                messagebox.showinfo("Open File", "File opened successfully.")
             except Exception as e:
                 messagebox.showerror("Open File", f"Error opening file: {e}")
 
