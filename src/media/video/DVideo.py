@@ -28,7 +28,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
 
         # Output final video
         ffmpeg.output(v3[0], v3[1], self.cache_path).run()
-
+        
         self.cache_path = new_version_path
 
     def location(self, new_x : float, new_y : float, resolution_w : float, resolution_h : float):
@@ -70,11 +70,45 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         """
         ffmpeg.input(self.cache_path).filter('crop', width=width, height=height, x_off=x_offset, y_off=y_offset).output(self.cache_path).run()
 
-    def overlay(self, media):
-        pass
+    def overlay(self, media, x = 0, y = 0):
+        """
+        Overlay video on top of other video (webcam, etc.)
+        Default is currently set to top left (0, 0)
+        Args:
+            x and y represent the top left starting point of the video. 
+            For example 0,0 would be top left corner
+        """
 
+        new_version_path = self.generate_temp_path()
 
-    def colorkey(self, media):
+        base = ffmpeg.input(self.cache_path)
+        overlay = ffmpeg.input(media.cache_path)
+
+        final_video = ffmpeg.overlay(base.video, overlay.video, x=x, y=y)
+
+        (
+            ffmpeg
+            .output(final_video, base.audio, new_version_path)
+            .run()
+        )
+
+        self.cache_path = new_version_path
+        
+
+    def colorkey(self, media, color="0x00FF00", similarity = 0.3, blend = 0.1):
+        """
+        Apply colorkey filter using color of choice
+        Args:
+            Color (string): Hexadecimal value of color of your background you want to be transparent
+
+            Similarity: Float 0 to 1 that represents how close a pixel has to be to color
+            variable for it to be included in filter
+
+            Blend: Float 0 to 1 that represents how smooth the edges are of the green screen.
+            Lower the number the more jagged they may look while the higher the number may 
+            produce a "blurry" or "faded" effect. 
+        """
+        
         # Generate new path to avoid reading/writing to same file
         new_version_path = self.generate_temp_path()
 
@@ -82,7 +116,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         background = ffmpeg.input(media.cache_path)
 
         # Apply filter
-        keyed_video = foreground.video.filter("colorkey", "0x00FF00", 0.3, 0.1)
+        keyed_video = foreground.video.filter("colorkey", color, similarity, blend)
 
         # Overlay the video onto background
         final_video = ffmpeg.overlay(background.video, keyed_video)
@@ -93,6 +127,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             .output(final_video, foreground.audio, new_version_path)
             .run()
         )
+
 
         self.cache_path = new_version_path
 
