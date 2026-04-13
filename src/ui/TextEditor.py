@@ -53,7 +53,7 @@ class TextEditor:
         self.scrollbar.grid(row=0, column=2, sticky="ns")
 
         self.text_editor.config(yscrollcommand=self.on_textscroll)
-        self.text_editor.insert("1.0", "# Start typing here...\n")
+        #self.text_editor.insert("1.0", "# Start typing here...\n")
 
         self.status_bar = tk.Label(
             self.main_frame,
@@ -130,6 +130,9 @@ class TextEditor:
         self.scrollbar.set(*args)
         self.line_numbers.yview_moveto(args[0])
 
+    def get_content(self):
+        content = self.text_editor.get("1.0", "end-1c")
+        return content
     def save_file(self, event=None):
         if self.current_file:
             try:
