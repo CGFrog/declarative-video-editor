@@ -11,11 +11,10 @@ class DMedia():
         name: DVEL media variable name.
         file_path: path to file
     """
-    def __init__(self, name : str, file_path : str) -> None:
-        self.name = name
+    def __init__(self, file_path : str) -> None:
         self.file_path = file_path
         self.duration: str = ""
-        self.cache_path = f"cache/name_{uuid.uuid4()}.mp4"
+        self.cache_path = f"cache/media_{uuid.uuid4()}.mp4"
         ffmpeg.input(self.file_path).output(self.cache_path).run()
     
     @classmethod
