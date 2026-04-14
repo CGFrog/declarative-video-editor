@@ -35,13 +35,14 @@ class DeclarationParser():
 
         returns StateVariable        
         """
-        state_var = StateVariable()
         start_of_def: int = first_of_token(tokens, TL.DEFINITION)
         start_of_func: int = first_of_token(tokens,TL.FUNC_COMP)
 
-        state_var.clips = self.__generate_clips(tokens[start_of_def:start_of_func:])
-        state_var.effects = self.__generate_effects(tokens[start_of_func::])
-        return state_var
+        return StateVariable(
+            clips=self.__generate_clips(tokens[start_of_def:start_of_func:]),
+            effects=self.__generate_effects(tokens[start_of_func::]),
+            type=tokens[0].value
+        )
     
     def __generate_effects(self, tokens : list[Token])->list[Effect]:
         """
