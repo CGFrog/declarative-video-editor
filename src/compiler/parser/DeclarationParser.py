@@ -6,6 +6,7 @@ from src.compiler.parser.ParsingUtils import extract_duration, first_of_token,ex
 class DeclarationParser():
     def __init__(self):
         self.state: dict = {} # Holds all media variables, i.e. videos, audio, and images, as well as their attributes such as effects applied and durations.
+        self.primitives: dict = {} # Holds num/string variables
         self.line_number : int = 1
 
     def parse_source(self, lines_of_tokens : list[list[Token]]):
@@ -22,6 +23,8 @@ class DeclarationParser():
                     if tokens[1].key != TL.IDENTIFIER: 
                         raise Exception(f"Invalid identifier after type declaration.")
                     self.state.update({tokens[1].value : self.__parse_media(tokens)})
+                case TL.NUM | TL.STR:
+                    self.__parse_primitive(tokens)
             self.line_number += 1
 
     def __parse_media(self, tokens : list[Token])->StateVariable:
@@ -42,6 +45,11 @@ class DeclarationParser():
         state_var.clips = self.__generate_clips(tokens[start_of_def:start_of_func:])
         state_var.effects = self.__generate_effects(tokens[start_of_func::])
         return state_var
+    
+    def __parse_primitive(self, tokens: list[Token]):
+        """
+        Parses primitive declarations like: 
+        num opacity = 0.5"""
     
     def __generate_effects(self, tokens : list[Token])->list[Effect]:
         """
