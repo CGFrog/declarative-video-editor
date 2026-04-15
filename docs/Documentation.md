@@ -10,21 +10,9 @@
         <li><a href="#declare">Declaring Variables</a></li>
         <li><a href="#trim">Trim</a></li>
         <li><a href="#concetanate">Concatenation</a></li>
+        <li><a href="#effects">Effects</a></li>
+        <ul>
+            <li><a href="#scale">Scale</a></li>
+        </ul>
     </ul>
 </ul>
-
-
-
-<h2 id="install">Install</h2>
-
-<h2 id="setup">Setup</h2>
-
-<h2 id="language">Language</h2>
-
-<h3 id="import">Importing Media</h3>
-
-<h3 id="declare">Declaring Variables</h3>
-
-<h3 id="trim">Trim</h3>
-
-<h3 id="concatenate">Concatenation</h3>
