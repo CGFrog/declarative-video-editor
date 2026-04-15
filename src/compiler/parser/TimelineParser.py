@@ -22,7 +22,7 @@ class TimelineParser:
                 case TL.RENDER:
                     self.render_settings= self.__parse_render_line(tokens)
 
-    def __parse_render_line(self, tokens : list[Token]):
+    def __parse_render_line(self, tokens : list[Token])-> RenderSettings:
         index: int = 0       
         params : tuple[str, str] | None = None 
         export_path: str | None = None 
