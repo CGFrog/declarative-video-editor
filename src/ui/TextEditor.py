@@ -188,7 +188,7 @@ class TextEditor:
 
         return "break"  # Prevent default behavior
 
-    def _configure_syntax_tags(self):
+    def _configure_syntax_tags(self): #color tags for syntax highlighting
         self.text_editor.tag_configure("media", foreground="darkblue")
         self.text_editor.tag_configure("identifier", foreground="sky blue")
         self.text_editor.tag_configure("number", foreground="red")
@@ -197,7 +197,7 @@ class TextEditor:
         self.text_editor.tag_configure("keyword", foreground="orange")
         self.text_editor.tag_configure("symbol", foreground="darkgray")
 
-    def _get_tag_for_token(self, token):
+    def _get_tag_for_token(self, token): #converts token types from lexer into Tkinter tags
         if token.key == TL.MEDIA:
             return "media"
         elif token.key == TL.IDENTIFIER:
@@ -215,13 +215,16 @@ class TextEditor:
             return "symbol"
         return None
 
-    def highlight_syntax(self):
+    def highlight_syntax(self): #removes existing tags and applies new ones based on current text content and lexer tokens
         for tag in ["media", "identifier", "number", "definition", "effect", "keyword", "symbol"]:
             self.text_editor.tag_remove(tag, "1.0", "end")
 
+        #Get content from editor and split into lines for processing
         content = self.text_editor.get("1.0", "end-1c")
         lines = content.split("\n")
 
+        #process each line independently through lexer, splits line into tokens and 
+        #applies syntax color based on token type and position in line
         for line_num, line in enumerate(lines, start=1):
             if not line.strip():
                 continue
@@ -245,8 +248,10 @@ class TextEditor:
                     continue
                 end = start + len(token_value)
 
+                #convert character positions into Tkinter text indices
                 start_index = f"{line_num}.{start}"
                 end_index = f"{line_num}.{end}"
 
+                #apply syntax color to range corresponding to token
                 self.text_editor.tag_add(tag_name, start_index, end_index)
                 search_col = end
