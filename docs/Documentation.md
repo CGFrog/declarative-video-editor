@@ -13,6 +13,15 @@
         <li><a href="#effects">Effects</a></li>
         <ul>
             <li><a href="#scale">Scale</a></li>
+            <li><a href="#location">Location</a></li>
+            <li><a href="#rotation">Rotation</a></li>
+            <li><a href="#crop">Crop</a></li>
+            <li><a href="#overlay">Overlay</a></li>
+            <li><a href="#chromakey">Chroma Key</a></li>
         </ul>
+        <li><a href="#timeline">Timeline Declaration</a></li>
+        <li><a href="#rendering">Rendering Videos</a></li>
+        <li><a href="#comments">Commenting Your Code</a></li>
     </ul>
+    <li><a href="#how-to">How-To Guides</a></li>
 </ul>
