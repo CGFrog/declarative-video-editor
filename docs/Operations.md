@@ -18,4 +18,6 @@ video game_footage = "game_footage.mp4" (0,30) + (35,49)
 ```
 audio music = "music.mp3" (0,e) |> volume(2) |> noise_filter(-60)
 ```
-<p></p>
+<p>In order to apply multiple effects onto a single piece of media, you can use |> between each effect rule you apply (see code above).</p>
+
+<h3>Next: <a href="#effects">Effects</a></h3>
