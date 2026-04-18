@@ -20,4 +20,4 @@ audio music = "music.mp3" (0,e) |> volume(2) |> noise_filter(-60)
 image logo = "logo.png" (0,e)
 ```
 
-<h3>Next: <a href="#operations">Operations</a></h3>
+<h3>Next: <a href="Operations.md">Operations</a></h3>

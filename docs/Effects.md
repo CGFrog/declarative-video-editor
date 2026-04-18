@@ -110,4 +110,4 @@ noise_filter(x)
 ```
 <p>Where x is the noise filter value.</p>
 
-<h3>Next: <a href="#timeline">Timeline</a></h3>
+<h3>Next: <a href="Timeline.md">Timeline</a></h3>

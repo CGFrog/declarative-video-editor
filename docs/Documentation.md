@@ -2,11 +2,11 @@
 <p>DVEL (Declaritive Video Editing Language) is a programming language used for video editing. This documentation will cover the installation, setup, syntax, and general how-to guides.</p>
 
 <ul>
-    <li><a href="#setup">Install / Setup</a></li>
-    <li><a href="#import">Importing Media</a></li>
-    <li><a href="#trim">Operations</a></li>
-    <li><a href="#effects">Effects</a></li>
-    <li><a href="#timeline">Timeline</a></li>
-    <li><a href="#comments">Commenting</a></li>
-    <li><a href="#how-to">How-To Guides</a></li>
+    <li><a href="Setup.md">Install / Setup</a></li>
+    <li><a href="ImportingMedia.md">Importing Media</a></li>
+    <li><a href="Operations.md">Operations</a></li>
+    <li><a href="Effects.md">Effects</a></li>
+    <li><a href="Timeline.md">Timeline</a></li>
+    <li><a href="Commenting.md">Commenting</a></li>
+    <li><a href="Samples.md">DVEL Samples</a></li>
 </ul>
