@@ -1,5 +1,5 @@
 <h1>Effects</h1>
-<p>DVEL supports effects for both videos and audio. Options include:</p>
+<p>DVEL supports effects for both videos and audio.</p>
 <h3>Supported Effects:</h3>
 <ul>
     <li>Saturation</li>
