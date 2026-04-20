@@ -94,7 +94,7 @@ class DeclarationParser():
         for p in raw_params:
             match p.type:
                 case "NUMBER":
-                    resolved.append(float(p.value))
+                    resolved.append(p.value)
                 case "STRING":
                     resolved.append(p.value)
                 case "IDENTIFIER":
