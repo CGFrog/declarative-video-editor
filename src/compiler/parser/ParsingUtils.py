@@ -1,5 +1,6 @@
 from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.lexer.Token import Token
+from src.compiler.parser.Primitive import Primitive
 
 class Param:
     # Identifier, String or Number types
@@ -36,11 +37,12 @@ def extract_function_parameters(tokens: list[Token]) ->list:
     for token in tokens:
         # If we add effects that take strings as variables, i.e. textboxes of some sort, add an if/match case here.
         if token.key == TL.IDENTIFIER:
-            params.append(Param("IDENTIFIER", token.value))
+            params.append(Primitive("IDENTIFIER", token.value))
 
         if token.key == TL.STRING:
-            params.append(Param("STRING", token.value))
+            params.append(Primitive("STRING", token.value))
 
         if token.key == TL.NUMBER:
-            params.append(Param("NUMBER", token.value))
+            params.append(Primitive("NUMBER", token.value))
+
     return params

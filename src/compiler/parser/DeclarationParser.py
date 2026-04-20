@@ -2,7 +2,9 @@ from src.compiler.lexer.Token import Token
 from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.StateVariable import Clip, StateVariable
 from src.compiler.Effect import Effect
-from src.compiler.parser.ParsingUtils import extract_duration, first_of_token,extract_function_parameters, Param
+from src.compiler.parser.ParsingUtils import extract_duration, first_of_token, extract_function_parameters
+from src.compiler.parser.Primitive import Primitive
+
 class DeclarationParser(): 
     def __init__(self): 
         self.state: dict = {} # Holds all media variables, i.e. videos, audio, and images, as well as their attributes such as effects applied and durations.
@@ -79,7 +81,7 @@ class DeclarationParser():
         """
         self.primitives[name_token.value] = value
         
-    def resolve_params(raw_params: list[Param], primitives: dict) -> list:
+    def resolve_params(raw_params: list[Primitive], primitives: dict) -> list:
         resolved = []
 
         for p in raw_params:
@@ -91,6 +93,7 @@ class DeclarationParser():
                 case "IDENTIFIER":
                     if p.value not in primitives:
                         raise Exception(f"Undefined variable: {p.value}")
+                    resolved.append(primitives[p.value])
                 case _:
                     raise Exception(f"Unknown parameter type {p.type}")
         
