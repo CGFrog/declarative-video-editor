@@ -63,10 +63,13 @@ class DeclarationParser():
         If number, convert to float variable and store in value. 
         If string, do not convert into float, store in value
         """
-        if type_token == TL.NUM:
-            value = float(value_token.value)
-        elif type_token == TL.STR:
-            value = value_token.value
+        match type_token:
+            case TL.NUM:
+                value = float(value_token.value)
+            case TL.STR:
+                value = value_token.value
+            case _:
+                raise Exception(f"Line {self.line_number}: Invalid primitive type '{type_token}'.")
         
         """
         Creates a link between the variable name and its value 
@@ -76,6 +79,23 @@ class DeclarationParser():
         """
         self.primitives[name_token.value] = value
         
+    def resolve_params(raw_params: list[Param], primitives: dict) -> list:
+        resolved = []
+
+        for p in raw_params:
+            match p.type:
+                case "NUMBER":
+                    resolved.append(float(p.value))
+                case "STRING":
+                    resolved.append(p.value)
+                case "IDENTIFIER":
+                    if p.value not in primitives:
+                        raise Exception(f"Undefined variable: {p.value}")
+                case _:
+                    raise Exception(f"Unknown parameter type {p.type}")
+        
+        return resolved
+    
     
     def __generate_effects(self, tokens : list[Token])->list[Effect]:
         """
@@ -95,18 +115,9 @@ class DeclarationParser():
                     raw_params = extract_function_parameters(tokens[index+1:index+input_len])
 
                     # Check parameters against self.primitives dict {}
-                    resolved_params = []
-                    for p in raw_params:
-                        if isinstance(p, Param) and p.type == "IDENTIFIER":
-                            # If value within self.primitives, assign value to variable name
-                            if p.value in self.primitives:
-                                resolved_params.append(self.primitives[p.value])
-                            else:
-                                # Raise error if user attempts to use variable they never defined
-                                raise Exception(f"Undefined variable: {p.value} on line {self.line_number}")
-                        else:
-                            # If direct number or string, keep it as it is.
-                            resolved_params.append(p.value)
+                    resolved_params = self.resolve_params(raw_params, self.primitives)
+                    
+
 
                     # Bundle everything into an effect object from resolved_params
                     effects.append(Effect(token.value, resolved_params))
