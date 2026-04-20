@@ -30,7 +30,7 @@ def extract_function_parameters(tokens: list[Token]) ->list:
             case TL.IDENTIFIER:
                 params.append(Primitive("IDENTIFIER", token.value))
 
-            case TL.STRING:
+            case TL.DEFINITION:
                 params.append(Primitive("STRING", token.value))
 
             case TL.NUMBER:

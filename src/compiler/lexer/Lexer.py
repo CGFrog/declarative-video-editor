@@ -31,7 +31,11 @@ labels = {
 
     'timeline': TL.TIMELINE,
     'after': TL.AFTER,
-    'render': TL.RENDER
+    'render': TL.RENDER,
+
+    # Primitive Variables
+    'str': TL.STR,
+    'num': TL.NUM
 }
 
 # Import token class

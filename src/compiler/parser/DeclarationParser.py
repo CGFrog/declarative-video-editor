@@ -119,8 +119,6 @@ class DeclarationParser():
 
                     # Check parameters against self.primitives dict {}
                     resolved_params = self.resolve_params(raw_params, self.primitives)
-                    
-
 
                     # Bundle everything into an effect object from resolved_params
                     effects.append(Effect(token.value, resolved_params))
