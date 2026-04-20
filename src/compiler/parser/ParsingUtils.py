@@ -2,16 +2,6 @@ from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.lexer.Token import Token
 from src.compiler.parser.Primitive import Primitive
 
-class Param:
-    # Identifier, String or Number types
-    def __init__(self, type, value):
-        self.type = type 
-        self.value = value
-
-    # Debugging Params 
-    def __repr__(self):
-        return f"Param({self.type}, {self.value})"
-
 def extract_duration(tokens: list[Token])-> list[str]:
     """
     Takes in a list of tokens and returns the comma separated values as a list of strings
