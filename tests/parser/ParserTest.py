@@ -5,8 +5,8 @@ from src.compiler.StateVariable import Clip, Effect
 from src.compiler.parser.Parser import Parser
 
 TEST1 : str =  """
-
-video intro = \"intro.mp4\" (0,e) |> saturation(3) |> speed(1.5)            
+num n1 = 5
+video intro = \"intro.mp4\" (0,e) |> saturation(n1) |> speed(1.5)            
 timeline
 intro 0 1
 % Hey this is a comment      
@@ -24,7 +24,7 @@ introVar.effects.append(
 introVar.effects.append(
     Effect(
         'saturation', 
-        ['3'])
+        ['5'])
     )
 introVar.clips.append(
     Clip(
