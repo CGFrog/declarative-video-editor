@@ -4,6 +4,8 @@ import sys
 class ConsoleView:
     def __init__(self,parent):
         self.parent = parent
+        self.input_callback = None
+        self.input_start_index = "1.0"
 
     def ConsoleView(self):
         self.main_frame = tk.Frame(self.parent, bg="black")
@@ -19,20 +21,58 @@ class ConsoleView:
         self.redirectOut()
 
     def consoleOutput(self):
-        self.console = tk.Text(self.main_frame, bg="black", fg="white", state="disabled", wrap="word")
-        self.console.grid(row=0, column=0, stick="nsew")
+        self.console = tk.Text(self.main_frame, bg="black", fg="white", wrap="word")
+        self.console.grid(row=0, column=0, sticky="nsew")
 
         self.scrollbar = tk.Scrollbar(self.main_frame, orient="vertical", command=self.console.yview)
         self.scrollbar.grid(row=0, column=1, sticky="ns")
 
+        self.console.bind("<Return>", self.on_enter)
+        self.console.bind("<Key>", self.on_key)
         self.console.config(yscrollcommand=self.scrollbar.set)
 
     def redirectOut(self):
+        self.original_stdout = sys.stdout
+        self.original_stderr = sys.stderr
+
+        self.parent.after(100, self._apply_redirect)
+
+    def _apply_redirect(self):
         sys.stdout = self
         sys.stderr = self
 
+        print("Welcome to DVEL!")
+
     def write(self, message):
-        self.console.config(state="normal")
-        self.console.insert("end", message)
+        try:
+            self.console.insert("end", message)
+            self.console.see("end")
+            self.input_start_index = self.console.index("end-1c")
+        except Exception:
+            self._original_stdout.write(message)
+
+    def flush(self):
+        pass
+
+    def set_input_callback(self, callback):
+        self.input_callback = callback
+
+    def on_enter(self, event):
+        input_text = self.console.get(self.input_start_index, "end-1c").strip()
+
+        self.console.insert("end", "\n")
         self.console.see("end")
-        self.console.config(state="disabled")
+
+        if self.input_callback:
+            self.input_callback(input_text)
+
+        self.input_start_index = self.console.index("end-1c")
+
+        return "break"
+
+    def on_key(self, event):
+        if self.console.compare("insert", "<", self.input_start_index):
+            return "break"
+
+    def handle_console_input(self, text):
+        print(f"You typed: {text}")

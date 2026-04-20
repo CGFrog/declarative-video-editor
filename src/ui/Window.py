@@ -25,7 +25,7 @@ class Window:
         )
         self.main_pane.pack(fill="both", expand=True)
 
-        self.left_frame = tk.Frame(self.main_pane, bg="BLUE")
+        self.left_frame = tk.Frame(self.main_pane)
         self.main_pane.add(self.left_frame, minsize=200)
 
         self.right_pane = tk.PanedWindow(
@@ -36,10 +36,10 @@ class Window:
         )
         self.main_pane.add(self.right_pane, minsize=200)
 
-        self.top_right_frame = tk.Frame(self.right_pane, bg="GREEN")
+        self.top_right_frame = tk.Frame(self.right_pane)
         self.right_pane.add(self.top_right_frame, minsize=150)
 
-        self.bottom_right_frame = tk.Frame(self.right_pane, bg="RED")
+        self.bottom_right_frame = tk.Frame(self.right_pane)
         self.right_pane.add(self.bottom_right_frame, minsize=100)
 
     def TextEditorView(self):
@@ -62,6 +62,7 @@ class Window:
 
         self.console = ConsoleView(self.bottom_right_frame)
         self.console.ConsoleView()
+        self.console.set_input_callback(self.console.handle_console_input)
 
 
     def run(self):
