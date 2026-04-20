@@ -35,6 +35,7 @@ introVar.clips.append(
 
 state: dict[str, StateVariable] = {
     "intro" : introVar,
+    "n1" : 5.0
 }
 
 timeline: list[TimelineElement] = [
@@ -61,3 +62,4 @@ if __name__=="__main__":
     assert parser.state == state
     assert parser.timeline == timeline
     assert parser.render_settings == render_settings
+    assert parser.primitives == {"n1" : 5.0}

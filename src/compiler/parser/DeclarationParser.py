@@ -61,8 +61,8 @@ class DeclarationParser():
         name_token = tokens[1] # Variable name
 
         # Find equal sign, if no equal sign raise exception!
-        eq_index = first_of_token(tokens, TL.DEFINITION)
-        if eq_index < 0:
+        eq_index = first_of_token(tokens, TL.ASSIGN)
+        if eq_index >= len(tokens):
             raise Exception(f"Line {self.line_number}: missing '=' in primitive declaration.")
         
         # store value of variable in value_token
