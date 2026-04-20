@@ -26,13 +26,14 @@ def extract_function_parameters(tokens: list[Token]) ->list:
     
     for token in tokens:
         # If we add effects that take strings as variables, i.e. textboxes of some sort, add an if/match case here.
-        if token.key == TL.IDENTIFIER:
-            params.append(Primitive("IDENTIFIER", token.value))
+        match token.key:
+            case TL.IDENTIFIER:
+                params.append(Primitive("IDENTIFIER", token.value))
 
-        if token.key == TL.STRING:
-            params.append(Primitive("STRING", token.value))
+            case TL.STRING:
+                params.append(Primitive("STRING", token.value))
 
-        if token.key == TL.NUMBER:
-            params.append(Primitive("NUMBER", token.value))
+            case TL.NUMBER:
+                params.append(Primitive("NUMBER", token.value))
 
     return params
