@@ -79,7 +79,7 @@ class DeclarationParser():
         compiler sees that "name.token_value" it looks it up in 
         the DICT and assigns the stored value to that name. 
         """
-        self.primitives[name_token.value] = value
+        self.primitives.update({name_token.value: value})
         
     def resolve_params(raw_params: list[Primitive], primitives: dict) -> list:
         resolved = []
