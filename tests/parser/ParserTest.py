@@ -24,7 +24,7 @@ introVar.effects.append(
 introVar.effects.append(
     Effect(
         'saturation', 
-        ['5'])
+        ['5.0'])
     )
 introVar.clips.append(
     Clip(
