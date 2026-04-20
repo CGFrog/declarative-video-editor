@@ -1,6 +1,16 @@
 from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.lexer.Token import Token
 
+class Param:
+    # Identifier, String or Number types
+    def __init__(self, type, value):
+        self.type = type 
+        self.value = value
+
+    # Debugging Params 
+    def __repr__(self):
+        return f"Param({self.type}, {self.value})"
+
 def extract_duration(tokens: list[Token])-> list[str]:
     """
     Takes in a list of tokens and returns the comma separated values as a list of strings
@@ -22,8 +32,15 @@ def extract_function_parameters(tokens: list[Token]) ->list:
     (a_1,a_2,...,a_n), returns them as a list of strings.
     """
     params = []
+    
     for token in tokens:
         # If we add effects that take strings as variables, i.e. textboxes of some sort, add an if/match case here.
+        if token.key == TL.IDENTIFIER:
+            params.append(Param("IDENTIFIER", token.value))
+
+        if token.key == TL.STRING:
+            params.append(Param("STRING", token.value))
+
         if token.key == TL.NUMBER:
-            params.append(token.value)
+            params.append(Param("NUMBER", token.value))
     return params
