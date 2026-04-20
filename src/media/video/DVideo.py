@@ -128,6 +128,5 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             .run()
         )
 
-
         self.cache_path = new_version_path
 

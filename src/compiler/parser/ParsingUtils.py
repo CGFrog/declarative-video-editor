@@ -1,5 +1,6 @@
 from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.lexer.Token import Token
+from src.compiler.parser.Primitive import Primitive
 
 def extract_duration(tokens: list[Token])-> list[str]:
     """
@@ -22,8 +23,17 @@ def extract_function_parameters(tokens: list[Token]) ->list:
     (a_1,a_2,...,a_n), returns them as a list of strings.
     """
     params = []
+    
     for token in tokens:
         # If we add effects that take strings as variables, i.e. textboxes of some sort, add an if/match case here.
-        if token.key == TL.NUMBER:
-            params.append(token.value)
+        match token.key:
+            case TL.IDENTIFIER:
+                params.append(Primitive("IDENTIFIER", token.value))
+
+            case TL.DEFINITION:
+                params.append(Primitive("STRING", token.value))
+
+            case TL.NUMBER:
+                params.append(Primitive("NUMBER", token.value))
+
     return params
