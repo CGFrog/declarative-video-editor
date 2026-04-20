@@ -81,7 +81,7 @@ class DeclarationParser():
         """
         self.primitives.update({name_token.value: value})
         
-    def resolve_params(raw_params: list[Primitive], primitives: dict) -> list:
+    def resolve_params(self, raw_params: list[Primitive], primitives: dict) -> list:
         resolved = []
 
         for p in raw_params:
