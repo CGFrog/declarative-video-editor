@@ -16,7 +16,6 @@ class Parser():
         self.render_settings: RenderSettings | None = None
         self.line_number : int = 1
 
-
     def parse_source(self, source_code : str):
         lines_of_code : list[str] = source_code.splitlines()
         lines_of_code = [i.strip() for i in lines_of_code]

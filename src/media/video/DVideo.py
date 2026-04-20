@@ -4,7 +4,7 @@ import ffmpeg
 import math
 from src.compiler.CompilerUtils import generate_temp_path
 
-class DVideo(DMedia): #D just seems like a reasonable way to distinguish between our video wrapper class and the ffmpeg video class. I.e. the D in DVEL.
+class DVideo(DMedia): # D just seems like a reasonable way to distinguish between our video wrapper class and the ffmpeg video class. I.e. the D in DVEL.
     def __init__(self, file_path : str)-> None:
         super().__init__(file_path)
 

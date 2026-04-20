@@ -61,7 +61,7 @@ class TimelineParser:
                     try:
                         start_time = tokens[index + 1].value
                     except:
-                        raise Exception("No valid identifier specified after 'after'")
+                        raise Exception("No valid identifier specified 'after'")
                     pass
             index += 1
         return TimelineElement(identifier,start_time, z )
