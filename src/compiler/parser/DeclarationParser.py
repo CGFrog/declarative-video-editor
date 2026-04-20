@@ -29,6 +29,7 @@ class DeclarationParser():
                 case TL.NUM | TL.STR: 
                     self.__parse_primitive(tokens)
             self.line_number += 1
+        print("DEBUG — FINAL PARSER STATE:", self.state)
 
     def __parse_media(self, tokens : list[Token])->StateVariable:
         """
