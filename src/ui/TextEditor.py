@@ -195,25 +195,26 @@ class TextEditor:
         self.text_editor.tag_configure("definition", foreground="green")
         self.text_editor.tag_configure("effect", foreground="purple")
         self.text_editor.tag_configure("keyword", foreground="orange")
-        self.text_editor.tag_configure("symbol", foreground="darkgray")
+        self.text_editor.tag_configure("symbol", foreground="black")
 
     def _get_tag_for_token(self, token): #converts token types from lexer into Tkinter tags
-        if token.key == TL.MEDIA:
-            return "media"
-        elif token.key == TL.IDENTIFIER:
-            return "identifier"
-        elif token.key == TL.NUMBER:
-            return "number"
-        elif token.key == TL.DEFINITION:
-            return "definition"
-        elif token.key == TL.EFFECT:
-            return "effect"
-        elif token.key in (TL.RENDER, TL.TIMELINE, TL.AFTER, TL.START_OF_VID, TL.END_OF_VID):
-            return "keyword"
-        elif token.key in (TL.ASSIGN, TL.UNION, TL.LPAREN, TL.RPAREN, TL.LBRACK, TL.RBRACK, TL.COMMA, TL.PERIOD, TL.COLON, TL.FUNC_COMP
-    ):
-            return "symbol"
-        return None
+        match token.key:
+            case TL.MEDIA:
+                return "media"
+            case TL.IDENTIFIER:
+                return "identifier"
+            case TL.NUMBER:
+                return "number"
+            case TL.DEFINITION:
+                return "definition"
+            case TL.EFFECT:
+                return "effect"
+            case TL.RENDER | TL.TIMELINE | TL.AFTER | TL.START_OF_VID | TL.END_OF_VID:
+                return "keyword"
+            case TL.ASSIGN | TL.UNION | TL.LPAREN | TL.RPAREN | TL.LBRACK | TL.RBRACK | TL.COMMA | TL.PERIOD | TL.COLON | TL.FUNC_COMP:
+                return "symbol"
+            case _:
+                return None
 
     def highlight_syntax(self): #removes existing tags and applies new ones based on current text content and lexer tokens
         for tag in ["media", "identifier", "number", "definition", "effect", "keyword", "symbol"]:
