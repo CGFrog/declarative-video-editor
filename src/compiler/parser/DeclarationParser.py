@@ -30,6 +30,13 @@ class DeclarationParser():
                     self.__parse_primitive(tokens)
             self.line_number += 1
         print("DEBUG — FINAL PARSER STATE:", self.state)
+        for name, var in self.state.items():
+            print("MEDIA NAME:", name)
+            print("  PATH:", var.path)
+            print("  START:", var.start)
+            print("  END:", var.end)
+            print("  EFFECTS:", var.effects)
+
 
     def __parse_media(self, tokens : list[Token])->StateVariable:
         """
