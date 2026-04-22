@@ -49,7 +49,7 @@ class ConsoleView:
             self.console.see("end")
             self.input_start_index = self.console.index("end-1c")
         except Exception:
-            self._original_stdout.write(message)
+            self.original_stdout.write(message)
 
     def flush(self):
         pass
