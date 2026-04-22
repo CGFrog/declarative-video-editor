@@ -24,6 +24,7 @@ class TokenLabel(Enum):
     AFTER = 21
     STR = 22
     NUM = 23
+    FUNC = 24
 
 class Token():
     def __init__(self, key, value):

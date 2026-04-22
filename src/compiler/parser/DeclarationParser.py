@@ -9,6 +9,7 @@ class DeclarationParser():
     def __init__(self): 
         self.state: dict = {} # Holds all media variables, i.e. videos, audio, and images, as well as their attributes such as effects applied and durations.
         self.primitives: dict = {} # Holds all primitive variables i.e. num and str and acts as a look-up table when the compiler sees a variable used.
+        self.functions: dict = {} # Holds all declared functions from end user and acts as a look-up table
         self.line_number : int = 1
 
     def parse_source(self, lines_of_tokens : list[list[Token]]):
