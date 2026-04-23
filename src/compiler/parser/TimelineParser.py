@@ -55,7 +55,7 @@ class TimelineParser:
                 case TL.LBRACK:
                     rbrack: int = first_of_token(tokens[index + 1::], TL.RBRACK) + index
                     render_params = extract_function_parameters(tokens[index + 1:rbrack+1:])
-                    params = tuple(render_params)
+                    params = tuple(p.value for p in render_params)
             index += 1
         if export_path == None or params == None:
             raise Exception("Invalid render settings specified.")

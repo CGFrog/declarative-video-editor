@@ -54,6 +54,10 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# VLC Library
+python_vlc-3.0.21203.dist-info/
+vlc.py
+
 # Translations
 *.mo
 *.pot
@@ -212,3 +216,4 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+.DS_Store

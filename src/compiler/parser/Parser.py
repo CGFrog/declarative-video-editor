@@ -42,6 +42,7 @@ class Parser():
         timeline_parser.parse_source(timeline_tokens)
 
         self.state = declaration_parser.state
+        self.primitives = declaration_parser.primitives
         self.timeline = timeline_parser.timeline_elements
         self.render_settings = timeline_parser.render_settings
         if self.render_settings == None:

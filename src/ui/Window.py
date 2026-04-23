@@ -1,5 +1,7 @@
 import tkinter as tk
-from ui.TextEditor import TextEditor
+from src.ui.TextEditor import TextEditor
+from src.ui.VideoPlayer import VideoPlayer
+from src.ui.Menu import Menu
 
 class Window:
     def __init__(self):
@@ -10,6 +12,10 @@ class Window:
         self.root.geometry("400x300")
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
+
+    def createMenu(self):
+        self.menu = Menu(self.root, self.editor)
+        self.root.config(menu=self.menu)
 
     def windowLayout(self):
         self.main_frame = tk.Frame(self.root, bg="YELLOW")
@@ -24,15 +30,15 @@ class Window:
         self.left_frame.grid(row=0, rowspan=2, column=0, sticky="nsew")
         self.left_frame.rowconfigure(0, weight=1)
         self.left_frame.columnconfigure(0, weight=1)
-
+        # create and initialize text box and other elements from textEditor class
         self.editor = TextEditor(self.left_frame)
         self.editor.TextEditorView()
-        # create and initialize text box and other elements from textEditor class
 
     def videoDisplayView(self):
         self.right_frame = tk.Frame(self.main_frame, bg="GREEN")
         self.right_frame.grid(row=0, column=1, sticky="nsew")
         # create and initialize media player and other elements from videoPlayer class
+        self.video_player = VideoPlayer(self.right_frame)
 
     def consoleView(self):
         self.bottom_frame = tk.Frame(self.main_frame, bg="RED")
@@ -45,4 +51,5 @@ class Window:
         self.TextEditorView()
         self.videoDisplayView()
         self.consoleView()
+        self.createMenu()
         self.root.mainloop()

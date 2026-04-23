@@ -30,7 +30,11 @@ labels = {
 
     'timeline': TL.TIMELINE,
     'after': TL.AFTER,
-    'render': TL.RENDER
+    'render': TL.RENDER,
+
+    # Primitive Variables
+    'str': TL.STR,
+    'num': TL.NUM
 }
 
 # Import token class
@@ -90,6 +94,8 @@ class Lexer():
     def build_tokens(self, text : str) -> list[Token]:
         tokens = []
         self.text = text
+        self.pos = -1
+        self.current_char = None
         self.__forward()
 
         while self.current_char is not None and self.current_char != '%':
