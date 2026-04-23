@@ -159,7 +159,51 @@ class DeclarationParser():
                     # Bundle everything into an effect object from resolved_params
                     effects.append(Effect(token.value, resolved_params))
                     index=input_len+ index
+
+                case TL.IDENTIFIER:
+                    func_name = token.value
+                    if func_name not in self.functions:
+                        raise Exception(f"Line {self.line_number}: Unknown function '{func_name}'.")
+                    func = self.functions[func_name]
+                    right_paren = first_of_token(tokens[index:], TL.RPAREN)
+                    raw_args = extract_function_parameters(tokens[index+1:index+right_paren])
+                    resolved_args = self.resolve_params(raw_args, self.primitives)
+                    if len(resolved_args) != len(func["params"]):
+                        raise Exception(
+                            f"Line {self.line_number}: '{func_name}' expects "
+                            f"{len(func['params'])} args, got {len(self.resolve_args)}."
+                        )
+                    local_vars = dict(zip(func["params"], resolved_args))
+                    expanded_effects = self.__generate_effects_with_localVars(func["body"], local_vars)
+                    effects.extend(expanded_effects)
+                    index += right_paren
+
             index+=1
+        effects.reverse()
+        return effects
+
+    def __generate_effects_with_localVars(self, tokens: list[Token], local_vars: dict) -> list[Effect]:
+        """
+        Evaluates a declared function's body tokens using a local variable DICT (not global).
+        Called when a user defined function like f(1,2,3) is found in a pipe chain.
+        It resolves parameters against local_vars which maps parameter names to their 
+        passed in argument values. (e.g. local_vars = {"a": 1, "b": 2, "c": 3})
+        Returns a list of Effect objects with the arguments substituted in.
+        """        
+        index = 0
+        effects: list[Effect] = []
+        while index < len(Token):
+            token = tokens[index]
+            match token.key:
+                case TL.EFFECT:
+                    input_len = first_of_token(tokens[index:], TL.RPAREN)
+                    if input_len < 0:
+                        raise Exception(f"Invalidfunction body on line {self.line_number}")
+                    raw_params = extract_function_parameters(tokens[index+1:index+input_len])
+                    resolved_params = self.resolve_params(raw_params, local_vars)
+                    effects.append(Effect(token.value, resolved_params))
+                    index += input_len
+            index += 1
         effects.reverse()
         return effects
     
