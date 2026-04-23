@@ -3,19 +3,14 @@ import json
 import subprocess
 from typing import Dict, List
 from src.compiler.parser.Parser import Parser
-from src.compiler.StateVariable import Clip, StateVariable
+from src.compiler.StateVariable import StateVariable
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.FFMpegBuilder import FFMpegBuilder
-
-class ResolvedClip:
-    def __init__(self, path, src_start, src_end, timeline_start, z):
-        self.path = path
-        self.src_start = src_start
-        self.src_end = src_end
-        self.timeline_start = timeline_start
-        self.z = z
-
+from src.compiler.ResolvedClip import ResolvedClip
 class Compiler:
+    """
+    The compiler works by concatenating the videos together on each layer, and overlay the layers on top of each other.
+    """
     def __init__(self):
         self.parser = Parser()
         self.state: Dict[str, StateVariable] = {}
@@ -25,8 +20,7 @@ class Compiler:
         self.layers = {}
         self.duration_cache: dict[str,float] = {}
 
-
-    def compile(self, source_code: str):
+    def compile(self, source_code: str)->str:
         self.parser.parse_source(source_code=source_code)
         self.state = self.parser.state
         self.timeline = self.parser.timeline
@@ -35,26 +29,32 @@ class Compiler:
         render_settings = self.parser.render_settings
 
         clips = self.__generate_clips()
-        layers = self.__build_layers(clips)
+        layers: dict = self.__build_layers(clips)
         ffmpeg_builder = FFMpegBuilder()
         
-        filter_complex = ffmpeg_builder.build_filter_graph(layers, int(render_settings.x), int(render_settings.y) )
-        inputs = ffmpeg_builder.build_inputs()
+        # generates the ffmpeg command
+        filter_complex: str = ffmpeg_builder.build_filter_graph(layers, int(render_settings.x), int(render_settings.y) )
+        # resolves all of the inputs for the ffmpeg command.
+        inputs: str = ffmpeg_builder.build_inputs()
 
-        output_path = self.parser.render_settings.export_path
-        final_v = ffmpeg_builder.final_video_label
-
+        output_path:str = self.parser.render_settings.export_path
+        final_v:str = ffmpeg_builder.final_video_label
+        final_a:str = ffmpeg_builder.final_audio_label
+        # returns the ffmpeg command as a string to reduce side-effects, that way users can compile and to see errors often without generating a whole video.
         return (
             f"ffmpeg {inputs} "
             f"-filter_complex \"{filter_complex}\" "
-            f"-map \"[{final_v}]\" -map \"[a]\" "
+            f"-map \"[{final_v}]\" -map \"[{final_a}]\" "
             f"\"{output_path}\""
         )
-
+    
     def __generate_clips(self):
+        """
+        # Generates new clips that can be more easily used by the ffmpeg builder. Essentially combining timeline clips with their state variable counter parts.
+        """
         result: list[ResolvedClip] = []
         for timeline_element in self.timeline:
-            base_start = self.__resolve_start_time(timeline_element.identifier)
+            base_start = self.__resolve_start_time(timeline_element)
             z: int = int(timeline_element.z)
             state: StateVariable = self.state[timeline_element.identifier]
             cursor = base_start
@@ -70,13 +70,17 @@ class Compiler:
                         src_start=start,
                         src_end=end,
                         timeline_start=cursor,
-                        z=z
+                        z=z,
+                        effects=state.effects
                     )
                 )
                 cursor += duration
         return result
 
     def __get_media_duration(self, path:str)->float:
+        """
+        Uses ffprobe to find the duration of a video.
+        """
         if path in self.duration_cache:
             return self.duration_cache[path]
         result = subprocess.run(
@@ -101,21 +105,39 @@ class Compiler:
         self.duration_cache[path] = duration
         return duration
     
-    def __resolve_start_time(self, name: str) -> float:
-        visited = set()
-        def resolve(n: str) -> float:
-            if n in visited:
-                raise Exception(f"Cyclic dependency: {n}")
-            visited.add(n)
-            timeline_element = next(x for x in self.timeline if x.identifier==n)
-            try:
-                return float(timeline_element.start_time)
-            except ValueError:
-                return resolve(timeline_element.start_time)+self.__get_state_duration(timeline_element.start_time)
+    def __resolve_start_time(self, element: TimelineElement) -> float:
+        """
+        x after y, y after z, to find the start time of x we must know the start time of z + duration of z + duration of y, this function calculates that recursively.
 
-        return resolve(name)
+        I'd like to be able to re-reference previous variables rather than cyclic dependency errors but with so little time left, this will do.
+
+        If one of you wants to tackle the challege
+
+        We want:
+
+        x after y
+        z after y
+        x after z
+
+        where the last x is essentially just a copy of the first x with a new start time.
+        """
+        visited = set()
+        def resolve(el: TimelineElement) -> float:
+            if id(el) in visited:
+                raise Exception(f"Cyclic dependency: {el.identifier}")
+            visited.add(id(el))
+            try:
+                return float(el.start_time)
+            except ValueError:
+                dep = next(x for x in self.timeline if x.identifier == el.start_time)
+                return resolve(dep) + self.__get_state_duration(dep.identifier)
+
+        return resolve(element)
 
     def __get_state_duration(self, name: str) -> float:
+        """
+        Finds the duration of a state variable
+        """
         state = self.state[name]
         total =0
         for clip in state.clips:
@@ -125,6 +147,9 @@ class Compiler:
         return total
     
     def __build_layers(self, clips:list[ResolvedClip]):
+        """
+        Adds video clips to their corresponding layer.
+        """
         layers = defaultdict(list) # This is a neat trick, initializes all elements in the dict to list.
         for clip in clips:
             layers[clip.z].append(clip)
@@ -134,19 +159,20 @@ class Compiler:
 
 def main():
     source_code = """
-    video intro = "C:\\Users\\ianco\\Downloads\\DVEL\\full_video.mp4" (0,5)
-    video intro2 = "C:\\Users\\ianco\\Downloads\\DVEL\\full_video.mp4" (0,5)
+    video ian = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ian.mkv" (0,3)
+    video karl = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\karl.mkv" (0,7)
+
     timeline
-    intro 5 1
+
+    ian 0 1
+    karl after ian 1
+    
     render "output.mp4" [1920,1080]
     """
 
     compiler = Compiler()
     command = compiler.compile(source_code)
-
-    print("Generated FFmpeg command:\n")
     print(command)
-
     subprocess.run(command, shell=True, check=True)
 
 
