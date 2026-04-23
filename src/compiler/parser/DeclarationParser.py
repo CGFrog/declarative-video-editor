@@ -29,6 +29,9 @@ class DeclarationParser():
                 # Check each line, if it starts w/ NUM or STR it sends the token to __parse_primitive.
                 case TL.NUM | TL.STR: 
                     self.__parse_primitive(tokens)
+                case TL.FUNC:
+                    name = tokens[1].value
+                    self.functions[name] = self.__parse_func_decl(tokens)
             self.line_number += 1
         print("DEBUG — FINAL PARSER STATE:", self.state)
         for name, var in self.state.items():
@@ -88,6 +91,31 @@ class DeclarationParser():
         the DICT and assigns the stored value to that name. 
         """
         self.primitives.update({name_token.value: value})
+    
+    def __parse_func_decl(self, tokens : list[Token]) -> dict:
+        """
+        Parses through line containing keyword 'func', slices the tokens within the '()' 
+        and returns identifier tokens. Body_tokens represent the entire pipeline right of the = sign.
+        Then, validates the identifiers are within the parameters list, else raises exception. 
+        Stores everything into a dict that gets saved into self.functions for later use.
+        """
+        
+        left_paren = first_of_token(tokens, TL.LPAREN)
+        right_paren = first_of_token(tokens, TL.RPAREN)
+
+        params = []
+        for token in tokens[left_paren+1:right_paren]:
+            if token.key == TL.IDENTIFIER:
+                params.append(token.value)
+        
+        eq_index = first_of_token(tokens, TL.ASSIGN)
+        body_tokens = tokens[eq_index + 1:]
+
+        for token in body_tokens:
+            if token.key == TL.IDENTIFIER and token.value not in params:
+                raise Exception(f"Line {self.line_number}: Undefined parameter '{token.value} in func body.")
+        
+        return {"params": params, "body": body_tokens}
         
     def resolve_params(self, raw_params: list[Primitive], primitives: dict) -> list:
         resolved = []
