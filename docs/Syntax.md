@@ -56,7 +56,7 @@ The timeline is where all the various media objects are compiled together. Once 
 video v_1 = "my_cool_lets_play.mp4" ()
 
 timeline
-v_1 0
+v_1 0 1
 <media variable name> <start time> <z layer (layer of media in the timeline)>
 .
 .
@@ -77,7 +77,7 @@ timeline
 intro 0 1
 game_footage after intro 1
 music 0 1
-webcam_footage after intro z=2
+webcam_footage after intro 2
 
 render "lets_play.mp4" [1920,1080]
 ```
