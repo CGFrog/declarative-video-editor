@@ -192,7 +192,7 @@ class DeclarationParser():
         """        
         index = 0
         effects: list[Effect] = []
-        while index < len(Token):
+        while index < len(tokens):
             token = tokens[index]
             match token.key:
                 case TL.EFFECT:
