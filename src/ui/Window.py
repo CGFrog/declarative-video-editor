@@ -61,7 +61,7 @@ class Window:
         self.bottom_right_frame.columnconfigure(0, weight=1)
 
         self.console = ConsoleView(self.bottom_right_frame)
-        self.console.ConsoleView()
+        self.console.console_view()
         self.console.set_input_callback(self.console.handle_console_input)
 
 

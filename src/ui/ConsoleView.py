@@ -7,7 +7,7 @@ class ConsoleView:
         self.input_callback = None
         self.input_start_index = "1.0"
 
-    def ConsoleView(self):
+    def console_view(self):
         self.main_frame = tk.Frame(self.parent, bg="black")
         self.main_frame.grid(row=0, column=0, sticky="nsew")
 
@@ -28,7 +28,6 @@ class ConsoleView:
         self.scrollbar.grid(row=0, column=1, sticky="ns")
 
         self.console.bind("<Return>", self.on_enter)
-        self.console.bind("<Key>", self.on_key)
         self.console.config(yscrollcommand=self.scrollbar.set)
 
     def redirectOut(self):
@@ -51,9 +50,6 @@ class ConsoleView:
         except Exception:
             self.original_stdout.write(message)
 
-    def flush(self):
-        pass
-
     def set_input_callback(self, callback):
         self.input_callback = callback
 
@@ -69,10 +65,6 @@ class ConsoleView:
         self.input_start_index = self.console.index("end-1c")
 
         return "break"
-
-    def on_key(self, event):
-        if self.console.compare("insert", "<", self.input_start_index):
-            return "break"
 
     def handle_console_input(self, text):
         print(f"You typed: {text}")
