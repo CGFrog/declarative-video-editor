@@ -1,6 +1,7 @@
 import tkinter as tk
 from src.ui.TextEditor import TextEditor
 from src.ui.VideoPlayer import VideoPlayer
+from src.ui.ConsoleView import ConsoleView
 from src.ui.Menu import Menu
 
 class Window:
@@ -9,41 +10,60 @@ class Window:
 
     def createWindow(self):
         self.root.title("Declarative Video Editor")
-        self.root.geometry("400x300")
-        self.root.rowconfigure(0, weight=1)
-        self.root.columnconfigure(0, weight=1)
+        self.root.geometry("800x600")
 
     def createMenu(self):
         self.menu = Menu(self.root, self.editor)
         self.root.config(menu=self.menu)
 
     def windowLayout(self):
-        self.main_frame = tk.Frame(self.root, bg="YELLOW")
-        self.main_frame.grid(row=0, column=0, sticky="nsew")
-        self.main_frame.rowconfigure(0, weight=1, uniform="rows")
-        self.main_frame.rowconfigure(1, weight=1, uniform="rows")
-        self.main_frame.columnconfigure(0, weight=1, uniform="cols")
-        self.main_frame.columnconfigure(1, weight=1, uniform="cols")
+        self.main_pane = tk.PanedWindow(
+            self.root,
+            orient="horizontal",
+            sashrelief="raised",
+            showhandle=True,
+        )
+        self.main_pane.pack(fill="both", expand=True)
+
+        self.left_frame = tk.Frame(self.main_pane)
+        self.main_pane.add(self.left_frame, minsize=200)
+
+        self.right_pane = tk.PanedWindow(
+            self.main_pane,
+            orient="vertical",
+            sashrelief="raised",
+            showhandle=True,
+        )
+        self.main_pane.add(self.right_pane, minsize=200)
+
+        self.top_right_frame = tk.Frame(self.right_pane)
+        self.right_pane.add(self.top_right_frame, minsize=150)
+
+        self.bottom_right_frame = tk.Frame(self.right_pane)
+        self.right_pane.add(self.bottom_right_frame, minsize=100)
 
     def TextEditorView(self):
-        self.left_frame = tk.Frame(self.main_frame, bg="BLUE")
-        self.left_frame.grid(row=0, rowspan=2, column=0, sticky="nsew")
         self.left_frame.rowconfigure(0, weight=1)
         self.left_frame.columnconfigure(0, weight=1)
-        # create and initialize text box and other elements from textEditor class
+
         self.editor = TextEditor(self.left_frame)
         self.editor.TextEditorView()
 
     def videoDisplayView(self):
-        self.right_frame = tk.Frame(self.main_frame, bg="GREEN")
-        self.right_frame.grid(row=0, column=1, sticky="nsew")
-        # create and initialize media player and other elements from videoPlayer class
-        self.video_player = VideoPlayer(self.right_frame)
+        self.top_right_frame.rowconfigure(0, weight=1)
+        self.top_right_frame.columnconfigure(0, weight=1)
+
+        self.video_player = VideoPlayer(self.top_right_frame)
+
 
     def consoleView(self):
-        self.bottom_frame = tk.Frame(self.main_frame, bg="RED")
-        self.bottom_frame.grid(row=1, column=1, sticky="nsew")
-        # create and initialize console and other elements from console class
+        self.bottom_right_frame.rowconfigure(0, weight=1)
+        self.bottom_right_frame.columnconfigure(0, weight=1)
+
+        self.console = ConsoleView(self.bottom_right_frame)
+        self.console.console_view()
+        self.console.set_input_callback(self.console.handle_console_input)
+
 
     def run(self):
         self.createWindow()

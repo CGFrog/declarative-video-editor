@@ -1,12 +1,20 @@
 import tkinter as tk
 import vlc
 import os
+import sys
 from tkinter import filedialog
 from tkinter import ttk
 
 class VideoPlayer:
     def __init__(self, parent_frame):
-        self.instance = vlc.Instance()
+        vlc_path = self.get_vlc_path()
+
+        os.environ["PATH"] = vlc_path + ";" + os.environ.get("PATH", "")
+
+        self.instance = vlc.Instance([
+            f"--plugin-path={os.path.join(vlc_path, 'plugins')}"
+        ])
+
         self.player = self.instance.media_player_new()
 
         self.parent_frame = parent_frame
@@ -29,8 +37,16 @@ class VideoPlayer:
         self.is_dragging_progress = False
 
         self.build_ui()
-        self.parent_frame.after(100, self.setVideoOutput)
+        self.parent_frame.after(100, self.set_video_output)
         self.parent_frame.after(200, self.update_progress)
+
+    def get_vlc_path(self):
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(__file__)
+
+        return os.path.join(base_path, "vlc")
 
     def build_ui(self):
         self.video_widget = tk.Frame(self.parent_frame, bg="black")
@@ -74,7 +90,7 @@ class VideoPlayer:
         self.file_label = tk.Label(progress_frame, text="No video loaded", width=20, anchor="w")
         self.file_label.grid(row=0, column=2, sticky="w", padx=(0, 5))
 
-    def setVideoOutput(self):
+    def set_video_output(self):
         self.video_widget.update_idletasks()
         window_id = self.video_widget.winfo_id()
 
@@ -104,7 +120,7 @@ class VideoPlayer:
         if self.player.get_media() is None:
             return
 
-        self.setVideoOutput()
+        self.set_video_output()
         self.player.play()
         #self.file_label.config(text="Playing")
 
