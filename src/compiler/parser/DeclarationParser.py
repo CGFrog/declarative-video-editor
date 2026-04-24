@@ -4,6 +4,7 @@ from src.compiler.StateVariable import Clip, StateVariable
 from src.compiler.Effect import Effect
 from src.compiler.parser.ParsingUtils import extract_duration, first_of_token, extract_function_parameters
 from src.compiler.parser.Primitive import Primitive
+from src.compiler.parser.ResolvedFunction import ResolvedFunction
 
 class DeclarationParser(): 
     def __init__(self): 
@@ -34,12 +35,6 @@ class DeclarationParser():
                     name = tokens[1].value
                     self.functions[name] = self.__parse_func_decl(tokens)
             self.line_number += 1
-        print("DEBUG — FINAL PARSER STATE:", self.state)
-        for name, var in self.state.items():
-            print("MEDIA NAME:", name)
-            print("  CLIPS:", [(c.path, c.duration) for c in var.clips])
-            print("  EFFECTS:", [(e.type, e.param) for e in var.effects])
-
 
 
     def __parse_media(self, tokens : list[Token])->StateVariable:
@@ -93,16 +88,12 @@ class DeclarationParser():
         """
         self.primitives.update({name_token.value: value})
     
-    def __parse_func_decl(self, tokens : list[Token]) -> dict:
+    def __parse_func_decl(self, tokens : list[Token]) -> ResolvedFunction:
         """
         Parses through line containing keyword 'func', slices the tokens within the '()' 
         and returns identifier tokens. Body_tokens represent the entire pipeline right of the = sign.
         Then, validates the identifiers are within the parameters list, else raises exception. 
         Stores everything into a dict that gets saved into self.functions for later use.
-        
-        self.functions["f"] = {
-        "params": ["a", "b", "c"],
-        "body": [...tokens for saturation(a) |> speed(b) |> volume(c)...]} 
         """
         
         left_paren = first_of_token(tokens, TL.LPAREN)
@@ -120,7 +111,7 @@ class DeclarationParser():
             if token.key == TL.IDENTIFIER and token.value not in params:
                 raise Exception(f"Line {self.line_number}: Undefined parameter '{token.value} in func body.")
         
-        return {"params": params, "body": body_tokens}
+        return ResolvedFunction(params, body_tokens)
         
     def resolve_params(self, raw_params: list[Primitive], primitives: dict) -> list:
         resolved = []
@@ -151,7 +142,7 @@ class DeclarationParser():
             token = tokens[index]
             match token.key:
                 case TL.EFFECT:
-                    input_len: int = first_of_token(tokens[index::], TL.RPAREN)
+                    input_len: int = first_of_token(tokens[index:], TL.RPAREN)
                     if input_len < 0:
                         raise(Exception(f"Invalid function composition on {self.line_number}"))
                     
@@ -181,16 +172,16 @@ class DeclarationParser():
                     resolved_args = self.resolve_params(raw_args, self.primitives)
                     
                     # Validate argument count matches parameter count
-                    if len(resolved_args) != len(func["params"]):
+                    if len(resolved_args) != len(func.params):
                         raise Exception(
                             f"Line {self.line_number}: '{func_name}' expects "
-                            f"{len(func['params'])} args, got {len(self.resolve_args)}."
+                            f"{len(func.params)} args, got {len(resolved_args)}."
                         )
                     # Create a temporary local dict pairing each parameter name with its argument value
-                    local_vars = dict(zip(func["params"], resolved_args))
+                    local_vars = dict(zip(func.params, resolved_args))
                     
                     # Evaluate the function body using local_vars and collect the resulting effects
-                    expanded_effects = self.__generate_effects_with_localVars(func["body"], local_vars)
+                    expanded_effects = self.__generate_effects_with_localVars(func.body, local_vars)
                     effects.extend(expanded_effects)
                     index += right_paren
 
