@@ -12,6 +12,7 @@ class Menu(tk.Menu):
         file_menu = tk.Menu(menu, tearoff=0)
         file_menu.add_command(label="Open", command=self.open)
         file_menu.add_command(label="Save", command=self.save)
+        file_menu.add_command(label="Save As", command=self.save_as)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.quit)
 
@@ -20,17 +21,18 @@ class Menu(tk.Menu):
         self.add_command(label="Help", command=self.help)
 
     def open(self):
-        # Route to open function
-        print("Opening...")
+        self.text_editor.open_file()
 
     def compile(self):
         content = self.text_editor.get_content()
         Compiler.compile(content)
 
     def save(self):
-        # TO DO
-        print("Saving...")
+        self.text_editor.save_file()
+
+    def save_as(self):
+        self.text_editor.save_file_as()
 
     def help(self):
-        # TO DO
-        print("Helping...")
+        # Route to documentation
+        print("Routing to documentation...")
