@@ -1,10 +1,12 @@
+from uuid import uuid4
 from src.media.DMedia import DMedia
 import ffmpeg
 import math
+from src.compiler.CompilerUtils import generate_temp_path
 
-class DVideo(DMedia): #D just seems like a reasonable way to distinguish between our video wrapper class and the ffmpeg video class. I.e. the D in DVET.
-    def __init__(self, name : str, file_path : str)-> None:
-        super()
+class DVideo(DMedia): # D just seems like a reasonable way to distinguish between our video wrapper class and the ffmpeg video class. I.e. the D in DVEL.
+    def __init__(self, file_path : str)-> None:
+        super().__init__(file_path)
 
     def trim(self, start : str, duration :str):
         """
@@ -13,11 +15,16 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             start: Start time of trim in seconds
             duration: Duration of trim in seconds
         """
-        ffmpeg.input(self.cache_path, ss=start, duration=duration).output(cache_path).run()
+        new_path:str = generate_temp_path()
+        if duration == 'e':
+            ffmpeg.input(self.cache_path, ss=start).output(new_path, c='copy').run()
+        else:
+            ffmpeg.input(self.cache_path, ss=start, t=duration).output(new_path).run()
+        self.cache_path = new_path
 
     def union(self, media):
         # Generate new path to avoid reading/writing to same file
-        new_version_path = self.generate_temp_path()
+        new_path:str = generate_temp_path()
         
         # Load two video files 
         v1 = ffmpeg.input(self.cache_path)
@@ -27,9 +34,13 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         v3 = ffmpeg.concat(v1.video, v1.audio, v2.video, v2.audio, v=1, a=1).node
 
         # Output final video
-        ffmpeg.output(v3[0], v3[1], self.cache_path).run()
+        (
+            ffmpeg
+            .output(v3[0], v3[1], new_path)
+            .run()
+        )
         
-        self.cache_path = new_version_path
+        self.cache_path = new_path
 
     def location(self, new_x : float, new_y : float, resolution_w : float, resolution_h : float):
         """
@@ -40,7 +51,14 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             resolution_w: video "canvas" width
             resolution_h: video "canvas" height
         """
-        ffmpeg.input(self.cache_path).filter('pad', w=resolution_w, h=resolution_h, new_x=new_x, new_y=new_y).output(self.cache_path).run()
+        new_path = generate_temp_path()
+        (        
+            ffmpeg
+            .input(self.cache_path)
+            .filter('pad', w=resolution_w, h=resolution_h, new_x=new_x, new_y=new_y)
+            .output(new_path).run()
+        )
+        self.cache_path = new_path
 
     def rotation(self, angle : float):
         """
@@ -48,7 +66,14 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         Args:
             angle: degree amount to rotate video by
         """
-        ffmpeg.input(self.cache_path).filter('rotate', rotation_angle=(angle * math.pi / 180)).output(self.cache_path).run()
+        new_path = generate_temp_path()
+        (
+            ffmpeg
+            .input(self.cache_path)
+            .filter('rotate', rotation_angle=(angle * math.pi / 180))
+            .output(new_path).run()
+        )
+        self.cache_path=new_path
 
     def scale(self, pct : float):
         """
@@ -56,8 +81,12 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         Args:
             pct: percentage increase/decrease in the video's scale
         """
+        new_path = generate_temp_path()
         scale = f'iw*{pct}:ih*{pct}'
-        ffmpeg.input(self.cache_path).filter('scale', scale_pct=scale).output(self.cache_path).run()
+        (
+            ffmpeg.input(self.cache_path).filter('scale', scale_pct=scale).output(new_path).run()
+        )
+        self.cache_path=new_path
 
     def crop(self, width : float, height : float, x_offset : float, y_offset : float):
         """
@@ -68,7 +97,11 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
             x_offset: amount of pixels to crop from the x-axis
             y_offset: amount of pixels to crop from the y-axis
         """
-        ffmpeg.input(self.cache_path).filter('crop', width=width, height=height, x_off=x_offset, y_off=y_offset).output(self.cache_path).run()
+        new_path = generate_temp_path()
+        (
+            ffmpeg.input(self.cache_path).filter('crop', width=width, height=height, x_off=x_offset, y_off=y_offset).output(new_path).run()
+        )
+        self.cache_path = new_path
 
     def overlay(self, media, x = 0, y = 0):
         """
@@ -110,7 +143,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         """
         
         # Generate new path to avoid reading/writing to same file
-        new_version_path = self.generate_temp_path()
+        new_path:str = generate_temp_path()
 
         foreground = ffmpeg.input(self.cache_path)
         background = ffmpeg.input(media.cache_path)
@@ -122,11 +155,7 @@ class DVideo(DMedia): #D just seems like a reasonable way to distinguish between
         final_video = ffmpeg.overlay(background.video, keyed_video)
 
         # Output final video along with audio from original video
-        (
-            ffmpeg
-            .output(final_video, foreground.audio, new_version_path)
-            .run()
-        )
+        ffmpeg.output(final_video, foreground.audio, new_path).run()
 
-        self.cache_path = new_version_path
+        self.cache_path = new_path
 

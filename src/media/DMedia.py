@@ -1,6 +1,5 @@
 import ffmpeg
-import abc
-import uuid
+from src.compiler.CompilerUtils import generate_temp_path
 
 class DMedia():
     """
@@ -11,21 +10,20 @@ class DMedia():
         name: DVEL media variable name.
         file_path: path to file
     """
-    def __init__(self, name : str, file_path : str) -> None:
-        self.name = name
+    def __init__(self, file_path : str) -> None:
         self.file_path = file_path
         self.duration: str = ""
-        self.cache_path = f"cache/name_{uuid.uuid4()}.mp4"
+        self.cache_path = generate_temp_path()
         ffmpeg.input(self.file_path).output(self.cache_path).run()
     
     @classmethod
-    def trim(self, time1, time2)->None:
+    def trim(cls, self, time1, time2)->None:
         pass
 
     @classmethod
-    def union(self, media)->None:
+    def union(cls, self, media)->None:
         pass
 
     @classmethod
-    def overlay(self, media)->None:
+    def overlay(cls, self, media)->None:
         pass

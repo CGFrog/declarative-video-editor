@@ -57,7 +57,6 @@ if __name__=="__main__":
     """
     parser = Parser()
     parser.parse_source(TEST1)
-
     assert parser.state == state
     assert parser.timeline == timeline
     assert parser.render_settings == render_settings

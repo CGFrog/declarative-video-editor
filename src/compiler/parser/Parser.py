@@ -51,19 +51,19 @@ class Parser():
 
 # Test Case
 def main():
-    source_code =   """video intro = \"intro.mp4\" (0,e) |> saturation(3) |> speed(1.5)
-                    audio music = \"music.mp3\" (0,e) |> volume(2) |> noise_filter(-60)
-                    video game_footage = \"game_footage.mp4\" (0,30) + (35,49)
-                    video webcam_footage = \"webcam_footage.mp4\" (0,30) + (35,49) |> transform(1000,320) |> scale(0.2,0.2)
-                    
-                    
-                    timeline
-                    intro 0 1
-                    game_footage after intro 1
-                    music 0 1
-                    webcam_footage after intro 2
-                    
-                    render \"lets_play.mp4\" [1920,1080]"""
+    source_code = """
+    video ian = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ian.mkv" (0,3)
+    video karl = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\karl.mkv" (0,7)
+
+    timeline
+
+    ian 0 1
+    karl after ian 1
+    ian after karl 1
+    
+    render "output.mp4" [1920,1080]
+    """
+
     parser = Parser()
     parser.parse_source(source_code)
     for name in parser.state.keys():
@@ -74,9 +74,9 @@ def main():
         print("Effects")
         for effect in parser.state[name].effects:
             print(f"    Type: {effect.type}, Params: {effect.param}")
-        print("Timeline Parser")
-        for t in parser.timeline:
-            print(f"    Identifier: {t.identifier}, Start Time: {t.start_time}, z: {t.z}")
+    print("Timeline Parser")
+    for t in parser.timeline:
+        print(f"    Identifier: {t.identifier}, Start Time: {t.start_time}, z: {t.z}")
 
 if __name__ == '__main__':
     main()

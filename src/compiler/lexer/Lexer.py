@@ -19,7 +19,6 @@ labels = {
     'video': TL.MEDIA,
     'audio': TL.MEDIA,
     'image': TL.MEDIA,
-
     'blur': TL.EFFECT,
     'saturation': TL.EFFECT,
     'chroma': TL.EFFECT,

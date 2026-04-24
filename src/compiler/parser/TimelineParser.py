@@ -21,8 +21,30 @@ class TimelineParser:
                     self.timeline_elements.append(self.__parse_media_line(tokens))
                 case TL.RENDER:
                     self.render_settings= self.__parse_render_line(tokens)
+        self.__validate_timeline()
 
-    def __parse_render_line(self, tokens : list[Token]):
+    def __validate_timeline(self):
+        """
+        Ensures no cyclic dependencies and all identifiers are accounted for.
+        """
+        seen = set()
+        identifiers = {el.identifier for el in self.timeline_elements}
+        for element in self.timeline_elements:
+            try: # ensure x start time is all good and we have it
+                float(element.start_time)
+            except ValueError:
+                if element.start_time not in identifiers:
+                    raise Exception(f"'{element.identifier}' references unknown identifier '{element.start_time}' in 'after'.")
+            # ensure an identifier is not user in an after twice, cyclic dependencies are bad, itd be nice to find a better fix for this. 
+            if element.identifier in seen:
+                raise Exception(f"'{element.identifier}' appears more than once in the timeline. Each variable can only be placed once to avoid ambiguous cyclic dependencies.")
+            seen.add(element.identifier)
+        identifiers = {el.identifier for el in self.timeline_elements}
+
+    def __parse_render_line(self, tokens : list[Token])-> RenderSettings:
+        """
+        Parsing for the final render line, this will be modified if we want more than 'render [x,y]'
+        """
         index: int = 0       
         params : tuple[str, str] | None = None 
         export_path: str | None = None 
@@ -40,6 +62,9 @@ class TimelineParser:
         return RenderSettings(export_path, params)
 
     def __parse_media_line(self, tokens: list[Token]):
+        """
+        Parses the x after y or x 0 1 declarations after timeline.
+        """
         z : str | None = ""
         start_time: str | None = ""
         index : int = 0
@@ -60,9 +85,9 @@ class TimelineParser:
                     after = True
                     try:
                         start_time = tokens[index + 1].value
+                        index += 1
                     except:
-                        raise Exception("No valid identifier specified after 'after'")
-                    pass
+                        raise Exception("No valid identifier specified 'after'")
             index += 1
         return TimelineElement(identifier,start_time, z )
         
