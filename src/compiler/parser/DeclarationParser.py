@@ -29,6 +29,7 @@ class DeclarationParser():
                 # Check each line, if it starts w/ NUM or STR it sends the token to __parse_primitive.
                 case TL.NUM | TL.STR: 
                     self.__parse_primitive(tokens)
+                # Check if line starts with 'func', then it calls __parse_func_decl function
                 case TL.FUNC:
                     name = tokens[1].value
                     self.functions[name] = self.__parse_func_decl(tokens)
@@ -98,6 +99,10 @@ class DeclarationParser():
         and returns identifier tokens. Body_tokens represent the entire pipeline right of the = sign.
         Then, validates the identifiers are within the parameters list, else raises exception. 
         Stores everything into a dict that gets saved into self.functions for later use.
+        
+        self.functions["f"] = {
+        "params": ["a", "b", "c"],
+        "body": [...tokens for saturation(a) |> speed(b) |> volume(c)...]} 
         """
         
         left_paren = first_of_token(tokens, TL.LPAREN)
@@ -162,18 +167,29 @@ class DeclarationParser():
 
                 case TL.IDENTIFIER:
                     func_name = token.value
+                    # Check if function not in DICT 
                     if func_name not in self.functions:
                         raise Exception(f"Line {self.line_number}: Unknown function '{func_name}'.")
                     func = self.functions[func_name]
+
                     right_paren = first_of_token(tokens[index:], TL.RPAREN)
+
+                    # Extract the raw arguments between the ( and )
                     raw_args = extract_function_parameters(tokens[index+1:index+right_paren])
+                    
+                    # Resolve arguments against self.primitives in case any are variables e.g. f(Var1, 2, 3)
                     resolved_args = self.resolve_params(raw_args, self.primitives)
+                    
+                    # Validate argument count matches parameter count
                     if len(resolved_args) != len(func["params"]):
                         raise Exception(
                             f"Line {self.line_number}: '{func_name}' expects "
                             f"{len(func['params'])} args, got {len(self.resolve_args)}."
                         )
+                    # Create a temporary local dict pairing each parameter name with its argument value
                     local_vars = dict(zip(func["params"], resolved_args))
+                    
+                    # Evaluate the function body using local_vars and collect the resulting effects
                     expanded_effects = self.__generate_effects_with_localVars(func["body"], local_vars)
                     effects.extend(expanded_effects)
                     index += right_paren
@@ -182,9 +198,10 @@ class DeclarationParser():
         effects.reverse()
         return effects
 
+    # Walks through tokens and builds a list of Effect objects 
     def __generate_effects_with_localVars(self, tokens: list[Token], local_vars: dict) -> list[Effect]:
         """
-        Evaluates a declared function's body tokens using a local variable DICT (not global).
+        Evaluates a declared function's body tokens using the local variable DICT created in __generate_effects.
         Called when a user defined function like f(1,2,3) is found in a pipe chain.
         It resolves parameters against local_vars which maps parameter names to their 
         passed in argument values. (e.g. local_vars = {"a": 1, "b": 2, "c": 3})
@@ -198,7 +215,7 @@ class DeclarationParser():
                 case TL.EFFECT:
                     input_len = first_of_token(tokens[index:], TL.RPAREN)
                     if input_len < 0:
-                        raise Exception(f"Invalidfunction body on line {self.line_number}")
+                        raise Exception(f"Invalid function body on line {self.line_number}")
                     raw_params = extract_function_parameters(tokens[index+1:index+input_len])
                     resolved_params = self.resolve_params(raw_params, local_vars)
                     effects.append(Effect(token.value, resolved_params))
