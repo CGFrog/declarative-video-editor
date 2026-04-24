@@ -2,10 +2,13 @@ from src.compiler.lexer.Token import Token
 from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.StateVariable import Clip, StateVariable
 from src.compiler.Effect import Effect
-from src.compiler.parser.ParsingUtils import extract_duration, first_of_token,extract_function_parameters
-class DeclarationParser():
-    def __init__(self):
+from src.compiler.parser.ParsingUtils import extract_duration, first_of_token, extract_function_parameters
+from src.compiler.parser.Primitive import Primitive
+
+class DeclarationParser(): 
+    def __init__(self): 
         self.state: dict = {} # Holds all media variables, i.e. videos, audio, and images, as well as their attributes such as effects applied and durations.
+        self.primitives: dict = {} # Holds all primitive variables i.e. num and str and acts as a look-up table when the compiler sees a variable used.
         self.line_number : int = 1
 
     def parse_source(self, lines_of_tokens : list[list[Token]]):
@@ -22,7 +25,17 @@ class DeclarationParser():
                     if tokens[1].key != TL.IDENTIFIER: 
                         raise Exception(f"Invalid identifier after type declaration.")
                     self.state.update({tokens[1].value : self.__parse_media(tokens)})
+                # Check each line, if it starts w/ NUM or STR it sends the token to __parse_primitive.
+                case TL.NUM | TL.STR: 
+                    self.__parse_primitive(tokens)
             self.line_number += 1
+        print("DEBUG — FINAL PARSER STATE:", self.state)
+        for name, var in self.state.items():
+            print("MEDIA NAME:", name)
+            print("  CLIPS:", [(c.path, c.duration) for c in var.clips])
+            print("  EFFECTS:", [(e.type, e.param) for e in var.effects])
+
+
 
     def __parse_media(self, tokens : list[Token])->StateVariable:
         """
@@ -43,6 +56,57 @@ class DeclarationParser():
         state_var.effects = self.__generate_effects(tokens[start_of_func::])
         return state_var
     
+    def __parse_primitive(self, tokens : list[Token]):
+        type_token = tokens[0].key # Data type (num or str)
+        name_token = tokens[1] # Variable name
+
+        # Find equal sign, if no equal sign raise exception!
+        eq_index = first_of_token(tokens, TL.ASSIGN)
+        if eq_index >= len(tokens):
+            raise Exception(f"Line {self.line_number}: missing '=' in primitive declaration.")
+        
+        # store value of variable in value_token
+        value_token = tokens[eq_index + 1]
+
+        """
+        If number, convert to float variable and store in value. 
+        If string, do not convert into float, store in value
+        """
+        match type_token:
+            case TL.NUM:
+                value = float(value_token.value)
+            case TL.STR:
+                value = value_token.value
+            case _:
+                raise Exception(f"Line {self.line_number}: Invalid primitive type '{type_token}'.")
+        
+        """
+        Creates a link between the variable name and its value 
+        and stores it in self.primitives DICT. Next time the 
+        compiler sees that "name.token_value" it looks it up in 
+        the DICT and assigns the stored value to that name. 
+        """
+        self.primitives.update({name_token.value: value})
+        
+    def resolve_params(self, raw_params: list[Primitive], primitives: dict) -> list:
+        resolved = []
+
+        for p in raw_params:
+            match p.type:
+                case "NUMBER":
+                    resolved.append(p.value)
+                case "STRING":
+                    resolved.append(p.value)
+                case "IDENTIFIER":
+                    if p.value not in primitives:
+                        raise Exception(f"Undefined variable: {p.value}")
+                    resolved.append(primitives[p.value])
+                case _:
+                    raise Exception(f"Unknown parameter type {p.type}")
+        
+        return resolved
+    
+    
     def __generate_effects(self, tokens : list[Token])->list[Effect]:
         """
         Parses the effects of a line.
@@ -56,7 +120,15 @@ class DeclarationParser():
                     input_len: int = first_of_token(tokens[index::], TL.RPAREN)
                     if input_len < 0:
                         raise(Exception(f"Invalid function composition on {self.line_number}"))
-                    effects.append(Effect(token.value, extract_function_parameters(tokens[index+1:index+ input_len:])))
+                    
+                    # Temp placeholder list 
+                    raw_params = extract_function_parameters(tokens[index+1:index+input_len])
+
+                    # Check parameters against self.primitives dict {}
+                    resolved_params = self.resolve_params(raw_params, self.primitives)
+
+                    # Bundle everything into an effect object from resolved_params
+                    effects.append(Effect(token.value, resolved_params))
                     index=input_len+ index
             index+=1
         effects.reverse()

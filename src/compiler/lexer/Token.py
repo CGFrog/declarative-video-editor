@@ -22,6 +22,8 @@ class TokenLabel(Enum):
     TIMELINE= 19
     RENDER = 20
     AFTER = 21
+    STR = 22
+    NUM = 23
 
 class Token():
     def __init__(self, key, value):
