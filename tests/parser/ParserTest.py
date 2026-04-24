@@ -24,7 +24,7 @@ introVar.effects.append(
 introVar.effects.append(
     Effect(
         'saturation', 
-        ['5.0'])
+        [5.0])
     )
 introVar.clips.append(
     Clip(
@@ -60,18 +60,14 @@ render "output.mp4" [1920,1080]
 """
 
 # --- Expected state for TEST2 --- #
-v1Var: StateVariable = StateVariable()
-v1Var.clips.append(Clip("v1.mp4", ['0', 'e']))
-v1Var.effects.append(Effect('saturation', ['1']))
-v1Var.effects.append(Effect('speed', ['2']))
-v1Var.effects.append(Effect('volume', ['3']))
-
-
-v2Var: StateVariable = StateVariable()
-v2Var.clips.append(Clip("v2.mp4", ['0', 'e']))
-v2Var.effects.append(Effect('saturation', ['3']))
-v2Var.effects.append(Effect('speed', ['1']))
-v2Var.effects.append(Effect('volume', ['2']))
+v1Var: StateVariable = StateVariable(
+    effects=[Effect('saturation', ['1']), Effect('speed', ['2']), Effect('volume', ['3'])],
+    clips=[Clip("v1.mp4", ['0', 'e'])]
+)
+v2Var: StateVariable = StateVariable(
+    effects=[Effect('saturation', ['3']), Effect('speed', ['1']), Effect('volume', ['2'])],
+    clips=[Clip("v2.mp4", ['0', 'e'])]
+)
 
 state2: dict[str, StateVariable] = {
     "v1": v1Var,
@@ -105,6 +101,10 @@ if __name__=="__main__":
      # TEST2
     parser2 = Parser()
     parser2.parse_source(TEST2)
+    actual2 = parser2.state['v1']
+    expected2 = state2['v1']
+    print("ACTUAL v1 effects:  ", [(e.type, e.param) for e in actual2.effects])
+    print("EXPECTED v1 effects:", [(e.type, e.param) for e in expected2.effects])
     assert parser2.state == state2
     assert parser2.timeline == timeline2
     assert parser2.render_settings == render_settings2
