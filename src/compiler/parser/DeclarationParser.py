@@ -30,7 +30,7 @@ class DeclarationParser():
                     self.state.update({tokens[1].value : self.__parse_media(tokens)})
                 # Check each line, if it starts w/ NUM or STR it sends the token to __parse_primitive.
                 case TL.NUM | TL.STR: 
-                    self.__parse_primitive(tokens)
+                    self.state.update({tokens[1].value : self.__parse_primitive(tokens)})
                 # Check if line starts with 'func', then it calls __parse_func_decl function
                 case TL.FUNC:
                     name = tokens[1].value

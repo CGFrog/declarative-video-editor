@@ -34,6 +34,11 @@ class Compiler:
         
         # generates the ffmpeg command
         filter_complex: str = ffmpeg_builder.build_filter_graph(layers, int(render_settings.x), int(render_settings.y) )
+
+        # Handles text elements
+        filter_parts_extra = self.__handle_text(ffmpeg_builder)
+        filter_complex = filter_complex + ";" + ";".join(filter_parts_extra)
+
         # resolves all of the inputs for the ffmpeg command.
         inputs: str = ffmpeg_builder.build_inputs()
 
@@ -53,12 +58,18 @@ class Compiler:
         # Generates new clips that can be more easily used by the ffmpeg builder. Essentially combining timeline clips with their state variable counter parts.
         """
         result: list[ResolvedClip] = []
+        self.text_elements = [] # Stores text elements
         for timeline_element in self.timeline:
             base_start = self.__resolve_start_time(timeline_element)
             z: int = int(timeline_element.z)
             state: StateVariable = self.state.get(timeline_element.identifier)
-            if (state == None): # No state = text element (not traditional media - since there is no state variable)
-                self.__handle_text_element(timeline_element)
+            if type(state).__name__ == 'TextVariable': # If text variable detected, append to text_elements and continue
+                self.text_elements.append({
+                    "text": state.text,
+                    "start": timeline_element.start_time,
+                    "duration": state.duration,
+                    "z": z
+                })
                 continue
             cursor = base_start
             for clip in state.clips:
@@ -160,14 +171,30 @@ class Compiler:
             layers[z].sort(key=lambda c: c.timeline_start)
         return layers
     
-    def __handle_text_element(self, timeline_element: TimelineElement):
-        print(f"TEXT ELE: {timeline_element.identifier}, {timeline_element.start_time}, {timeline_element.z}")
+    def __handle_text(self, ffmpeg_builder):
+        current_v = ffmpeg_builder.final_video_label
+        filter_parts_extra = []
+
+        for text in sorted(self.text_elements, key=lambda t: t['z']):
+            current_v = ffmpeg_builder.build_text_overlay(
+                text=text["text"],
+                timeline_start=text["start"],
+                duration=text["duration"],
+                z=text["z"],
+                filter_parts=filter_parts_extra,
+                current_v=current_v
+            )
+
+        ffmpeg_builder.final_video_label = current_v
+
+        if filter_parts_extra:
+            return filter_parts_extra
 
 def main():
     source_code = """
     video scenery = "C:\\Users\\benbu\\Videos\\IMG_1937.MOV" (0,e)
     video ben = "C:\\Users\\benbu\\Videos\\IMG_1962.MOV" (0,e)
-    str t_1 = "Hello World, it is a nice day out! I am going to go outside, today!" 6
+    str t_1 = "Hello World, it is a nice day out!" 2
 
     timeline
 
