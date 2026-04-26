@@ -24,6 +24,7 @@ class Compiler:
         self.parser.parse_source(source_code=source_code)
         self.state = self.parser.state
         self.timeline = self.parser.timeline
+        print(self.state)
         
         assert self.parser.render_settings is not None
         render_settings = self.parser.render_settings
@@ -56,7 +57,10 @@ class Compiler:
         for timeline_element in self.timeline:
             base_start = self.__resolve_start_time(timeline_element)
             z: int = int(timeline_element.z)
-            state: StateVariable = self.state[timeline_element.identifier]
+            state: StateVariable = self.state.get(timeline_element.identifier)
+            if (state == None): 
+                self.__handle_text_element(timeline_element)
+                continue
             cursor = base_start
             for clip in state.clips:
                 start = float(clip.duration[0]) if clip.duration[0] else 0
@@ -156,18 +160,23 @@ class Compiler:
         for z in layers:
             layers[z].sort(key=lambda c: c.timeline_start)
         return layers
+    
+    def __handle_text_element(self, timeline_element: TimelineElement):
+        print(f"TEXT ELE: {timeline_element.identifier}, {timeline_element.start_time}, {timeline_element.z}")
 
 def main():
     source_code = """
-    video ian = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ian.mkv" (0,3)
-    video karl = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\karl.mkv" (0,7)
+    video scenery = "C:\\Users\\benbu\\Videos\\IMG_1937.MOV" (0,e)
+    video ben = "C:\\Users\\benbu\\Videos\\IMG_1962.MOV" (0,e)
+    str t_1 = "Hello, World" 6
 
     timeline
 
-    ian 0 1
-    karl after ian 1
+    ben 0 1
+    t_1 0 1
+    scenery after ben 1
     
-    render "output.mp4" [1920,1080]
+    render "output.mp4" [1656,1242]
     """
 
     compiler = Compiler()
