@@ -36,8 +36,9 @@ class Compiler:
         filter_complex: str = ffmpeg_builder.build_filter_graph(layers, int(render_settings.x), int(render_settings.y) )
 
         # Handles text elements
-        filter_parts_extra = self.__handle_text(ffmpeg_builder)
-        filter_complex = filter_complex + ";" + ";".join(filter_parts_extra)
+        if (self.text_elements):
+            filter_parts_extra = self.__handle_text(ffmpeg_builder)
+            filter_complex = filter_complex + ";" + ";".join(filter_parts_extra)
 
         # resolves all of the inputs for the ffmpeg command.
         inputs: str = ffmpeg_builder.build_inputs()
@@ -187,8 +188,7 @@ class Compiler:
 
         ffmpeg_builder.final_video_label = current_v
 
-        if filter_parts_extra:
-            return filter_parts_extra
+        return filter_parts_extra
 
 def main():
     source_code = """
