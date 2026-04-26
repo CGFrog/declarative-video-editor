@@ -24,7 +24,6 @@ class Compiler:
         self.parser.parse_source(source_code=source_code)
         self.state = self.parser.state
         self.timeline = self.parser.timeline
-        print(self.state)
         
         assert self.parser.render_settings is not None
         render_settings = self.parser.render_settings
@@ -58,7 +57,7 @@ class Compiler:
             base_start = self.__resolve_start_time(timeline_element)
             z: int = int(timeline_element.z)
             state: StateVariable = self.state.get(timeline_element.identifier)
-            if (state == None): 
+            if (state == None): # No state = text element (not traditional media - since there is no state variable)
                 self.__handle_text_element(timeline_element)
                 continue
             cursor = base_start
@@ -168,7 +167,7 @@ def main():
     source_code = """
     video scenery = "C:\\Users\\benbu\\Videos\\IMG_1937.MOV" (0,e)
     video ben = "C:\\Users\\benbu\\Videos\\IMG_1962.MOV" (0,e)
-    str t_1 = "Hello, World" 6
+    str t_1 = "Hello World, it is a nice day out! I am going to go outside, today!" 6
 
     timeline
 
