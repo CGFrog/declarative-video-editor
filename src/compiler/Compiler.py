@@ -38,7 +38,7 @@ class Compiler:
         # Handles text elements
         if (self.text_elements):
             filter_parts_extra = self.__handle_text(ffmpeg_builder)
-            filter_complex = filter_complex + ";" + ";".join(filter_parts_extra)
+            filter_complex = filter_complex + ";" + ";".join(filter_parts_extra) # Place text filters into ffmpeg graph
 
         # resolves all of the inputs for the ffmpeg command.
         inputs: str = ffmpeg_builder.build_inputs()
@@ -173,20 +173,22 @@ class Compiler:
         return layers
     
     def __handle_text(self, ffmpeg_builder):
-        current_v = ffmpeg_builder.final_video_label
+        """
+        If a text element is detected, create text overlay ffmpeg command, add to filter_parts.
+        """
+        current_v = ffmpeg_builder.final_video_label # Pointer to current end of the video chain
         filter_parts_extra = []
 
-        for text in sorted(self.text_elements, key=lambda t: t['z']):
+        for text in sorted(self.text_elements, key=lambda t: t['z']): # Sort by z (layer), lower z draws first
             current_v = ffmpeg_builder.build_text_overlay(
                 text=text["text"],
                 timeline_start=text["start"],
                 duration=text["duration"],
-                z=text["z"],
                 filter_parts=filter_parts_extra,
                 current_v=current_v
             )
 
-        ffmpeg_builder.final_video_label = current_v
+        ffmpeg_builder.final_video_label = current_v # current_v holds label of text overlay
 
         return filter_parts_extra
 
@@ -195,11 +197,13 @@ def main():
     video scenery = "C:\\Users\\benbu\\Videos\\IMG_1937.MOV" (0,e)
     video ben = "C:\\Users\\benbu\\Videos\\IMG_1962.MOV" (0,e)
     str t_1 = "Hello World, it is a nice day out!" 2
+    str caption_1 = "This is a simple test caption..." 1
 
     timeline
 
     ben 0 1
-    t_1 0 1
+    t_1 1 1
+    caption_1 3 1
     scenery after ben 1
     
     render "output.mp4" [1656,1242]

@@ -174,7 +174,10 @@ class FFMpegBuilder:
             f"{audio_inputs}amix=inputs={len(layer_outputs)}:duration=longest[{self.final_audio_label}]"
         )
 
-    def build_text_overlay(self, text: str, timeline_start: float, duration: float, z: int, filter_parts: list, current_v: str) -> str:
+    def build_text_overlay(self, text: str, timeline_start: float, duration: float, filter_parts: list, current_v: str) -> str:
+        """
+        Applies text element to the video frame.
+        """
         uid = uuid4().hex[:6]
         out_label = f"v_text_{uid}"
         end_time = float(timeline_start) + float(duration)
@@ -182,7 +185,8 @@ class FFMpegBuilder:
         filter_parts.append(
             f"[{current_v}]drawtext="
             f"text='{text}':"
-            f"fontsize=48:"
+            f"fontfile='C\\:/Windows/Fonts/arial.ttf':"
+            f"fontsize=56:" # Font size 56
             f"fontcolor=white:"
             f"x=(w-text_w)/2:" # Centered in the screen
             f"y=(h-text_h-50):" # 50 pixels from the bottom of screen
