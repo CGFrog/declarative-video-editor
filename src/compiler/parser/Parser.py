@@ -4,6 +4,7 @@ from src.compiler.parser.DeclarationParser import DeclarationParser
 from src.compiler.lexer.Token import Token
 from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.StateVariable import StateVariable
+from src.compiler.VideoVariable import Clip,VideoVariable
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.parser.RenderSettings import RenderSettings
 from src.compiler.TextVariable import TextVariable
@@ -16,6 +17,7 @@ class Parser():
         self.timeline : list[TimelineElement] = [] # Tells the compiler how to organize our video.
         self.render_settings: RenderSettings | None = None
         self.line_number : int = 1
+        self.primitives = {}
 
     def parse_source(self, source_code : str):
         lines_of_code : list[str] = source_code.splitlines()
@@ -48,37 +50,3 @@ class Parser():
         self.render_settings = timeline_parser.render_settings
         if self.render_settings == None:
             raise Exception("No render settings specified.")
-
-
-# Test Case
-def main():
-    source_code = """
-    video scenery = "C:\\Users\\benbu\\Videos\\IMG_1937.MOV" (0,e)
-    video ben = "C:\\Users\\benbu\\Videos\\IMG_1962.MOV" (0,e)
-    str t = "Hello, World" 6
-
-    timeline
-
-    ben 0 1
-    t 0 1
-    scenery after ben 1
-    
-    render "output.mp4" [1656,1242]
-    """
-
-    parser = Parser()
-    parser.parse_source(source_code)
-    for name in parser.state.keys():
-        print(f"Name: {name}: ")
-        print("Clips")
-        for clip in parser.state[name].clips:
-            print(f"    Path: {clip.path}, Duration: {clip.duration}")
-        print("Effects")
-        for effect in parser.state[name].effects:
-            print(f"    Type: {effect.type}, Params: {effect.param}")
-    print("Timeline Parser")
-    for t in parser.timeline:
-        print(f"    Identifier: {t.identifier}, Start Time: {t.start_time}, z: {t.z}")
-
-if __name__ == '__main__':
-    main()

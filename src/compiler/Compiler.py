@@ -2,8 +2,11 @@ from collections import defaultdict
 import json
 import subprocess
 from typing import Dict, List
+from src.compiler.parser.RenderSettings import RenderSettings
 from src.compiler.parser.Parser import Parser
 from src.compiler.StateVariable import StateVariable
+from src.compiler.VideoVariable import Clip, VideoVariable
+
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.FFMpegBuilder import FFMpegBuilder
 from src.compiler.ResolvedClip import ResolvedClip
@@ -14,23 +17,28 @@ class Compiler:
     """
     def __init__(self):
         self.parser = Parser()
-        self.state: Dict[str, StateVariable | TextVariable] = {}
+        self.state: Dict[str,StateVariable] = {}
         self.timeline: List[TimelineElement] = []
         self.input_index: Dict[str, int] = {}
         self.next_index: int = 0
         self.layers = {}
         self.duration_cache: dict[str,float] = {}
+        self.text_elements = []
+        self.clips =[]
 
     def compile(self, source_code: str)->str:
         self.parser.parse_source(source_code=source_code)
         self.state = self.parser.state
         self.timeline = self.parser.timeline
-        
-        assert self.parser.render_settings is not None
-        render_settings = self.parser.render_settings
 
-        clips = self.__generate_clips()
-        layers: dict = self.__build_layers(clips)
+        assert self.parser.render_settings is not None
+        render_settings: RenderSettings= self.parser.render_settings
+
+        self.__generate_state_objects()
+
+        if self.clips is None:
+            raise Exception("No valid clips.")
+        layers: dict = self.__build_layers(self.clips)
         ffmpeg_builder = FFMpegBuilder()
         
         # generates the ffmpeg command
@@ -49,13 +57,13 @@ class Compiler:
         final_a:str = ffmpeg_builder.final_audio_label
         # returns the ffmpeg command as a string to reduce side-effects, that way users can compile and to see errors often without generating a whole video.
         return (
-            f"ffmpeg {inputs} "
+            f"ffmpeg -y {inputs} "
             f"-filter_complex \"{filter_complex}\" "
             f"-map \"[{final_v}]\" -map \"[{final_a}]\" "
             f"\"{output_path}\""
         )
     
-    def __generate_clips(self):
+    def __generate_state_objects(self): # I hate this function a lot, does so many things at once but itll do for now.
         """
         # Generates new clips that can be more easily used by the ffmpeg builder. Essentially combining timeline clips with their state variable counter parts.
         """
@@ -64,7 +72,7 @@ class Compiler:
         for timeline_element in self.timeline:
             base_start = self.__resolve_start_time(timeline_element)
             z: int = int(timeline_element.z)
-            state: StateVariable | TextVariable | None = self.state.get(timeline_element.identifier)
+            state: StateVariable | None = self.state.get(timeline_element.identifier)
             if state is None:
                 raise Exception(f"Cannot find the state of {timeline_element.identifier}")
             if isinstance(state,TextVariable): # If text variable detected, append to text_elements and continue
@@ -75,26 +83,27 @@ class Compiler:
                     "z": z
                 })
                 continue
-            cursor = base_start
-            for clip in state.clips:
-                start = float(clip.duration[0]) if clip.duration[0] else 0
-                end = self.__get_media_duration(clip.path) if clip.duration[1] == 'e' else float(clip.duration[1])
-                duration = end -start
-                if (end < start):
-                    raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
-                result.append(
-                    ResolvedClip(
-                        path=clip.path,
-                        src_start=start,
-                        src_end=end,
-                        timeline_start=cursor,
-                        z=z,
-                        effects=state.effects
+            cursor :float = base_start
+            if isinstance(state,VideoVariable):
+                for clip in state.clips:
+                    start = float(clip.duration[0]) if clip.duration[0] else 0
+                    end = self.__get_media_duration(clip.path) if clip.duration[1] == 'e' else float(clip.duration[1])
+                    duration = end - start
+                    if (end < start):
+                        raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
+                    result.append(
+                        ResolvedClip(
+                            path=clip.path,
+                            src_start=start,
+                            src_end=end,
+                            timeline_start=cursor,
+                            z=z,
+                            effects=state.effects
+                        )
                     )
-                )
-                cursor += duration
-        return result
-
+                    cursor += duration
+        self.clips = result
+    
     def __get_media_duration(self, path:str)->float:
         """
         Uses ffprobe to find the duration of a video.
@@ -157,13 +166,21 @@ class Compiler:
         Finds the duration of a state variable
         """
         state = self.state[name]
-        total =0
-        for clip in state.clips:
-            start:float = float(clip.duration[0]) if clip.duration[0] else 0
-            end: float = self.__get_media_duration(clip.path) if clip.duration[1] == "e" else float(clip.duration[1])
-            total += end-start
-        return total
-    
+        if isinstance(state, TextVariable):
+            return float(state.duration)
+
+        if isinstance(state, VideoVariable): # this may be similar for audio might be interchangeable
+            total = 0
+            for clip in state.clips:
+                start:float = float(clip.duration[0]) if clip.duration[0] else 0
+                end: float = self.__get_media_duration(clip.path) if clip.duration[1] == "e" else float(clip.duration[1])
+                total += end-start
+            return total
+        # you will need to add an instance check for audio here probably.
+        else:
+            raise Exception("Unknown class type of state.")
+
+
     def __build_layers(self, clips:list[ResolvedClip]):
         """
         Adds video clips to their corresponding layer.
@@ -197,7 +214,7 @@ class Compiler:
 
 def main():
     source_code = """
-    video ben = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ben1.MOV" (0,6)
+    video ben = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ben1.MOV" (0,e)
     video ian = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ian.mkv" (0,6)
     str t_1 = "Hello World, it is a nice day out!" 2
     str caption_1 = "This is a simple test caption..." 1
