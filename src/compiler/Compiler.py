@@ -232,17 +232,21 @@ class Compiler:
 
 def main():
     source_code = """
-    video ben = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ben1.MOV" (0,e)
-    video ian = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ian.mkv" (0,6)
-    str t_1 = "Hello World, it is a nice day out!" 2
-    str caption_1 = "This is a simple test caption..." 1
+    video karl = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\karl.mkv" (0,4)
+    video scenery1 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben2.MOV" (0,e)
+    video scenery2 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben1.MOV" (0, e)
+    video zach = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\zach.mkv" (3, 6)
+    str karl_caption = "Here is Karl!" 3
+    str zach_caption = "Here is Zach!" 3
 
     timeline
 
-    ben 0 1
-    t_1 1 1
-    caption_1 3 1
-    ian after ben 1
+    karl 0 1
+    karl_caption 1 1
+    scenery1 after karl 1
+    zach after scenery1 2
+    zach_caption 6 2
+    scenery2 after zach 2
     
     render "output.mp4" [1920,1080]
     """

@@ -197,7 +197,10 @@ class FFMpegBuilder:
         """
         uid = uuid4().hex[:6]
         out_label = f"v_text_{uid}"
-        end_time = float(timeline_start) + float(duration)
+        try:
+            end_time = float(timeline_start) + float(duration)
+        except ValueError:
+            raise Exception(f"You must explicitly define the start time of the text string:{text}")
 
         filter_parts.append(
             f"[{current_v}]drawtext="
