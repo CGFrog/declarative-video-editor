@@ -52,16 +52,17 @@ class Parser():
 # Test Case
 def main():
     source_code = """
-    video ian = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ian.mkv" (0,3)
-    video karl = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\karl.mkv" (0,7)
+    video scenery = "C:\\Users\\benbu\\Videos\\IMG_1937.MOV" (0,e)
+    video ben = "C:\\Users\\benbu\\Videos\\IMG_1962.MOV" (0,e)
+    str t = "Hello, World" 6
 
     timeline
 
-    ian 0 1
-    karl after ian 1
-    ian after karl 1
+    ben 0 1
+    t 0 1
+    scenery after ben 1
     
-    render "output.mp4" [1920,1080]
+    render "output.mp4" [1656,1242]
     """
 
     parser = Parser()

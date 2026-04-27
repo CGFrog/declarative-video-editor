@@ -5,6 +5,7 @@ from src.compiler.Effect import Effect
 from src.compiler.parser.ParsingUtils import extract_duration, first_of_token, extract_function_parameters
 from src.compiler.parser.Primitive import Primitive
 from src.compiler.parser.ResolvedFunction import ResolvedFunction
+from src.compiler.TextVariable import TextVariable
 
 class DeclarationParser(): 
     def __init__(self): 
@@ -29,7 +30,7 @@ class DeclarationParser():
                     self.state.update({tokens[1].value : self.__parse_media(tokens)})
                 # Check each line, if it starts w/ NUM or STR it sends the token to __parse_primitive.
                 case TL.NUM | TL.STR: 
-                    self.__parse_primitive(tokens)
+                    self.state.update({tokens[1].value : self.__parse_primitive(tokens)})
                 # Check if line starts with 'func', then it calls __parse_func_decl function
                 case TL.FUNC:
                     name = tokens[1].value
@@ -57,7 +58,7 @@ class DeclarationParser():
             type=tokens[0].value
         )
     
-    def __parse_primitive(self, tokens : list[Token]):
+    def __parse_primitive(self, tokens : list[Token])->TextVariable:
         type_token = tokens[0].key # Data type (num or str)
         name_token = tokens[1] # Variable name
 
@@ -66,7 +67,20 @@ class DeclarationParser():
         if eq_index >= len(tokens):
             raise Exception(f"Line {self.line_number}: missing '=' in primitive declaration.")
         
-        # store value of variable in value_token
+        # store caption text in a variable
+        text = ""
+        curr_Idx = eq_index + 1
+        curr_Token = tokens[curr_Idx]
+        while curr_Token.key != TL.NUMBER:
+            if curr_Token.key != TL.COMMA: text += " "
+            text += curr_Token.value
+            curr_Idx += 1
+            curr_Token = tokens[curr_Idx]
+
+        # Store text duration
+        duration = tokens[curr_Idx].value
+
+        text = text.replace("\"", "")
         value_token = tokens[eq_index + 1]
 
         """
@@ -88,6 +102,7 @@ class DeclarationParser():
         the DICT and assigns the stored value to that name. 
         """
         self.primitives.update({name_token.value: value})
+        return TextVariable(identifier=name_token.value, text=text, duration=duration)
     
     def __parse_func_decl(self, tokens : list[Token]) -> ResolvedFunction:
         """
