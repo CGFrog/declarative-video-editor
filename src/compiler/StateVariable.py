@@ -11,8 +11,8 @@ class Clip:
         return False
 
 class StateVariable:
-    def __init__(self, effects=None, clips=None, type=""):
-        self.effects: list[Effect] = effects if effects is not None else []
+    def __init__(self, effects=[], clips=[], type=""):
+        self.effects: list[Effect] = effects
         self.clips: list[Clip] = clips if clips is not None else []
         self.type: str = type
 
