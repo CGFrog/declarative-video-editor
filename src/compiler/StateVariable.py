@@ -9,6 +9,9 @@ class Clip:
         if isinstance(other, Clip):
             return self.path == other.path and self.duration == other.duration
         return False
+    
+    def __repr__(self) -> str:
+        return f"Path: {self.path}\nDuration: {self.duration}"
 
 class StateVariable:
     def __init__(self, effects=[], clips=[], type=""):
@@ -20,3 +23,10 @@ class StateVariable:
         if isinstance(other, StateVariable):
             return self.effects == other.effects and self.clips == other.clips
         return False
+    
+    def __repr__(self)->str:
+        return f"""
+        Effects: {[e for e in self.effects]} \n 
+        Clips: {[c for c in self.clips]} \n
+        Type: {self.type} \n
+        """

@@ -7,13 +7,14 @@ from src.compiler.StateVariable import StateVariable
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.FFMpegBuilder import FFMpegBuilder
 from src.compiler.ResolvedClip import ResolvedClip
+from src.compiler.TextVariable import TextVariable
 class Compiler:
     """
     The compiler works by concatenating the videos together on each layer, and overlay the layers on top of each other.
     """
     def __init__(self):
         self.parser = Parser()
-        self.state: Dict[str, StateVariable] = {}
+        self.state: Dict[str, StateVariable | TextVariable] = {}
         self.timeline: List[TimelineElement] = []
         self.input_index: Dict[str, int] = {}
         self.next_index: int = 0
@@ -63,8 +64,10 @@ class Compiler:
         for timeline_element in self.timeline:
             base_start = self.__resolve_start_time(timeline_element)
             z: int = int(timeline_element.z)
-            state: StateVariable = self.state.get(timeline_element.identifier)
-            if type(state).__name__ == 'TextVariable': # If text variable detected, append to text_elements and continue
+            state: StateVariable | TextVariable | None = self.state.get(timeline_element.identifier)
+            if state is None:
+                raise Exception(f"Cannot find the state of {timeline_element.identifier}")
+            if isinstance(state,TextVariable): # If text variable detected, append to text_elements and continue
                 self.text_elements.append({
                     "text": state.text,
                     "start": timeline_element.start_time,
@@ -194,8 +197,8 @@ class Compiler:
 
 def main():
     source_code = """
-    video scenery = "C:\\Users\\benbu\\Videos\\IMG_1937.MOV" (0,e)
-    video ben = "C:\\Users\\benbu\\Videos\\IMG_1962.MOV" (0,e)
+    video ben = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ben1.MOV" (0,6)
+    video ian = "C:\\Users\\ianco\\Downloads\\DVEL_TEST\\ian.mkv" (0,6)
     str t_1 = "Hello World, it is a nice day out!" 2
     str caption_1 = "This is a simple test caption..." 1
 
@@ -204,9 +207,9 @@ def main():
     ben 0 1
     t_1 1 1
     caption_1 3 1
-    scenery after ben 1
+    ian after ben 1
     
-    render "output.mp4" [1656,1242]
+    render "output.mp4" [1920,1080]
     """
 
     compiler = Compiler()
