@@ -65,45 +65,63 @@ class Compiler:
     
     def __generate_state_objects(self): # I hate this function a lot, does so many things at once but itll do for now.
         """
-        # Generates new clips that can be more easily used by the ffmpeg builder. Essentially combining timeline clips with their state variable counter parts.
+        # Generates new clips, text objects, and audio that can be more easily used by the ffmpeg builder. Essentially combining timeline clips with their state variable counter parts.
         """
-        result: list[ResolvedClip] = []
         self.text_elements = [] # Stores text elements
         for timeline_element in self.timeline:
-            base_start = self.__resolve_start_time(timeline_element)
-            z: int = int(timeline_element.z)
+            z = 0
+            try:
+                z: int = int(timeline_element.z)
+            except:
+                raise Exception(f"z value of {timeline_element.identifier} cannot be converted to an integer.")
             state: StateVariable | None = self.state.get(timeline_element.identifier)
             if state is None:
-                raise Exception(f"Cannot find the state of {timeline_element.identifier}")
+                raise Exception(f"Cannot access the state of {timeline_element.identifier}")
             if isinstance(state,TextVariable): # If text variable detected, append to text_elements and continue
-                self.text_elements.append({
-                    "text": state.text,
-                    "start": timeline_element.start_time,
-                    "duration": state.duration,
-                    "z": z
-                })
-                continue
-            cursor :float = base_start
-            if isinstance(state,VideoVariable):
-                for clip in state.clips:
-                    start = float(clip.duration[0]) if clip.duration[0] else 0
-                    end = self.__get_media_duration(clip.path) if clip.duration[1] == 'e' else float(clip.duration[1])
-                    duration = end - start
-                    if (end < start):
-                        raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
-                    result.append(
-                        ResolvedClip(
-                            path=clip.path,
-                            src_start=start,
-                            src_end=end,
-                            timeline_start=cursor,
-                            z=z,
-                            effects=state.effects
-                        )
-                    )
-                    cursor += duration
-        self.clips = result
-    
+                self.__resolve_text_element(
+                    state=state,
+                    timeline_element=timeline_element,
+                    z=z
+                )
+            elif isinstance(state,VideoVariable):
+                self.__resolve_clips(
+                    timeline_element=timeline_element,
+                    state=state,
+                    z=z
+                )
+            else:
+                #do audio stuff.
+                pass
+
+    def __resolve_text_element(self,state,timeline_element,z):
+        self.text_elements.append({
+            "text": state.text,
+            "start": timeline_element.start_time,
+            "duration": state.duration,
+            "z": z
+        })
+
+    def __resolve_clips(self,timeline_element, state : VideoVariable,z:int):
+        base_start = self.__resolve_start_time(timeline_element)
+        cursor :float = base_start
+        for clip in state.clips:
+            start = float(clip.duration[0]) if clip.duration[0] else 0
+            end = self.__get_media_duration(clip.path) if clip.duration[1] == 'e' else float(clip.duration[1])
+            duration = end - start
+            if (end < start):
+                raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
+            self.clips.append(
+                ResolvedClip(
+                    path=clip.path,
+                    src_start=start,
+                    src_end=end,
+                    timeline_start=cursor,
+                    z=z,
+                    effects=state.effects
+                )
+            )
+            cursor += duration
+
     def __get_media_duration(self, path:str)->float:
         """
         Uses ffprobe to find the duration of a video.
