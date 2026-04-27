@@ -103,8 +103,6 @@ if __name__=="__main__":
     parser2.parse_source(TEST2)
     actual2 = parser2.state['v1']
     expected2 = state2['v1']
-    print("ACTUAL v1 effects:  ", [(e.type, e.param) for e in actual2.effects])
-    print("EXPECTED v1 effects:", [(e.type, e.param) for e in expected2.effects])
     assert parser2.state == state2
     assert parser2.timeline == timeline2
     assert parser2.render_settings == render_settings2
