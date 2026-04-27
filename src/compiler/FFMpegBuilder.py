@@ -117,7 +117,7 @@ class FFMpegBuilder:
 
         filter_parts.append(
             f"[{index}:v]trim=start={clip.src_start}:end={clip.src_end},"
-            f"setpts=PTS-STARTPTS"
+            f"setpts=PTS-STARTPTS,"
             # we are going to have to normalize each video, unfortunately adds compile time but it be what it be rn.
             f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
             f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
@@ -128,8 +128,9 @@ class FFMpegBuilder:
         filter_parts.append(
             f"[{index}:a]atrim=start={clip.src_start}:end={clip.src_end},"
             # normalize our audio as well here
+            f"asetpts=PTS-STARTPTS,"
             f"aresample=44100"
-            f"asetpts=PTS-STARTPTS[{audio_label}]"
+            f"[{audio_label}]"
         )
         return video_label, audio_label
 
