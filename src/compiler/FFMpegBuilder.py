@@ -111,20 +111,30 @@ class FFMpegBuilder:
         uid = uuid4().hex[:6]
         video_label = f"v{index}_{uid}"
         audio_label = f"a{index}_{uid}"
+        duration = clip.src_end - clip.src_start
+        print(f"DURATION:{duration}")
+        print(f"IS AUDIO:{clip.isAudio}")
 
-        # this is where we can add all of our effects to our video
-        effect_chain = self.__build_effect_chain(clip.effects)
+        if clip.isAudio == True:
+            filter_parts.append(
+                f"color=c=black@0.0:size={width}x{height}:duration={duration}:rate=30,"
+                f"format=yuva420p[{video_label}]"
+            )
+        else:
+            # this is where we can add all of our effects to our video
+            effect_chain = self.__build_effect_chain(clip.effects)
 
-        filter_parts.append(
-            f"[{index}:v]trim=start={clip.src_start}:end={clip.src_end},"
-            f"setpts=PTS-STARTPTS,"
-            # we are going to have to normalize each video, unfortunately adds compile time but it be what it be rn.
-            f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
-            f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
-            f"fps=30,"
-            f"format=yuv420p"
-            f"{effect_chain}[{video_label}]"  # effects slot in here naturally
-        )
+            filter_parts.append(
+                f"[{index}:v]trim=start={clip.src_start}:end={clip.src_end},"
+                f"setpts=PTS-STARTPTS,"
+                # we are going to have to normalize each video, unfortunately adds compile time but it be what it be rn.
+                f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
+                f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
+                f"fps=30,"
+                f"format=yuv420p"
+                f"{effect_chain}[{video_label}]"  # effects slot in here naturally
+            )
+
         filter_parts.append(
             f"[{index}:a]atrim=start={clip.src_start}:end={clip.src_end},"
             # normalize our audio as well here
