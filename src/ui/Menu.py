@@ -1,4 +1,5 @@
 import tkinter as tk
+import subprocess
 from src.compiler.Compiler import Compiler
 
 class Menu(tk.Menu):
@@ -18,6 +19,7 @@ class Menu(tk.Menu):
 
         self.add_cascade(label="File", menu=file_menu)
         self.add_command(label="Compile", command=self.compile)
+        self.add_command(label="Render", command=self.render)
         self.add_command(label="Help", command=self.help)
 
     def open(self):
@@ -25,7 +27,16 @@ class Menu(tk.Menu):
 
     def compile(self):
         content = self.text_editor.get_content()
-        Compiler.compile(content)
+        command = Compiler().compile(content)
+
+
+    def render(self):
+        compiler = Compiler()
+        content = self.text_editor.get_content()
+        command = compiler.compile(content)
+        output_path = compiler.parser.render_settings.export_path
+        subprocess.run(command, shell=True, check=True)
+
 
     def save(self):
         self.text_editor.save_file()

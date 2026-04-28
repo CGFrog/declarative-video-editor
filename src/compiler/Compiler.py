@@ -191,29 +191,3 @@ class Compiler:
         ffmpeg_builder.final_video_label = current_v # current_v holds label of text overlay
 
         return filter_parts_extra
-
-def main():
-    source_code = """
-    video scenery = "C:\\Users\\benbu\\Videos\\IMG_1937.MOV" (0,e)
-    video ben = "C:\\Users\\benbu\\Videos\\IMG_1962.MOV" (0,e)
-    str t_1 = "Hello World, it is a nice day out!" 2
-    str caption_1 = "This is a simple test caption..." 1
-
-    timeline
-
-    ben 0 1
-    t_1 1 1
-    caption_1 3 1
-    scenery after ben 1
-    
-    render "output.mp4" [1656,1242]
-    """
-
-    compiler = Compiler()
-    command = compiler.compile(source_code)
-    print(command)
-    subprocess.run(command, shell=True, check=True)
-
-
-if __name__ == "__main__":
-    main()
