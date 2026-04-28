@@ -13,7 +13,7 @@ class Window:
         self.root.geometry("800x600")
 
     def createMenu(self):
-        self.menu = Menu(self.root, self.editor)
+        self.menu = Menu(self.root, self.editor, self.video_player)
         self.root.config(menu=self.menu)
 
     def windowLayout(self):
