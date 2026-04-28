@@ -37,7 +37,12 @@ class FFMpegBuilder:
         black = self.__build_black_base(width, height, duration, filter_parts)
 
         for z in sorted(layers.keys()):
-            v_out, a_out = self.__build_layer(layers[z], filter_parts)
+            v_out, a_out = self.__build_layer(
+                clips=layers[z], 
+                filter_parts=filter_parts,
+                width=width, 
+                height=height
+            )
             layer_outputs.append((z, v_out, a_out))
 
         # takes all the layer and computes the final video syntax.
@@ -67,7 +72,7 @@ class FFMpegBuilder:
         )
         return label
 
-    def __build_layer(self, clips : list[ResolvedClip], filter_parts: list) -> tuple[str, str]:
+    def __build_layer(self, clips : list[ResolvedClip], filter_parts: list, width : int, height : int) -> tuple[str, str]:
         """
         Goes through all the videos and audio on a given layer and concatenates them.
         """
@@ -76,7 +81,11 @@ class FFMpegBuilder:
         # Without delaying our videos/audio, they by default start at t=0, which is not always what we want. 
         timeline_start = clips[0].timeline_start
         for clip in clips:
-            video_label, audio_label = self.__build_clip_filters(clip, filter_parts)
+            video_label, audio_label = self.__build_clip_filters(
+                clip=clip, 
+                filter_parts=filter_parts,
+                width=width,
+                height=height)
             stream_nodes.append((video_label, audio_label))
 
         v_concat, a_concat = self.__build_concat(stream_nodes, filter_parts)
@@ -94,7 +103,7 @@ class FFMpegBuilder:
 
         return v_out, a_out
 
-    def __build_clip_filters(self, clip: ResolvedClip, filter_parts: list) -> tuple[str, str]:
+    def __build_clip_filters(self, clip: ResolvedClip, filter_parts: list, width :int, height : int) -> tuple[str, str]:
         """
         Filters in ffmpeg take in a media and apply some function to that given clip, this function is essentially compiling our DVEL clips into the corresponding FFMpeg clip.
         """
@@ -108,12 +117,20 @@ class FFMpegBuilder:
 
         filter_parts.append(
             f"[{index}:v]trim=start={clip.src_start}:end={clip.src_end},"
-            f"setpts=PTS-STARTPTS"
+            f"setpts=PTS-STARTPTS,"
+            # we are going to have to normalize each video, unfortunately adds compile time but it be what it be rn.
+            f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
+            f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
+            f"fps=30,"
+            f"format=yuv420p"
             f"{effect_chain}[{video_label}]"  # effects slot in here naturally
         )
         filter_parts.append(
             f"[{index}:a]atrim=start={clip.src_start}:end={clip.src_end},"
-            f"asetpts=PTS-STARTPTS[{audio_label}]"
+            # normalize our audio as well here
+            f"asetpts=PTS-STARTPTS,"
+            f"aresample=44100"
+            f"[{audio_label}]"
         )
         return video_label, audio_label
 
@@ -180,7 +197,10 @@ class FFMpegBuilder:
         """
         uid = uuid4().hex[:6]
         out_label = f"v_text_{uid}"
-        end_time = float(timeline_start) + float(duration)
+        try:
+            end_time = float(timeline_start) + float(duration)
+        except ValueError:
+            raise Exception(f"You must explicitly define the start time of the text string:{text}")
 
         filter_parts.append(
             f"[{current_v}]drawtext="
