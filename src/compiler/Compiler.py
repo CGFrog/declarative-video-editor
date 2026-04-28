@@ -239,7 +239,7 @@ def main():
     video scenery1 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben2.MOV" (0, e)
     video scenery2 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben1.MOV" (0, e)
     video zach = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\zach.mkv" (3, 6)
-    audio strike = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\strike_sound_effect.mp3" (0, 4)
+    audio strike = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\strike_sound_effect.mp3" (0, 4) |> volume(1.5)
     str karl_caption = "Here is Karl!" 3
     str zach_caption = "Here is Zach!" 3
 

@@ -112,9 +112,8 @@ class FFMpegBuilder:
         video_label = f"v{index}_{uid}"
         audio_label = f"a{index}_{uid}"
         duration = clip.src_end - clip.src_start
-        print(f"DURATION:{duration}")
-        print(f"IS AUDIO:{clip.isAudio}")
 
+        # If the clip is an audio clip, create a transparent video to place it over
         if clip.isAudio == True:
             filter_parts.append(
                 f"color=c=black@0.0:size={width}x{height}:duration={duration}:rate=30,"
@@ -135,12 +134,14 @@ class FFMpegBuilder:
                 f"{effect_chain}[{video_label}]"  # effects slot in here naturally
             )
 
+        # Audio effect chain
+        audio_effect_chain = self.__build_effect_chain(clip.effects)
         filter_parts.append(
             f"[{index}:a]atrim=start={clip.src_start}:end={clip.src_end},"
             # normalize our audio as well here
             f"asetpts=PTS-STARTPTS,"
             f"aresample=44100"
-            f"[{audio_label}]"
+            f"{audio_effect_chain}[{audio_label}]"
         )
         return video_label, audio_label
 
@@ -162,6 +163,8 @@ class FFMpegBuilder:
                 pass
             case "speed":
                 pass
+            case "volume":
+                return f"volume={effect.param[0]}"
             case _:
                 raise Exception(f"Unknown effect: {effect.type}")
         return ""
