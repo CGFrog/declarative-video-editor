@@ -121,7 +121,7 @@ class FFMpegBuilder:
             )
         else:
             # this is where we can add all of our effects to our video
-            effect_chain = self.__build_effect_chain(clip.effects)
+            effect_chain = self.__build_effect_chain(clip.effects, audio=False)
 
             filter_parts.append(
                 f"[{index}:v]trim=start={clip.src_start}:end={clip.src_end},"
@@ -135,7 +135,7 @@ class FFMpegBuilder:
             )
 
         # Audio effect chain
-        audio_effect_chain = self.__build_effect_chain(clip.effects)
+        audio_effect_chain = self.__build_effect_chain(clip.effects, audio=True)
         filter_parts.append(
             f"[{index}:a]atrim=start={clip.src_start}:end={clip.src_end},"
             # normalize our audio as well here
@@ -145,12 +145,16 @@ class FFMpegBuilder:
         )
         return video_label, audio_label
 
-    def __build_effect_chain(self, effects: list[Effect]) -> str:
+    def __build_effect_chain(self, effects: list[Effect], audio: bool) -> str:
         if not effects:
             return ""
-        return "," + ",".join(self.__build_effect(e) for e in effects)
+        parts = [self.__build_effect(e, audio=audio) for e in effects]
+        parts = [p for p in parts if p]
+        if not parts:
+            return ""
+        return "," + ",".join(parts)
 
-    def __build_effect(self, effect) -> str:
+    def __build_effect(self, effect, audio: bool) -> str:
         """
         TODO:
         Make an EffectBuilder class that generates the effects
@@ -164,7 +168,7 @@ class FFMpegBuilder:
             case "speed":
                 pass
             case "volume":
-                return f"volume={effect.param[0]}"
+                return f"volume={effect.param[0]}" if audio else ""
             case _:
                 raise Exception(f"Unknown effect: {effect.type}")
         return ""
