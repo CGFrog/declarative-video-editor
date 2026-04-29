@@ -104,6 +104,8 @@ class VideoPlayer:
         )
         self.stop_button.grid(row=0, column=3, sticky="ew")
 
+
+
         progress_frame = tk.Frame(self.parent_frame, bg=Theme.PANEL)
         progress_frame.grid(row=2, column=0, sticky="ew")
         progress_frame.columnconfigure(0, weight=1)
@@ -116,10 +118,32 @@ class VideoPlayer:
         self.progress_scale.bind("<Button-1>", self.on_progress_press)
         self.progress_scale.bind("<ButtonRelease-1>", self.on_progress_release)
 
-        self.time_label = tk.Label(progress_frame, text="00:00 / 00:00", width=12, anchor="e")
+        self.progress_scale = ttk.Scale(
+            progress_frame,
+            from_=0,
+            to=1000,
+            orient="horizontal",
+            style="Dark.Horizontal.TScale"
+        )
+
+        self.time_label = tk.Label(
+            progress_frame, 
+            text="00:00 / 00:00", 
+            width=12, 
+            anchor="e",
+            bg=Theme.PANEL,
+            fg=Theme.TEXT
+        )
         self.time_label.grid(row=0, column=1, sticky="e", padx=(0, 5))
 
-        self.file_label = tk.Label(progress_frame, text="No video loaded", width=20, anchor="w")
+        self.file_label = tk.Label(
+            progress_frame, 
+            text="No video loaded", 
+            width=20, 
+            anchor="w",
+            bg=Theme.PANEL,
+            fg=Theme.MUTED
+        )
         self.file_label.grid(row=0, column=2, sticky="w", padx=(0, 5))
 
     def set_video_output(self):

@@ -1,12 +1,11 @@
 import tkinter as tk
-import sv_ttk
 from src.ui.TextEditor import TextEditor
 from src.ui.VideoPlayer import VideoPlayer
 from src.ui.ConsoleView import ConsoleView
 from src.ui.Menu import Menu
 from src.ui.TimelineView import TimelineView
 from src.ui.Theme import Theme
-
+from tkinter import ttk
 class Window:
     def __init__(self):
         self.root = tk.Tk()
@@ -14,7 +13,53 @@ class Window:
     def create_window(self):
         self.root.title("Declarative Video Editor")
         self.root.geometry("800x600")
+        self.maximize_window()
+        style = self.apply_dark_ttk_theme()
         self.root.configure(bg=Theme.BG)
+
+        
+    def maximize_window(self):
+        try:
+            self.root.state("zoomed")  # Windows
+        except:
+            self.root.attributes("-zoomed", True)
+
+    def apply_dark_ttk_theme(self):
+        style = ttk.Style()
+        style.theme_use("clam")
+        thumb = Theme.PANEL
+        bg = Theme.BG
+        panel = Theme.PANEL
+        border = Theme.BORDER
+        text = Theme.PANEL
+
+        style.configure(
+            "Vertical.TScrollbar",
+            gripcount=0,
+            background=thumb,
+            troughcolor=bg,
+            bordercolor=border,
+            arrowcolor=text,
+        )
+
+        style.configure(
+            "Horizontal.TScrollbar",
+            gripcount=0,
+            background=thumb,
+            troughcolor=bg,
+            bordercolor=border,
+            arrowcolor=text,
+        )
+        style.configure(
+            "Horizontal.TScale",
+            gripcount=0,
+            background=thumb,
+            troughcolor=bg,
+            bordercolor=border,
+        )
+
+        return style
+
 
     def create_menu(self):
         self.menu = Menu(self.root, self.editor, on_compile = self.__refresh_timeline)
@@ -45,7 +90,7 @@ class Window:
         self.right_pane.add(self.top_right_frame, minsize=150)
 
         self.bottom_right_frame = tk.Frame(self.right_pane, bg=Theme.PANEL)
-        self.right_pane.add(self.bottom_right_frame, minsize=100)
+        self.right_pane.add(self.bottom_right_frame, minsize=50)
 
     def text_editor_view(self):
         self.left_frame.rowconfigure(0, weight=1)

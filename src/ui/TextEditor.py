@@ -60,10 +60,11 @@ class TextEditor:
         self._configure_syntax_tags()
 
     def _scrollbar(self):
-        self.scrollbar = tk.Scrollbar(
+        self.scrollbar = ttk.Scrollbar(
             self.main_frame,
             orient="vertical",
             command=self.on_scroll,
+            style="Dark.Vertical.TScrollbar"
         )
         self.scrollbar.grid(row=0, column=2, sticky="ns")
 

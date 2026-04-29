@@ -1,4 +1,6 @@
 import tkinter as tk
+from tkinter import ttk
+from src.ui.Theme import Theme
 import sys
 
 class ConsoleView:
@@ -8,7 +10,7 @@ class ConsoleView:
         self.input_start_index = "1.0"
 
     def console_view(self):
-        self.main_frame = tk.Frame(self.parent, bg="black")
+        self.main_frame = tk.Frame(self.parent, bg=Theme.BG)
         self.main_frame.grid(row=0, column=0, sticky="nsew")
 
         self.parent.rowconfigure(0, weight=1)
@@ -21,10 +23,15 @@ class ConsoleView:
         self.redirectOut()
 
     def consoleOutput(self):
-        self.console = tk.Text(self.main_frame, bg="black", fg="white", wrap="word")
+        self.console = tk.Text(self.main_frame, bg=Theme.BG, fg="white", wrap="word")
         self.console.grid(row=0, column=0, sticky="nsew")
 
-        self.scrollbar = tk.Scrollbar(self.main_frame, orient="vertical", command=self.console.yview)
+        self.scrollbar = ttk.Scrollbar(
+            self.main_frame, 
+            orient="vertical", 
+            command=self.console.yview,
+            style="Dark.Vertical.TScrollbar"    
+        )
         self.scrollbar.grid(row=0, column=1, sticky="ns")
 
         self.console.bind("<Return>", self.on_enter)

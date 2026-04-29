@@ -1,5 +1,6 @@
 import tkinter as tk
 import os
+from tkinter import ttk
 
 
 HEIGHT = 40
@@ -37,10 +38,20 @@ class TimelineView:
         self.canvas = tk.Canvas(self.frame, bg="gray15", height = 175)
         self.canvas.grid(row=1, column=1, sticky="nsew")
 
-        self.scroll_x = tk.Scrollbar(self.frame, orient="horizontal", command=self._xview)
+        self.scroll_x = ttk.Scrollbar(
+            self.frame,
+            orient="horizontal", 
+            command=self._xview,
+            style="Dark.Horizontal.TScrollbar"
+        )
         self.scroll_x.grid(row=2, column=1, sticky="ew")
 
-        self.scroll_y = tk.Scrollbar(self.frame, orient="vertical", command=self._yview)
+        self.scroll_y = ttk.Scrollbar(
+            self.frame, 
+            orient="vertical", 
+            command=self._yview,
+            style="Dark.Vertical.TScrollbar",
+        )
         self.scroll_y.grid(row=1, column=2, sticky="ns")
 
         self.canvas.configure(
