@@ -6,12 +6,10 @@ class Menu(tk.Menu):
     def __init__(self, parent, text_editor, on_compile = None):
         super().__init__(parent)
 
-        menu = tk.Menu(self)
-
         self.text_editor = text_editor
         self.on_compile = on_compile
 
-        file_menu = tk.Menu(menu, tearoff=0)
+        file_menu = tk.Menu(self, tearoff=0)
         file_menu.add_command(label="Open", command=self.open)
         file_menu.add_command(label="Save", command=self.save)
         file_menu.add_command(label="Save As", command=self.save_as)
@@ -21,6 +19,7 @@ class Menu(tk.Menu):
         self.add_cascade(label="File", menu=file_menu)
         self.add_command(label="Compile", command=self.compile)
         self.add_command(label="Help", command=self.help)
+        parent.config(menu=self)
 
     def open(self):
         self.text_editor.open_file()

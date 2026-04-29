@@ -34,7 +34,9 @@ class Compiler:
         assert self.parser.render_settings is not None
         render_settings: RenderSettings= self.parser.render_settings
 
-        self.clips = self.__generate_clips()
+        self.__generate_state_objects()
+        if self.clips is None:
+            raise Exception("No clips available to render.")
         self.layers: dict = self.__build_layers(self.clips)
         ffmpeg_builder = FFMpegBuilder()
         
