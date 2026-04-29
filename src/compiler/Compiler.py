@@ -79,6 +79,13 @@ class Compiler:
                 duration = end -start
                 if (end < start):
                     raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
+                # Adjust duration if speed effect is applied, so timeline positions are correct
+                for effect in state.effects:
+                    if effect.type == "speed":
+                        speed = effect.param[0] if len(effect.param) > 0 else 1.0
+                        duration = duration / speed 
+                        end = start + duration
+
                 result.append(
                     ResolvedClip(
                         path=clip.path,
@@ -158,9 +165,17 @@ class Compiler:
         for clip in state.clips:
             start:float = float(clip.duration[0]) if clip.duration[0] else 0
             end: float = self.__get_media_duration(clip.path) if clip.duration[1] == "e" else float(clip.duration[1])
-            total += end-start
+            adjusted = end - start
+            
+            # Adjust duration to account for speed effects
+            for effect in state.effects:
+                if effect.type == "speed":
+                    speed = effect.param[0] if len(effect.param) > 0 else 1.0
+                    adjusted = adjusted / speed
+            total += adjusted
         return total
     
+
     def __build_layers(self, clips:list[ResolvedClip]):
         """
         Adds video clips to their corresponding layer.
