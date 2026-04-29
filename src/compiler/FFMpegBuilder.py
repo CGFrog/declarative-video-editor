@@ -1,6 +1,7 @@
 from uuid import uuid4
 from src.compiler.Effect import Effect
 from src.compiler.ResolvedClip import ResolvedClip
+from src.compiler.EffectBuilder import EffectBuilder
 
 class FFMpegBuilder:
     def __init__(self):
@@ -8,6 +9,7 @@ class FFMpegBuilder:
         self.next_index: int = 0
         self.final_video_label: str = ""
         self.final_audio_label: str = ""
+        self._effect_builder = EffectBuilder()
 
     def __get_or_create_input_index(self, path: str) -> int:
         """
@@ -94,6 +96,7 @@ class FFMpegBuilder:
 
         return v_out, a_out
 
+    #
     def __build_clip_filters(self, clip: ResolvedClip, filter_parts: list) -> tuple[str, str]:
         """
         Filters in ffmpeg take in a media and apply some function to that given clip, this function is essentially compiling our DVEL clips into the corresponding FFMpeg clip.
@@ -104,40 +107,44 @@ class FFMpegBuilder:
         audio_label = f"a{index}_{uid}"
 
         # this is where we can add all of our effects to our video
-        effect_chain = self.__build_effect_chain(clip.effects)
+        video_effect_chain, audio_effect_chain = self.__build_effect_chains(clip.effects)
 
         filter_parts.append(
             f"[{index}:v]trim=start={clip.src_start}:end={clip.src_end},"
             f"setpts=PTS-STARTPTS"
-            f"{effect_chain}[{video_label}]"  # effects slot in here naturally
+            f"{video_effect_chain}[{video_label}]"  # effects slot in here naturally
         )
         filter_parts.append(
             f"[{index}:a]atrim=start={clip.src_start}:end={clip.src_end},"
-            f"asetpts=PTS-STARTPTS[{audio_label}]"
+            f"asetpts=PTS-STARTPTS"
+            f"{audio_effect_chain}[{audio_label}]"
         )
         return video_label, audio_label
 
-    def __build_effect_chain(self, effects: list[Effect]) -> str:
+    # Adjusted __build_effect_chain to support 2 streams since the speed effect will need video and audio streams
+    def __build_effect_chains(self, effects: list[Effect]) -> tuple[str, str]:
+        """
+        Splits effects into a video filter chain and an audio filter chain.
+        Speed is the only effect that touches both streams — its video side
+        (setpts) goes in the video chain and its audio side (atempo) goes
+        in the audio chain.
+        """
         if not effects:
-            return ""
-        return "," + ",".join(self.__build_effect(e) for e in effects)
+            return "", ""
+        
+        video_filters = []
+        audio_filters = []
 
-    def __build_effect(self, effect) -> str:
-        """
-        TODO:
-        Make an EffectBuilder class that generates the effects
-        This does nothing rn.
-        """
-        match effect.type:
-            case "blur":
-                pass
-            case "saturation":
-                pass
-            case "speed":
-                pass
-            case _:
-                raise Exception(f"Unknown effect: {effect.type}")
-        return ""
+        for effect in effects:
+            video_filters.append(self._effect_builder.build(effect))
+            audio_filter = self._effect_builder.get_audio_filter(effect)
+            if audio_filter:
+                audio_filters.append(audio_filter)
+        
+        video_chain = ("," + ",".join(video_filters)) if video_filters else ""
+        audio_chain = ("," + ",".join(audio_filters)) if audio_filters else ""
+        
+        return video_chain, audio_chain
 
     def __build_concat(self, stream_nodes: list, filter_parts: list) -> tuple[str, str]:
         """
