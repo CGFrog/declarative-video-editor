@@ -110,8 +110,8 @@ class Compiler:
             duration = end - start
             if (end < start):
                 raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
-            isAudio = False
-            if state.type == 'audio': isAudio = True
+            is_audio = False
+            if state.type == 'audio': is_audio = True
             self.clips.append(
                 ResolvedClip(
                     path=clip.path,
@@ -120,7 +120,7 @@ class Compiler:
                     timeline_start=cursor,
                     z=z,
                     effects=state.effects,
-                    isAudio=isAudio
+                    isAudio=is_audio
                 )
             )
             cursor += duration
