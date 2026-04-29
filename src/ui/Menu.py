@@ -30,10 +30,8 @@ class Menu(tk.Menu):
         compiler = Compiler()
         command = compiler.compile(content)
         subprocess.run(command, shell=True)
-        #to get clips
-        layers = compiler.build_layers(compiler.generate_clips())
         if self.on_compile:
-            self.on_compile(layers)
+            self.on_compile(compiler.layers)
 
     def save(self):
         self.text_editor.save_file()

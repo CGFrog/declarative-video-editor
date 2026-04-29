@@ -28,12 +28,12 @@ class Compiler:
         assert self.parser.render_settings is not None
         render_settings = self.parser.render_settings
 
-        clips = self.generate_clips()
-        layers: dict = self.build_layers(clips)
+        self.clips = self.__generate_clips()
+        self.layers: dict = self.__build_layers(self.clips)
         ffmpeg_builder = FFMpegBuilder()
         
         # generates the ffmpeg command
-        filter_complex: str = ffmpeg_builder.build_filter_graph(layers, int(render_settings.x), int(render_settings.y) )
+        filter_complex: str = ffmpeg_builder.build_filter_graph(self.layers, int(render_settings.x), int(render_settings.y) )
 
         # Handles text elements
         if (self.text_elements):
@@ -54,7 +54,7 @@ class Compiler:
             f"\"{output_path}\""
         )
     
-    def generate_clips(self):
+    def __generate_clips(self):
         """
         # Generates new clips that can be more easily used by the ffmpeg builder. Essentially combining timeline clips with their state variable counter parts.
         """
@@ -161,7 +161,7 @@ class Compiler:
             total += end-start
         return total
     
-    def build_layers(self, clips:list[ResolvedClip]):
+    def __build_layers(self, clips:list[ResolvedClip]):
         """
         Adds video clips to their corresponding layer.
         """

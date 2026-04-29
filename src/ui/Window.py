@@ -14,7 +14,7 @@ class Window:
         self.root.geometry("800x600")
 
     def createMenu(self):
-        self.menu = Menu(self.root, self.editor, on_compile = self._refresh_timeline)
+        self.menu = Menu(self.root, self.editor, on_compile = self.__refresh_timeline)
         self.root.config(menu=self.menu)
 
     def windowLayout(self):
@@ -52,10 +52,13 @@ class Window:
     
     def __timeline_view(self):
         self.timeline_view = TimelineView(self.left_frame, {}, scale=10)
-        self.timeline_view.TimelineView(row=1, column=0)
-        self.timeline_view.canvas.bind("<Configure>", lambda e: self.timeline_view.drawTimeline())
+        self.timeline_view._enable_timeline(row=1, column=0)
+        self.timeline_view.canvas.bind("<Configure>", lambda e: self.timeline_view._draw_timeline())
     
-    def _refresh_timeline(self, layers):
+    def __refresh_timeline(self, layers):
+        if not any(layers.values()):
+            return
+        
         canvas_width = self.timeline_view.canvas.winfo_width()
         total_duration = max(
             clip.timeline_start + (clip.src_end - clip.src_start)
@@ -64,7 +67,7 @@ class Window:
         )
         self.timeline_view.scale = canvas_width / total_duration
         self.timeline_view.layers = layers
-        self.timeline_view.drawTimeline()
+        self.timeline_view._draw_timeline()
 
     def videoDisplayView(self):
         self.top_right_frame.rowconfigure(0, weight=1)
