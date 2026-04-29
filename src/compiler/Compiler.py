@@ -107,6 +107,8 @@ class Compiler:
             duration = end - start
             if (end < start):
                 raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
+            is_audio = False
+            if state.type == 'audio': is_audio = True
             self.clips.append(
                 ResolvedClip(
                     path=clip.path,
@@ -114,7 +116,8 @@ class Compiler:
                     src_end=end,
                     timeline_start=cursor,
                     z=z,
-                    effects=state.effects
+                    effects=state.effects,
+                    isAudio=is_audio
                 )
             )
             cursor += duration
@@ -230,9 +233,10 @@ class Compiler:
 def main():
     source_code = """
     video karl = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\karl.mkv" (0,4)
-    video scenery1 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben2.MOV" (0,e)
+    video scenery1 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben2.MOV" (0, e)
     video scenery2 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben1.MOV" (0, e)
-    video zach = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\zach.mkv" (3, 6)
+    video zach = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\zach.mkv" (3, 6) |> volume(0)
+    audio strike = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\strike_sound_effect.mp3" (0, 4) |> volume(0)
     str karl_caption = "Here is Karl!" 3
     str zach_caption = "Here is Zach!" 3
 
@@ -244,6 +248,7 @@ def main():
     zach after scenery1 2
     zach_caption 6 2
     scenery2 after zach 2
+    strike 3 3
     
     render "output.mp4" [1920,1080]
     """
