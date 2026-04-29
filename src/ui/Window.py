@@ -3,6 +3,7 @@ from src.ui.TextEditor import TextEditor
 from src.ui.VideoPlayer import VideoPlayer
 from src.ui.ConsoleView import ConsoleView
 from src.ui.Menu import Menu
+from src.ui.TimelineView import TimelineView
 
 class Window:
     def __init__(self):
@@ -13,7 +14,7 @@ class Window:
         self.root.geometry("800x600")
 
     def createMenu(self):
-        self.menu = Menu(self.root, self.editor, self.video_player)
+        self.menu = Menu(self.root, self.editor, on_compile = self.__refresh_timeline)
         self.root.config(menu=self.menu)
 
     def windowLayout(self):
@@ -48,6 +49,25 @@ class Window:
 
         self.editor = TextEditor(self.left_frame)
         self.editor.TextEditorView()
+    
+    def __timeline_view(self):
+        self.timeline_view = TimelineView(self.left_frame, {}, scale=10)
+        self.timeline_view._enable_timeline(row=1, column=0)
+        self.timeline_view.canvas.bind("<Configure>", lambda e: self.timeline_view._draw_timeline())
+    
+    def __refresh_timeline(self, layers):
+        if not any(layers.values()):
+            return
+        
+        canvas_width = self.timeline_view.canvas.winfo_width()
+        total_duration = max(
+            clip.timeline_start + (clip.src_end - clip.src_start)
+            for clips in layers.values()
+            for clip in clips
+        )
+        self.timeline_view.scale = canvas_width / total_duration
+        self.timeline_view.layers = layers
+        self.timeline_view._draw_timeline()
 
     def videoDisplayView(self):
         self.top_right_frame.rowconfigure(0, weight=1)
@@ -69,6 +89,7 @@ class Window:
         self.createWindow()
         self.windowLayout()
         self.TextEditorView()
+        self.__timeline_view()
         self.videoDisplayView()
         self.consoleView()
         self.createMenu()

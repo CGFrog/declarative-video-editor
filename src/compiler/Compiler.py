@@ -1,12 +1,12 @@
 from collections import defaultdict
 import json
+from plistlib import InvalidFileException
 import subprocess
 from typing import Dict, List
 from src.compiler.parser.RenderSettings import RenderSettings
 from src.compiler.parser.Parser import Parser
 from src.compiler.StateVariable import StateVariable
 from src.compiler.VideoVariable import Clip, VideoVariable
-
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.FFMpegBuilder import FFMpegBuilder
 from src.compiler.ResolvedClip import ResolvedClip
@@ -38,15 +38,23 @@ class Compiler:
 
         if self.clips is None:
             raise Exception("No valid clips.")
-        layers: dict = self.__build_layers(self.clips)
+        layers: dict = self.__build_layers(
+            clips=self.clips
+        )
         ffmpeg_builder = FFMpegBuilder()
         
         # generates the ffmpeg command
-        filter_complex: str = ffmpeg_builder.build_filter_graph(layers, int(render_settings.x), int(render_settings.y) )
+        filter_complex: str = ffmpeg_builder.build_filter_graph(
+            layers=layers,
+            width=int(render_settings.x),
+            height=int(render_settings.y)
+        )
 
         # Handles text elements
         if (self.text_elements):
-            filter_parts_extra = self.__handle_text(ffmpeg_builder)
+            filter_parts_extra = self.__handle_text(
+                ffmpeg_builder=ffmpeg_builder
+            )
             filter_complex = filter_complex + ";" + ";".join(filter_parts_extra) # Place text filters into ffmpeg graph
 
         # resolves all of the inputs for the ffmpeg command.
@@ -106,10 +114,17 @@ class Compiler:
         cursor :float = base_start
         for clip in state.clips:
             start = float(clip.duration[0]) if clip.duration[0] else 0
-            end = self.__get_media_duration(clip.path) if clip.duration[1] == 'e' else float(clip.duration[1])
+
+            full_video_duration: float = self.__get_media_duration(path=clip.path)
+            end: float = full_video_duration if clip.duration[1] == 'e' else float(clip.duration[1])
+
+            if end > full_video_duration:
+                raise ValueError(f"{timeline_element.identifier} specified duration is longer than the video duration (use 'e' for inclusion of the whole video).")
             duration = end - start
             if (end < start):
                 raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
+            is_audio = False
+            if state.type == 'audio': is_audio = True
             self.clips.append(
                 ResolvedClip(
                     path=clip.path,
@@ -117,7 +132,8 @@ class Compiler:
                     src_end=end,
                     timeline_start=cursor,
                     z=z,
-                    effects=state.effects
+                    effects=state.effects,
+                    isAudio=is_audio
                 )
             )
             cursor += duration
@@ -144,7 +160,7 @@ class Compiler:
             text =True
         )
         if result.returncode != 0:
-            raise Exception(f"Cannot extract duration of clip at path {path}.")
+            raise InvalidFileException(f"Cannot extract duration of clip at path {path}.")
         
         duration = float(json.loads(result.stdout)['format']['duration'])
         self.duration_cache[path] = duration
@@ -209,7 +225,6 @@ class Compiler:
         for z in layers:
             layers[z].sort(key=lambda c: c.timeline_start)
         return layers
-    
     def __handle_text(self, ffmpeg_builder):
         """
         If a text element is detected, create text overlay ffmpeg command, add to filter_parts.
@@ -233,20 +248,22 @@ class Compiler:
 def main():
     source_code = """
     video karl = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\karl.mkv" (0,4)
-    video scenery1 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben2.MOV" (0,e)
+    video scenery1 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben2.MOV" (0, e)
     video scenery2 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben1.MOV" (0, e)
-    video zach = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\zach.mkv" (3, 6)
+    video zach = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\zach.mkv" (3, 6) |> volume(0)
+    audio strike = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\strike_sound_effect.mp3" (0, 4) |> volume(0)
     str karl_caption = "Here is Karl!" 3
     str zach_caption = "Here is Zach!" 3
 
     timeline
 
-    karl 0 1
-    karl_caption 1 1
-    scenery1 after karl 1
+    ian 0 1
+    ian_caption 1 1
+    scenery1 after ian 1
     zach after scenery1 2
     zach_caption 6 2
     scenery2 after zach 2
+    strike 3 3
     
     render "output.mp4" [1920,1080]
     """
@@ -254,7 +271,11 @@ def main():
     compiler = Compiler()
     command = compiler.compile(source_code)
     print(command)
-    subprocess.run(command, shell=True, check=True)
+    subprocess.run(
+        args=command, 
+        shell=True, 
+        check=True
+    )
 
 
 if __name__ == "__main__":
