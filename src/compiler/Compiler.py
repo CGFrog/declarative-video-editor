@@ -34,15 +34,12 @@ class Compiler:
         assert self.parser.render_settings is not None
         render_settings: RenderSettings= self.parser.render_settings
 
-        self.__generate_state_objects()
-
-        if self.clips is None:
-            raise Exception("No valid clips.")
-        layers: dict = self.__build_layers(self.clips)
+        self.clips = self.__generate_clips()
+        self.layers: dict = self.__build_layers(self.clips)
         ffmpeg_builder = FFMpegBuilder()
         
         # generates the ffmpeg command
-        filter_complex: str = ffmpeg_builder.build_filter_graph(layers, int(render_settings.x), int(render_settings.y) )
+        filter_complex: str = ffmpeg_builder.build_filter_graph(self.layers, int(render_settings.x), int(render_settings.y) )
 
         # Handles text elements
         if (self.text_elements):
