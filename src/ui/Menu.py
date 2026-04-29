@@ -31,10 +31,8 @@ class Menu(tk.Menu):
 
     def compile(self):
         content = self.text_editor.get_content()
-        command = Compiler().compile(content)
         compiler = Compiler()
         command = compiler.compile(content)
-        subprocess.run(command, shell=True)
         if self.on_compile:
             self.on_compile(compiler.layers)
 

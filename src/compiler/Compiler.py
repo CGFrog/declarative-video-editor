@@ -38,14 +38,14 @@ class Compiler:
 
         if self.clips is None:
             raise Exception("No valid clips.")
-        layers: dict = self.__build_layers(
+        self.layers: dict = self.__build_layers(
             clips=self.clips
         )
         ffmpeg_builder = FFMpegBuilder()
         
         # generates the ffmpeg command
         filter_complex: str = ffmpeg_builder.build_filter_graph(
-            layers=layers,
+            layers=self.layers,
             width=int(render_settings.x),
             height=int(render_settings.y)
         )

@@ -14,7 +14,7 @@ class Window:
         self.root.geometry("800x600")
 
     def createMenu(self):
-        self.menu = Menu(self.root, self.editor, on_compile = self.__refresh_timeline)
+        self.menu = Menu(self.root, self.editor, self.video_player, on_compile = self.__refresh_timeline)
         self.root.config(menu=self.menu)
 
     def windowLayout(self):
