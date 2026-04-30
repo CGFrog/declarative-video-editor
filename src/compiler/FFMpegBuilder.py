@@ -27,13 +27,12 @@ class FFMpegBuilder:
         sorted_inputs = sorted(self.input_index.items(), key=lambda x: x[1])
         return " ".join(f'-i "{path}"' for path, _ in sorted_inputs)
 
-    def build_filter_graph(self, layers, width: int, height: int) -> str:
+    def build_filter_graph(self, layers, width: int, height: int, duration) -> str:
         """
         A filter in ffmpeg is a function applied to a media, we are essentially creating a DAG of video and audio with this function.
         """
         filter_parts = []
         layer_outputs = []
-        duration = self.__get_total_duration(layers)
 
         # just add a black video in the background in case any empty gaps, if we wanted to be fancy we could let the user specify what this video is
         black = self.__build_black_base(width, height, duration, filter_parts)
@@ -52,17 +51,6 @@ class FFMpegBuilder:
         self.__build_audio_mix(layer_outputs, filter_parts)
 
         return ";".join(filter_parts)
-
-    def __get_total_duration(self, layers) -> float:
-        """
-        Returns the total duration of the video.
-        """
-        end_times = []
-        
-        for clips in layers.values():
-            for clip in clips:
-                end_times.append(clip.timeline_start + (clip.src_end - clip.src_start))
-        return max(end_times)
 
     def __build_black_base(self, width: int, height: int, duration: float, filter_parts: list) -> str:
         """
