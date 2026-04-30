@@ -1,11 +1,11 @@
-from src.compiler.lexer.Token import Token
+from src.compiler.lexer.Token import Token, TokenLabel
 from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.VideoVariable import Clip, VideoVariable
 from src.compiler.Effect import Effect
 from src.compiler.parser.ParsingUtils import extract_duration, first_of_token, extract_function_parameters
 from src.compiler.parser.Primitive import Primitive
 from src.compiler.parser.ResolvedFunction import ResolvedFunction
-from src.compiler.TextVariable import TextVariable
+from src.compiler.CaptionVariable import CaptionVariable
 
 class DeclarationParser(): 
     def __init__(self): 
@@ -21,20 +21,22 @@ class DeclarationParser():
         for tokens in lines_of_tokens:
             if len(tokens) == 0:
                 continue
+            declaratives: set[TL] = {TL.MEDIA, TL.STR, TL.CAPTION, TL.NUM,TL.FUNC}
             
+            if tokens[0].key in declaratives and tokens[1].key != TL.IDENTIFIER: 
+                raise Exception(f"Invalid identifier after type declaration.")
             token: TL = tokens[0].key
             match token:
                 case TL.MEDIA:
-                    if tokens[1].key != TL.IDENTIFIER: 
-                        raise Exception(f"Invalid identifier after type declaration.")
                     self.state.update({tokens[1].value : self.__parse_media(tokens)})
-                # Check each line, if it starts w/ NUM or STR it sends the token to __parse_primitive.
-                case TL.NUM | TL.STR: 
-                    self.state.update({tokens[1].value : self.__parse_primitive(tokens)})
-                # Check if line starts with 'func', then it calls __parse_func_decl function
+                case TL.STR: 
+                    self.primitives.update({tokens[1].value : self.__parse_primitive_string(tokens)})
+                case TL.CAPTION:
+                    self.state.update({tokens[1].value: self.__parse_caption(tokens)})
+                case TL.NUM:
+                    self.primitives.update({tokens[1].value : self.__parse_primitive_number(tokens)})
                 case TL.FUNC:
-                    name = tokens[1].value
-                    self.functions[name] = self.__parse_func_decl(tokens)
+                    self.functions[tokens[1].value] = self.__parse_func_decl(tokens)
             self.line_number += 1
 
 
@@ -58,52 +60,38 @@ class DeclarationParser():
             type=tokens[0].value
         )
     
-    def __parse_primitive(self, tokens : list[Token])->TextVariable:
-        type_token = tokens[0].key # Data type (num or str)
-        name_token = tokens[1] # Variable name
+    def __parse_primitive_number(self, tokens : list[Token]):
+        eq_index = first_of_token(tokens, TL.ASSIGN)
+        if eq_index >= len(tokens):
+            raise Exception(f"Line {self.line_number}: missing '=' in number declaration.")
+        value_token: Token = tokens[eq_index + 1]
+        value:str = value_token.value
+        return value
+    
+    def __parse_caption(self,tokens : list[Token])->CaptionVariable:
+        name_token = tokens[1]
+        caption = self.__parse_primitive_string(tokens)
+        duration = None
+        for token in tokens:
+            if token.key == TL.NUMBER:
+                duration = token.value
+        if duration is None:
+            raise Exception("Unspecified duration for caption.")
+        return CaptionVariable(identifier=name_token.value, text=caption, duration=duration)
 
-        # Find equal sign, if no equal sign raise exception!
+    def __parse_primitive_string(self, tokens : list[Token]):        
         eq_index = first_of_token(tokens, TL.ASSIGN)
         if eq_index >= len(tokens):
             raise Exception(f"Line {self.line_number}: missing '=' in primitive declaration.")
         
-        # store caption text in a variable
-        text = ""
         curr_Idx = eq_index + 1
-        curr_Token = tokens[curr_Idx]
-        while curr_Token.key != TL.NUMBER:
-            if curr_Token.key != TL.COMMA: text += " "
-            text += curr_Token.value
-            curr_Idx += 1
-            curr_Token = tokens[curr_Idx]
-
-        # Store text duration
-        duration = tokens[curr_Idx].value
-
-        text = text.replace("\"", "")
-        value_token = tokens[eq_index + 1]
-
-        """
-        If number, convert to float variable and store in value. 
-        If string, do not convert into float, store in value
-        """
-        match type_token:
-            case TL.NUM:
-                value = float(value_token.value)
-            case TL.STR:
-                value = value_token.value
-            case _:
-                raise Exception(f"Line {self.line_number}: Invalid primitive type '{type_token}'.")
+        curr_token = None
+        try:
+            curr_token = tokens[curr_Idx]
+        except:
+            raise Exception("No string after assignment, did you forget \"...\"?")
+        return curr_token.value
         
-        """
-        Creates a link between the variable name and its value 
-        and stores it in self.primitives DICT. Next time the 
-        compiler sees that "name.token_value" it looks it up in 
-        the DICT and assigns the stored value to that name. 
-        """
-        self.primitives.update({name_token.value: value})
-        return TextVariable(identifier=name_token.value, text=text, duration=duration)
-    
     def __parse_func_decl(self, tokens : list[Token]) -> ResolvedFunction:
         """
         Parses through line containing keyword 'func', slices the tokens within the '()' 
@@ -162,19 +150,17 @@ class DeclarationParser():
                     if input_len < 0:
                         raise(Exception(f"Invalid function composition on {self.line_number}"))
                     
-                    # Temp placeholder list 
-                    raw_params = extract_function_parameters(tokens[index+1:index+input_len])
-
                     # Check parameters against self.primitives dict {}
-                    resolved_params = self.resolve_params(raw_params, self.primitives)
+                    resolved_params = self.resolve_params(
+                        raw_params=extract_function_parameters(tokens[index+1:index+input_len]),
+                        primitives=self.primitives
+                    )
 
-                    # Bundle everything into an effect object from resolved_params
                     effects.append(Effect(token.value, resolved_params))
                     index=input_len+ index
 
                 case TL.IDENTIFIER:
                     func_name = token.value
-                    # Check if function not in DICT 
                     if func_name not in self.functions:
                         raise Exception(f"Line {self.line_number}: Unknown function '{func_name}'.")
                     func = self.functions[func_name]
@@ -197,7 +183,7 @@ class DeclarationParser():
                     local_vars = dict(zip(func.params, resolved_args))
                     
                     # Evaluate the function body using local_vars and collect the resulting effects
-                    expanded_effects = self.__generate_effects_with_localVars(func.body, local_vars)
+                    expanded_effects = self.__generate_effects_with_local_vars(func.body, local_vars)
                     effects.extend(expanded_effects)
                     index += right_paren
 
@@ -205,8 +191,7 @@ class DeclarationParser():
         effects.reverse()
         return effects
 
-    # Walks through tokens and builds a list of Effect objects 
-    def __generate_effects_with_localVars(self, tokens: list[Token], local_vars: dict) -> list[Effect]:
+    def __generate_effects_with_local_vars(self, tokens: list[Token], local_vars: dict) -> list[Effect]:
         """
         Evaluates a declared function's body tokens using the local variable DICT created in __generate_effects.
         Called when a user defined function like f(1,2,3) is found in a pipe chain.
@@ -228,7 +213,6 @@ class DeclarationParser():
                     effects.append(Effect(token.value, resolved_params))
                     index += input_len
             index += 1
-        effects.reverse()
         return effects
     
     def __generate_clips(self,tokens: list[Token])->list[Clip]:

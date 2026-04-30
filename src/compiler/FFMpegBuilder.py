@@ -1,6 +1,7 @@
 from uuid import uuid4
 from src.compiler.Effect import Effect
 from src.compiler.ResolvedClip import ResolvedClip
+from src.compiler.EffectBuilder import EffectBuilder
 
 class FFMpegBuilder:
     def __init__(self):
@@ -8,6 +9,7 @@ class FFMpegBuilder:
         self.next_index: int = 0
         self.final_video_label: str = ""
         self.final_audio_label: str = ""
+        self._effect_builder = EffectBuilder()
 
     def __get_or_create_input_index(self, path: str) -> int:
         """
@@ -64,7 +66,7 @@ class FFMpegBuilder:
 
     def __build_black_base(self, width: int, height: int, duration: float, filter_parts: list) -> str:
         """
-        Makes the black canvas video for when there are empty space between clips.
+        Makes the black canvas video for wh en there are empty space between clips.
         """
         label = "v_black_base"
         filter_parts.append(
@@ -114,7 +116,7 @@ class FFMpegBuilder:
         duration = clip.src_end - clip.src_start
 
         # If the clip is an audio clip, create a transparent video to place it over
-        if clip.isAudio == True:
+        if clip.is_audio == True:
             filter_parts.append(
                 f"color=c=black@0.0:size={width}x{height}:duration={duration}:rate=30,"
                 f"format=yuva420p[{video_label}]"
@@ -148,30 +150,17 @@ class FFMpegBuilder:
     def __build_effect_chain(self, effects: list[Effect], audio: bool) -> str:
         if not effects:
             return ""
-        parts = [self.__build_effect(e, audio=audio) for e in effects]
-        parts = [p for p in parts if p]
+        parts = []
+        for effect in effects:
+            if audio:
+                f = self._effect_builder.get_audio_filter(effect)
+            else:
+                f = self._effect_builder.build(effect)
+            if f:
+                parts.append(f)
         if not parts:
             return ""
         return "," + ",".join(parts)
-
-    def __build_effect(self, effect, audio: bool) -> str:
-        """
-        TODO:
-        Make an EffectBuilder class that generates the effects
-        This does nothing rn.
-        """
-        match effect.type:
-            case "blur":
-                pass
-            case "saturation":
-                pass
-            case "speed":
-                pass
-            case "volume":
-                return f"volume={effect.param[0]}" if audio else ""
-            case _:
-                raise Exception(f"Unknown effect: {effect.type}")
-        return ""
 
     def __build_concat(self, stream_nodes: list, filter_parts: list) -> tuple[str, str]:
         """

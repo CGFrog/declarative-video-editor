@@ -35,7 +35,8 @@ labels = {
 
     # Primitive Variables
     'str': TL.STR,
-    'num': TL.NUM
+    'num': TL.NUM,
+    'caption': TL.CAPTION
 }
 
 # Import token class
@@ -60,18 +61,22 @@ class Lexer():
             self.__forward()
 
     def __build_num(self):
+        start = self.pos
         num = ''
         while self.current_char != None and (self.current_char.isdigit() or self.current_char == '-' or self.current_char == '.'):
             num += self.current_char
             self.__forward()
-        return Token(TL.NUMBER, num)
+        end = self.pos
+        return Token(TL.NUMBER, num, start,end )
     
     def __build_word(self):
+        start =self.pos
         word = ''
         while self.current_char is not None and not self.current_char.isspace() and self.current_char not in symbols:
             word += self.current_char
             self.__forward()
 
+        end = self.pos
         token_key = None
 
         if word in labels:
@@ -81,16 +86,21 @@ class Lexer():
         if word == 'e': token_key = TL.END_OF_VID
         if token_key is None: token_key = TL.IDENTIFIER
 
-        return Token(token_key, word)
+        return Token(token_key, word,start, end)
     
     def __build_definition(self):
         definition: str = ''
+        start = self.pos
         self.__forward() # Assumes we enter build definition on some indicator token like "
-        while self.current_char is not None and not self.current_char.isspace() and not self.current_char =='"':
+        while self.current_char is not None and self.current_char != '"':
             definition += self.current_char
             self.__forward()
-        definition.removeprefix('"')
-        return Token(TL.DEFINITION, definition)
+
+        if self.current_char != '"':
+            raise Exception("Unterminated string literal")
+        self.__forward()
+        end = self.pos
+        return Token(TL.DEFINITION, definition,start, end)
     
     def build_tokens(self, text : str) -> list[Token]:
         tokens = []
@@ -108,22 +118,22 @@ class Lexer():
                 tokens.append(self.__build_word())
             elif self.current_char == '"': # Check for filepath definitions
                 tokens.append(self.__build_definition())
-                self.__forward()
             elif self.current_char == '|': # Check for function composition |>
+                start = self.pos
                 self.__forward()
                 if self.current_char == '>':
-                    tokens.append(Token(TL.FUNC_COMP, '|>'))
+                    tokens.append(Token(TL.FUNC_COMP, '|>', start, self.pos))
                     self.__forward()
                 else:
                     raise Exception(f"Illegal input: {self.current_char}")
             elif self.current_char in symbols: # Check for all other characters in the langauge
                 key = symbols[self.current_char]
-                tokens.append(Token(key, self.current_char))
+                tokens.append(Token(key, self.current_char,self.pos,self.pos))
                 self.__forward()
             else:
                 raise Exception(f"Illegal input: {self.current_char}")
 
-        tokens.append(Token(TL.END_OF_LINE, '')) # Indicates end of line
+        tokens.append(Token(TL.END_OF_LINE, '',self.pos,self.pos)) # Indicates end of line
         return tokens
 
 # --- Test Usage --- #

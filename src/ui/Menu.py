@@ -3,19 +3,15 @@ import subprocess
 import threading
 from src.compiler.Compiler import Compiler
 import subprocess
-import re
 
 class Menu(tk.Menu):
     def __init__(self, parent, text_editor, video_player, on_compile = None):
         super().__init__(parent)
-
-        menu = tk.Menu(self)
-
         self.video_player = video_player
         self.text_editor = text_editor
         self.on_compile = on_compile
 
-        file_menu = tk.Menu(menu, tearoff=0)
+        file_menu = tk.Menu(self, tearoff=0)
         file_menu.add_command(label="Open", command=self.open)
         file_menu.add_command(label="Save", command=self.save)
         file_menu.add_command(label="Save As", command=self.save_as)
@@ -26,6 +22,7 @@ class Menu(tk.Menu):
         self.add_command(label="Compile", command=self.compile)
         self.add_command(label="Render", command=self.render)
         self.add_command(label="Help", command=self.help)
+        parent.config(menu=self)
 
     def open(self):
         self.text_editor.open_file()
@@ -45,39 +42,26 @@ class Menu(tk.Menu):
         content = self.text_editor.get_content()
         command = compiler.compile(content)
         output_path = compiler.parser.render_settings.export_path
-
-        #subprocess.run(command, shell=True, check=True)
-        process = subprocess.Popen(
+        process: subprocess.Popen[str] = subprocess.Popen(
             command,
             shell=True,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stderr=subprocess.PIPE,
             text=True,
             bufsize=1
         )
-
-        total_duration = 60  # ← you need to get this somehow
-
-        for line in process.stdout:
-            t = self.extract_time(line)
-            if t is not None:
-                progress = (t / total_duration) * 100
-                print(f"Progress: {progress:.1f}%")
-
-        if self.on_compile:
-            self.on_compile(compiler.layers)
+        for line in process.stderr:
+            print(line, end="")
 
         process.wait()
 
-        print("--- Created: " + output_path + " ---")
-        self.after(0, lambda: self.load_and_play(output_path))
+        if process.returncode != 0:
+            raise subprocess.CalledProcessError(process.returncode, command)
+        if self.on_compile:
+            self.on_compile(compiler.layers)
 
-    def extract_time(self, line):
-        match = re.search(r"time=(\d+):(\d+):(\d+\.\d+)", line)
-        if match:
-            h, m, s = match.groups()
-            return int(h) * 3600 + int(m) * 60 + float(s)
-        return None
+        print("Rendered DVEL video to " + output_path + ".")
+        self.after(0, lambda: self.load_and_play(output_path))
 
     def load_and_play(self, path):
         self.video_player.load(path)
