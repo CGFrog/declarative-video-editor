@@ -126,7 +126,7 @@ class Compiler:
             for effect in state.effects:
                 if effect.type == "speed":
                     speed = effect.param[0] if len(effect.param) > 0 else 1.0
-                    duration = duration / speed
+                    duration = duration / float(speed)
                     end = start + duration
             is_audio = False
             if state.type == 'audio': is_audio = True
@@ -218,7 +218,7 @@ class Compiler:
                 for effect in state.effects:
                     if effect.type == "speed":
                         speed = effect.param[0] if len(effect.param) > 0 else 1.0
-                        adjusted = adjusted / speed
+                        adjusted = adjusted / float(speed)
                 total += adjusted
             return total
         # you will need to add an instance check for audio here probably.
