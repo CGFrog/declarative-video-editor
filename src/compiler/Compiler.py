@@ -123,6 +123,11 @@ class Compiler:
             duration = end - start
             if (end < start):
                 raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
+            for effect in state.effects:
+                if effect.type == "speed":
+                    speed = effect.param[0] if len(effect.param) > 0 else 1.0
+                    duration = duration / speed
+                    end = start + duration
             is_audio = False
             if state.type == 'audio': is_audio = True
             self.clips.append(
@@ -208,7 +213,13 @@ class Compiler:
             for clip in state.clips:
                 start:float = float(clip.duration[0]) if clip.duration[0] else 0
                 end: float = self.__get_media_duration(clip.path) if clip.duration[1] == "e" else float(clip.duration[1])
-                total += end-start
+                adjusted = end - start
+
+                for effect in state.effects:
+                    if effect.type == "speed":
+                        speed = effect.param[0] if len(effect.param) > 0 else 1.0
+                        adjusted = adjusted / speed
+                total += adjusted
             return total
         # you will need to add an instance check for audio here probably.
         else:
