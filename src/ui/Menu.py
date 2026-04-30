@@ -1,13 +1,16 @@
 import tkinter as tk
+import subprocess
+import threading
 from src.compiler.Compiler import Compiler
 import subprocess
 
 class Menu(tk.Menu):
-    def __init__(self, parent, text_editor, on_compile = None):
+    def __init__(self, parent, text_editor, video_player, on_compile = None):
         super().__init__(parent)
 
         menu = tk.Menu(self)
 
+        self.video_player = video_player
         self.text_editor = text_editor
         self.on_compile = on_compile
 
@@ -20,6 +23,7 @@ class Menu(tk.Menu):
 
         self.add_cascade(label="File", menu=file_menu)
         self.add_command(label="Compile", command=self.compile)
+        self.add_command(label="Render", command=self.render)
         self.add_command(label="Help", command=self.help)
 
     def open(self):
@@ -29,9 +33,26 @@ class Menu(tk.Menu):
         content = self.text_editor.get_content()
         compiler = Compiler()
         command = compiler.compile(content)
-        subprocess.run(command, shell=True)
         if self.on_compile:
             self.on_compile(compiler.layers)
+
+    def render(self):
+        threading.Thread(target=self.render_task, daemon=True).start()
+
+    def render_task(self):
+        compiler = Compiler()
+        content = self.text_editor.get_content()
+        command = compiler.compile(content)
+        output_path = compiler.parser.render_settings.export_path
+        subprocess.run(command, shell=True, check=True)
+        if self.on_compile:
+            self.on_compile(compiler.layers)
+        print("--- Created: " + output_path + " ---")
+        self.after(0, lambda: self.load_and_play(output_path))
+
+    def load_and_play(self, path):
+        self.video_player.load(path)
+        self.after(100, self.video_player.play)
 
     def save(self):
         self.text_editor.save_file()
