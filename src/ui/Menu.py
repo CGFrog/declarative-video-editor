@@ -3,6 +3,7 @@ import subprocess
 import threading
 from src.compiler.Compiler import Compiler
 import subprocess
+import re
 
 class Menu(tk.Menu):
     def __init__(self, parent, text_editor, video_player, on_compile = None):
@@ -44,11 +45,39 @@ class Menu(tk.Menu):
         content = self.text_editor.get_content()
         command = compiler.compile(content)
         output_path = compiler.parser.render_settings.export_path
-        subprocess.run(command, shell=True, check=True)
+
+        #subprocess.run(command, shell=True, check=True)
+        process = subprocess.Popen(
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
+
+        total_duration = 60  # ← you need to get this somehow
+
+        for line in process.stdout:
+            t = self.extract_time(line)
+            if t is not None:
+                progress = (t / total_duration) * 100
+                print(f"Progress: {progress:.1f}%")
+
         if self.on_compile:
             self.on_compile(compiler.layers)
+
+        process.wait()
+
         print("--- Created: " + output_path + " ---")
         self.after(0, lambda: self.load_and_play(output_path))
+
+    def extract_time(self, line):
+        match = re.search(r"time=(\d+):(\d+):(\d+\.\d+)", line)
+        if match:
+            h, m, s = match.groups()
+            return int(h) * 3600 + int(m) * 60 + float(s)
+        return None
 
     def load_and_play(self, path):
         self.video_player.load(path)
