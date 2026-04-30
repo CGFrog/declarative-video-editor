@@ -42,10 +42,25 @@ class Menu(tk.Menu):
         content = self.text_editor.get_content()
         command = compiler.compile(content)
         output_path = compiler.parser.render_settings.export_path
-        subprocess.run(command, shell=True, check=True)
+        process: subprocess.Popen[str] = subprocess.Popen(
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1
+        )
+        for line in process.stderr:
+            print(line, end="")
+
+        process.wait()
+
+        if process.returncode != 0:
+            raise subprocess.CalledProcessError(process.returncode, command)
         if self.on_compile:
             self.on_compile(compiler.layers)
-        print("--- Created: " + output_path + " ---")
+
+        print("Rendered DVEL video to " + output_path + ".")
         self.after(0, lambda: self.load_and_play(output_path))
 
     def load_and_play(self, path):
