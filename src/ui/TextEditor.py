@@ -218,6 +218,8 @@ class TextEditor:
         match token.key:
             case TL.MEDIA:
                 return "media"
+            case TL.CAPTION:
+                return "media"
             case TL.IDENTIFIER:
                 return "identifier"
             case TL.NUMBER:
