@@ -116,7 +116,7 @@ class FFMpegBuilder:
         duration = clip.src_end - clip.src_start
 
         # If the clip is an audio clip, create a transparent video to place it over
-        if clip.isAudio == True:
+        if clip.is_audio == True:
             filter_parts.append(
                 f"color=c=black@0.0:size={width}x{height}:duration={duration}:rate=30,"
                 f"format=yuva420p[{video_label}]"

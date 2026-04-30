@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from src.compiler.lexer.Lexer import Lexer
 from src.compiler.lexer.Token import TokenLabel as TL
+from src.ui.Theme import Theme
+from tkinter import ttk
 
 # blue window in left half of screen with text editor.
 class TextEditor:
@@ -11,7 +13,7 @@ class TextEditor:
         self.current_file = None
 
     def TextEditorView(self):
-        self.main_frame = tk.Frame(self.parent, bg="white")
+        self.main_frame = tk.Frame(self.parent, bg=Theme.PANEL)
         self.main_frame.grid(row=0, column=0, sticky="nsew")
 
         self.parent.rowconfigure(0, weight=1)
@@ -33,7 +35,8 @@ class TextEditor:
             padx=4,
             takefocus=0,
             border=0,
-            background="lightgray",
+            background=Theme.PANEL,
+            fg=Theme.MUTED,
             state="disabled",
             font=("Courier", 12),
             wrap="none",
@@ -46,15 +49,22 @@ class TextEditor:
             font=("Courier", 12),
             wrap="none",
             undo=True,
+            bg=Theme.BG,
+            fg=Theme.TEXT,
+            borderwidth=0,
+            highlightthickness=0,
+            insertbackground=Theme.CARET,
+            selectbackground=Theme.SELECTION,
         )
         self.text_editor.grid(row=0, column=1, sticky="nsew")
         self._configure_syntax_tags()
 
     def _scrollbar(self):
-        self.scrollbar = tk.Scrollbar(
+        self.scrollbar = ttk.Scrollbar(
             self.main_frame,
             orient="vertical",
             command=self.on_scroll,
+            style="Dark.Vertical.TScrollbar"
         )
         self.scrollbar.grid(row=0, column=2, sticky="ns")
 
@@ -67,12 +77,15 @@ class TextEditor:
             anchor="w",
             padx=6,
             font=("Courier", 10),
-            bg="lightgray",
-            fg="black",
+            bg=Theme.PANEL,
+            fg=Theme.MUTED,
         )
         self.status_bar.grid(row=1, column=0, columnspan=3, sticky="we")
 
-        self.text_editor.tag_configure("current_line", background="")
+        self.text_editor.tag_configure(
+         "current_line",
+        background=Theme.CURRENT_LINE
+        )
 
         # Update line numbers when typing, clicking, scrolling, etc.
         self.text_editor.bind("<KeyRelease>", self.on_update)
@@ -98,7 +111,11 @@ class TextEditor:
         self.update_line_numbers()
         self.highlight_current_line()
         self.update_status_bar()
-        self.highlight_syntax()
+
+        if hasattr(self, "_highlight_after"):
+            self.text_editor.after_cancel(self._highlight_after)
+
+        self._highlight_after = self.text_editor.after(200, self.highlight_syntax)
 
     def highlight_current_line(self):
         self.text_editor.tag_remove("current_line", "1.0", "end")
@@ -188,14 +205,14 @@ class TextEditor:
 
         return "break"  # Prevent default behavior
 
-    def _configure_syntax_tags(self): #color tags for syntax highlighting
-        self.text_editor.tag_configure("media", foreground="darkblue")
-        self.text_editor.tag_configure("identifier", foreground="sky blue")
-        self.text_editor.tag_configure("number", foreground="red")
-        self.text_editor.tag_configure("definition", foreground="green")
-        self.text_editor.tag_configure("effect", foreground="purple")
-        self.text_editor.tag_configure("keyword", foreground="orange")
-        self.text_editor.tag_configure("symbol", foreground="black")
+    def _configure_syntax_tags(self):
+        self.text_editor.tag_configure("media", foreground=Theme.S_MEDIA)
+        self.text_editor.tag_configure("identifier", foreground=Theme.S_IDENTIFIER)
+        self.text_editor.tag_configure("number", foreground=Theme.S_NUMBER)
+        self.text_editor.tag_configure("definition", foreground=Theme.S_DEFINITION)
+        self.text_editor.tag_configure("effect", foreground=Theme.S_EFFECT)
+        self.text_editor.tag_configure("keyword", foreground=Theme.S_KEYWORD)
+        self.text_editor.tag_configure("symbol", foreground=Theme.S_SYMBOL)
 
     def _get_tag_for_token(self, token): #converts token types from lexer into Tkinter tags
         match token.key:
@@ -233,8 +250,6 @@ class TextEditor:
                 tokens = self.lexer.build_tokens(line)
             except Exception as e:
                 continue
-            search_col = 0
-
             for token in tokens:
                 if token.key == TL.END_OF_LINE:
                     continue
@@ -244,15 +259,11 @@ class TextEditor:
                 token_value = token.value
                 if token_value == "":
                     continue
-                start = line.find(token_value, search_col)
-                if start == -1:
-                    continue
-                end = start + len(token_value)
-
+                
                 #convert character positions into Tkinter text indices
-                start_index = f"{line_num}.{start}"
-                end_index = f"{line_num}.{end}"
+
+                start_index = f"{line_num}.{token.start}"
+                end_index = f"{line_num}.{token.end}"
 
                 #apply syntax color to range corresponding to token
                 self.text_editor.tag_add(tag_name, start_index, end_index)
-                search_col = end

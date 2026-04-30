@@ -7,13 +7,13 @@ from src.compiler.StateVariable import StateVariable
 from src.compiler.VideoVariable import Clip,VideoVariable
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.parser.RenderSettings import RenderSettings
-from src.compiler.TextVariable import TextVariable
+from src.compiler.CaptionVariable import CaptionVariable
 
 
 from src.compiler.parser.TimelineParser import TimelineParser
 class Parser():
     def __init__(self):
-        self.state: dict[str,StateVariable | TextVariable] = {} # Holds all media variables, i.e. videos, audio, and images, as well as their attributes such as effects applied and durations.
+        self.state: dict[str,StateVariable | CaptionVariable] = {} # Holds all media variables, i.e. videos, audio, and images, as well as their attributes such as effects applied and durations.
         self.timeline : list[TimelineElement] = [] # Tells the compiler how to organize our video.
         self.render_settings: RenderSettings | None = None
         self.line_number : int = 1

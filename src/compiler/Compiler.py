@@ -10,7 +10,7 @@ from src.compiler.VideoVariable import Clip, VideoVariable
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.FFMpegBuilder import FFMpegBuilder
 from src.compiler.ResolvedClip import ResolvedClip
-from src.compiler.TextVariable import TextVariable
+from src.compiler.CaptionVariable import CaptionVariable
 class Compiler:
     """
     The compiler works by concatenating the videos together on each layer, and overlay the layers on top of each other.
@@ -85,7 +85,7 @@ class Compiler:
             state: StateVariable | None = self.state.get(timeline_element.identifier)
             if state is None:
                 raise Exception(f"Cannot access the state of {timeline_element.identifier}")
-            if isinstance(state,TextVariable): # If text variable detected, append to text_elements and continue
+            if isinstance(state,CaptionVariable): # If text variable detected, append to text_elements and continue
                 self.__resolve_text_element(
                     state=state,
                     timeline_element=timeline_element,
@@ -126,7 +126,7 @@ class Compiler:
             for effect in state.effects:
                 if effect.type == "speed":
                     speed = effect.param[0] if len(effect.param) > 0 else 1.0
-                    duration = duration / speed
+                    duration = duration / float(speed)
                     end = start + duration
             is_audio = False
             if state.type == 'audio': is_audio = True
@@ -138,7 +138,7 @@ class Compiler:
                     timeline_start=cursor,
                     z=z,
                     effects=state.effects,
-                    isAudio=is_audio
+                    is_audio=is_audio
                 )
             )
             cursor += duration
@@ -205,7 +205,7 @@ class Compiler:
         Finds the duration of a state variable
         """
         state = self.state[name]
-        if isinstance(state, TextVariable):
+        if isinstance(state, CaptionVariable):
             return float(state.duration)
 
         if isinstance(state, VideoVariable): # this may be similar for audio might be interchangeable
@@ -218,7 +218,7 @@ class Compiler:
                 for effect in state.effects:
                     if effect.type == "speed":
                         speed = effect.param[0] if len(effect.param) > 0 else 1.0
-                        adjusted = adjusted / speed
+                        adjusted = adjusted / float(speed)
                 total += adjusted
             return total
         # you will need to add an instance check for audio here probably.
@@ -255,39 +255,3 @@ class Compiler:
         ffmpeg_builder.final_video_label = current_v # current_v holds label of text overlay
 
         return filter_parts_extra
-
-def main():
-    source_code = """
-    video karl = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\karl.mkv" (0,4)
-    video scenery1 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben2.MOV" (0, e)
-    video scenery2 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben1.MOV" (0, e)
-    video zach = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\zach.mkv" (3, 6) |> volume(0)
-    audio strike = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\strike_sound_effect.mp3" (0, 4) |> volume(0)
-    str karl_caption = "Here is Karl!" 3
-    str zach_caption = "Here is Zach!" 3
-
-    timeline
-
-    ian 0 1
-    ian_caption 1 1
-    scenery1 after ian 1
-    zach after scenery1 2
-    zach_caption 6 2
-    scenery2 after zach 2
-    strike 3 3
-    
-    render "output.mp4" [1920,1080]
-    """
-
-    compiler = Compiler()
-    command = compiler.compile(source_code)
-    print(command)
-    subprocess.run(
-        args=command, 
-        shell=True, 
-        check=True
-    )
-
-
-if __name__ == "__main__":
-    main()

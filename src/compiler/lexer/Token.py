@@ -25,11 +25,15 @@ class TokenLabel(Enum):
     STR = 22
     NUM = 23
     FUNC = 24
+    CAPTION=25
 
 class Token():
-    def __init__(self, key, value):
+    def __init__(self, key, value, start=-1, end=-1):
         self.key : TokenLabel = key
         self.value : str = value
+        self.start : int = start
+        self.end : int = end
+
 
     def toString(self):
         return f"({self.key}, {self.value})"
@@ -38,3 +42,6 @@ class Token():
         if isinstance(other, Token):
             return self.key == other.key and self.value == other.value
         return False
+    
+    def __repr__(self) -> str:
+        return f"Key {self.key}, Value {self.value}"

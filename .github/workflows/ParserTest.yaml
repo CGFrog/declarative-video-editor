@@ -17,4 +17,8 @@ jobs:
           python-version: '3.11'
 
       - name: Run Parser Test Case 1
-        run: python -m tests.parser.ParserTest 
+        run: python -m tests.parser.ParserTest 1
+
+        
+      - name: Run Parser Test Case 2
+        run: python -m tests.parser.ParserTest 2

@@ -1,7 +1,7 @@
 from src.compiler.StateVariable import StateVariable
 
 
-class TextVariable(StateVariable):
+class CaptionVariable(StateVariable):
     def __init__(self, identifier, text, duration):
         super().__init__("text")
         self.identifier = identifier
@@ -9,5 +9,5 @@ class TextVariable(StateVariable):
         self.duration = duration
 
     def __eq__(self, other):
-        if isinstance(other, TextVariable):
+        if isinstance(other, CaptionVariable):
             return self.identifier == other.identifier and self.text == other.text and self.duration == other.duration
