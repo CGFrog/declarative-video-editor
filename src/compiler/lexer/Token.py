@@ -27,7 +27,7 @@ class TokenLabel(Enum):
     FUNC = 24
 
 class Token():
-    def __init__(self, key, value, start, end):
+    def __init__(self, key, value, start=-1, end=-1):
         self.key : TokenLabel = key
         self.value : str = value
         self.start : int = start

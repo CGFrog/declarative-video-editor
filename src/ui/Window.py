@@ -61,7 +61,7 @@ class Window:
         return style
 
 
-    def createMenu(self):
+    def __create_menu(self):
         self.menu = Menu(self.root, self.editor, self.video_player, on_compile = self.__refresh_timeline)
         self.root.config(menu=self.menu)
 

@@ -1,52 +1,45 @@
 from src.compiler.parser.RenderSettings import RenderSettings
 from src.compiler.parser.TimelineElement import TimelineElement
-from src.compiler.StateVariable import StateVariable
-from src.compiler.StateVariable import Clip, Effect
+from src.compiler.VideoVariable import Clip, VideoVariable
+from src.compiler.Effect import Effect
 from src.compiler.parser.Parser import Parser
 
-TEST1 : str =  """
+TEST1: str = """
 num n1 = 5.0
-video intro = \"intro.mp4\" (0,e) |> saturation(n1) |> speed(1.5)            
+video intro = "intro.mp4" (0,e) |> saturation(n1) |> speed(1.5)            
 timeline
 intro 0 1
 % Hey this is a comment      
-render \"lets_play.mp4\" [1920,1080] % Comment time!
+render "lets_play.mp4" [1920,1080] % Comment time!
 """
 
-introVar: StateVariable = StateVariable()
-introVar.effects.append(
-    Effect(
-        'speed', 
-        ['1.5']
-    )
+introVar = VideoVariable(
+    clips=[
+        Clip("intro.mp4", ['0', 'e'])
+    ],
+    effects=[
+        # NOTE: reversed order due to parser logic
+        Effect('speed', ['1.5']),
+        Effect('saturation', ['5.0']),
+    ],
+    type="video"
 )
 
-introVar.effects.append(
-    Effect(
-        'saturation', 
-        ["5.0"])
-    )
-introVar.clips.append(
-    Clip(
-        "intro.mp4", 
-        ['0','e']
-        )
-    )
-
-state: dict[str, StateVariable] = {
-    "intro" : introVar,
+state = {
+    "intro": introVar,
 }
 
-timeline: list[TimelineElement] = [
+timeline = [
     TimelineElement(
-        identifier = "intro", 
-        start_time='0',z='1'
+        identifier="intro",
+        start_time='0',
+        z='1'
     )
 ]
 
 render_settings = RenderSettings(
     export_path="lets_play.mp4",
-    resolution= ("1920","1080")
+    resolution=("1920", "1080")
 )
 
 TEST2: str = """
@@ -59,50 +52,56 @@ v2 0 2
 render "output.mp4" [1920,1080]
 """
 
-# --- Expected state for TEST2 --- #
-v1Var: StateVariable = StateVariable(
-    effects=[Effect('saturation', ['1']), Effect('speed', ['2']), Effect('volume', ['3'])],
-    clips=[Clip("v1.mp4", ['0', 'e'])]
-)
-v2Var: StateVariable = StateVariable(
-    effects=[Effect('saturation', ['3']), Effect('speed', ['1']), Effect('volume', ['2'])],
-    clips=[Clip("v2.mp4", ['0', 'e'])]
+v1Var = VideoVariable(
+    clips=[Clip("v1.mp4", ['0', 'e'])],
+    effects=[
+        # reversed order
+        Effect('volume', ['3']),
+        Effect('speed', ['2']),
+        Effect('saturation', ['1']),
+    ],
+    type="video"
 )
 
-state2: dict[str, StateVariable] = {
+v2Var = VideoVariable(
+    clips=[Clip("v2.mp4", ['0', 'e'])],
+    effects=[
+        # reversed order
+        Effect('volume', ['2']),
+        Effect('speed', ['1']),
+        Effect('saturation', ['3']),
+    ],
+    type="video"
+)
+
+state2 = {
     "v1": v1Var,
     "v2": v2Var,
 }
 
-render_settings2 = RenderSettings(
-    export_path="output.mp4",
-    resolution=("1920","1080")
-)
-
-timeline2: list[TimelineElement] = [
+timeline2 = [
     TimelineElement(identifier="v1", start_time='0', z='1'),
     TimelineElement(identifier="v2", start_time='0', z='2')
 ]
 
-
-if __name__=="__main__":
-    """
-    Duplicating code, TODO, add a testcase
-    parent class all future 
-    test case inherit from.
-    """
+render_settings2 = RenderSettings(
+    export_path="output.mp4",
+    resolution=("1920", "1080")
+)
+if __name__ == "__main__":
     parser = Parser()
     parser.parse_source(TEST1)
+
     assert parser.state == state
     assert parser.timeline == timeline
     assert parser.render_settings == render_settings
-    assert parser.primitives == {"n1" : 5.0}
+    assert parser.primitives == {"n1": 5.0}
 
-     # TEST2
     parser2 = Parser()
     parser2.parse_source(TEST2)
-    actual2 = parser2.state['v1']
-    expected2 = state2['v1']
+
     assert parser2.state == state2
     assert parser2.timeline == timeline2
     assert parser2.render_settings == render_settings2
+
+    print("All tests passed.")
