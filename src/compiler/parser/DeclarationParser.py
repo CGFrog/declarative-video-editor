@@ -21,7 +21,7 @@ class DeclarationParser():
         for tokens in lines_of_tokens:
             if len(tokens) == 0:
                 continue
-            declaratives: set[TL] = {TL.MEDIA, TL.STR, TL.CAPTION, TL.CAPTION, TL.NUM,TL.FUNC}
+            declaratives: set[TL] = {TL.MEDIA, TL.STR, TL.CAPTION, TL.NUM,TL.FUNC}
             
             if tokens[0].key in declaratives and tokens[1].key != TL.IDENTIFIER: 
                 raise Exception(f"Invalid identifier after type declaration.")
@@ -150,13 +150,12 @@ class DeclarationParser():
                     if input_len < 0:
                         raise(Exception(f"Invalid function composition on {self.line_number}"))
                     
-                    # Temp placeholder list 
-                    raw_params = extract_function_parameters(tokens[index+1:index+input_len])
-
                     # Check parameters against self.primitives dict {}
-                    resolved_params = self.resolve_params(raw_params, self.primitives)
+                    resolved_params = self.resolve_params(
+                        raw_params=extract_function_parameters(tokens[index+1:index+input_len]),
+                        primitives=self.primitives
+                    )
 
-                    # Bundle everything into an effect object from resolved_params
                     effects.append(Effect(token.value, resolved_params))
                     index=input_len+ index
 
@@ -184,7 +183,7 @@ class DeclarationParser():
                     local_vars = dict(zip(func.params, resolved_args))
                     
                     # Evaluate the function body using local_vars and collect the resulting effects
-                    expanded_effects = self.__generate_effects_with_localVars(func.body, local_vars)
+                    expanded_effects = self.__generate_effects_with_local_vars(func.body, local_vars)
                     effects.extend(expanded_effects)
                     index += right_paren
 
@@ -192,8 +191,7 @@ class DeclarationParser():
         effects.reverse()
         return effects
 
-    # Walks through tokens and builds a list of Effect objects 
-    def __generate_effects_with_localVars(self, tokens: list[Token], local_vars: dict) -> list[Effect]:
+    def __generate_effects_with_local_vars(self, tokens: list[Token], local_vars: dict) -> list[Effect]:
         """
         Evaluates a declared function's body tokens using the local variable DICT created in __generate_effects.
         Called when a user defined function like f(1,2,3) is found in a pipe chain.
