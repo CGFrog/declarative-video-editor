@@ -93,14 +93,7 @@ class Lexer():
         start = self.pos
         self.__forward() # Assumes we enter build definition on some indicator token like "
         while self.current_char is not None and self.current_char != '"':
-            if self.current_char == '\\':
-                self.__forward()
-                if self.current_char is None:
-                    raise Exception("Invalid escape sequence")
-                definition += self.current_char
-            else:
-                definition += self.current_char
-
+            definition += self.current_char
             self.__forward()
 
         if self.current_char != '"':
