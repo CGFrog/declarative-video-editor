@@ -52,12 +52,12 @@ class Menu(tk.Menu):
             bufsize=1
         )
 
-        #total_duration = something
+        total_duration = 60 #need to change
 
         for line in process.stderr:
             t = self.extract_time(line)
             if t is not None:
-                #progress = (t / total_duration) * 100
+                progress = (t / total_duration) * 100
                 print(f"Progress: {t:.1f}%")
 
         process.wait()

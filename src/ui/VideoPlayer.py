@@ -23,7 +23,6 @@ class VideoPlayer:
         self.parent_frame.rowconfigure(0, weight=1)
         self.parent_frame.rowconfigure(1, weight=0)
         self.parent_frame.rowconfigure(2, weight=0)
-        self.parent_frame.rowconfigure(3, weight=0)
         self.parent_frame.columnconfigure(0, weight=1)
 
         self.video_widget = None
@@ -33,7 +32,6 @@ class VideoPlayer:
 
         self.play_button = None
         self.pause_button = None
-        #self.load_button = None
         self.stop_button = None
 
         self.is_dragging_progress = False
@@ -74,35 +72,26 @@ class VideoPlayer:
         controls_frame.columnconfigure(2, weight=1)
         controls_frame.columnconfigure(2, weight=1)
 
-        
-
-        self.load_button = self.__create_button(
-            controls_frame, 
-            text="Load", 
-            command=self.pick_file
-        )
-        self.load_button.grid(row=0, column=0, sticky="ew")
-
         self.play_button = self.__create_button(
             controls_frame, 
             text="Play", 
             command=self.play
         )
-        self.play_button.grid(row=0, column=1, sticky="ew")
+        self.play_button.grid(row=0, column=0, sticky="ew")
 
         self.pause_button = self.__create_button(
             controls_frame, 
             text="Pause", 
             command=self.pause
         )
-        self.pause_button.grid(row=0, column=2, sticky="ew")
+        self.pause_button.grid(row=0, column=1, sticky="ew")
 
         self.stop_button = self.__create_button(
             controls_frame, 
             text="Stop", 
             command=self.stop
         )
-        self.stop_button.grid(row=0, column=3, sticky="ew")
+        self.stop_button.grid(row=0, column=2, sticky="ew")
 
 
 
