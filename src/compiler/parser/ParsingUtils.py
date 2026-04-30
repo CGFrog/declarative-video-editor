@@ -37,3 +37,8 @@ def extract_function_parameters(tokens: list[Token]) ->list:
                 params.append(Primitive("NUMBER", token.value))
 
     return params
+
+def is_valid_assignment(tokens : list[Token]):
+    eq_index = first_of_token(tokens, TL.ASSIGN)
+    return eq_index >= len(tokens)
+        

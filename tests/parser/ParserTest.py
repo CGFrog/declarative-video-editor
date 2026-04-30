@@ -1,6 +1,7 @@
 from src.compiler.parser.RenderSettings import RenderSettings
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.VideoVariable import Clip, VideoVariable
+from src.compiler.StateVariable import StateVariable
 from src.compiler.Effect import Effect
 from src.compiler.parser.Parser import Parser
 
@@ -13,12 +14,13 @@ intro 0 1
 render "lets_play.mp4" [1920,1080] % Comment time!
 """
 
+
+
 introVar = VideoVariable(
     clips=[
         Clip("intro.mp4", ['0', 'e'])
     ],
     effects=[
-        # NOTE: reversed order due to parser logic
         Effect('speed', ['1.5']),
         Effect('saturation', ['5.0']),
     ],
@@ -55,7 +57,6 @@ render "output.mp4" [1920,1080]
 v1Var = VideoVariable(
     clips=[Clip("v1.mp4", ['0', 'e'])],
     effects=[
-        # reversed order
         Effect('volume', ['3']),
         Effect('speed', ['2']),
         Effect('saturation', ['1']),
@@ -66,7 +67,6 @@ v1Var = VideoVariable(
 v2Var = VideoVariable(
     clips=[Clip("v2.mp4", ['0', 'e'])],
     effects=[
-        # reversed order
         Effect('volume', ['2']),
         Effect('speed', ['1']),
         Effect('saturation', ['3']),
@@ -95,11 +95,13 @@ if __name__ == "__main__":
     assert parser.state == state
     assert parser.timeline == timeline
     assert parser.render_settings == render_settings
-    assert parser.primitives == {"n1": 5.0}
+    assert parser.primitives == {"n1": '5.0'}
 
     parser2 = Parser()
     parser2.parse_source(TEST2)
 
+    print(parser2.state)
+    print(state2)
     assert parser2.state == state2
     assert parser2.timeline == timeline2
     assert parser2.render_settings == render_settings2

@@ -25,6 +25,7 @@ class TokenLabel(Enum):
     STR = 22
     NUM = 23
     FUNC = 24
+    CAPTION=25
 
 class Token():
     def __init__(self, key, value, start=-1, end=-1):
@@ -42,3 +43,5 @@ class Token():
             return self.key == other.key and self.value == other.value
         return False
     
+    def __repr__(self) -> str:
+        return f"Key {self.key}, Value {self.value}"

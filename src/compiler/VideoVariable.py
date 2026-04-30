@@ -16,10 +16,10 @@ class Clip:
         return f"Path: {self.path}\nDuration: {self.duration}"
 
 class VideoVariable(StateVariable):
-    def __init__(self, effects=[], clips=[], type=""):
-        self.effects: list[Effect] = effects
+    def __init__(self, effects=None, clips=None, type=""):
+        super().__init__(type)
+        self.effects: list[Effect] = effects if effects is not None else []
         self.clips: list[Clip] = clips if clips is not None else []
-        self.type: str = type
 
     def __eq__(self, other)-> bool:
         if isinstance(other, VideoVariable):

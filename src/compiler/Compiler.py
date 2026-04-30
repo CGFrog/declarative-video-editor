@@ -133,7 +133,7 @@ class Compiler:
                     timeline_start=cursor,
                     z=z,
                     effects=state.effects,
-                    isAudio=is_audio
+                    is_audio=is_audio
                 )
             )
             cursor += duration

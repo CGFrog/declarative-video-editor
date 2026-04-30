@@ -35,7 +35,8 @@ labels = {
 
     # Primitive Variables
     'str': TL.STR,
-    'num': TL.NUM
+    'num': TL.NUM,
+    'text': TL.CAPTION
 }
 
 # Import token class

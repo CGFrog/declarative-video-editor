@@ -1,7 +1,7 @@
 from src.compiler.Effect import Effect
 
 class StateVariable:
-    def __init__(self, effects=[], clips=[], type=""):
+    def __init__(self, type=""):
         self.type: str = type
 
     def __eq__(self, other)-> bool:
