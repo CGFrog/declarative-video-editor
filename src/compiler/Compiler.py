@@ -1,43 +1,60 @@
 from collections import defaultdict
 import json
+from plistlib import InvalidFileException
 import subprocess
 from typing import Dict, List
+from src.compiler.parser.RenderSettings import RenderSettings
 from src.compiler.parser.Parser import Parser
 from src.compiler.StateVariable import StateVariable
+from src.compiler.VideoVariable import Clip, VideoVariable
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.FFMpegBuilder import FFMpegBuilder
 from src.compiler.ResolvedClip import ResolvedClip
+from src.compiler.TextVariable import TextVariable
 class Compiler:
     """
     The compiler works by concatenating the videos together on each layer, and overlay the layers on top of each other.
     """
     def __init__(self):
         self.parser = Parser()
-        self.state: Dict[str, StateVariable] = {}
+        self.state: Dict[str,StateVariable] = {}
         self.timeline: List[TimelineElement] = []
         self.input_index: Dict[str, int] = {}
         self.next_index: int = 0
         self.layers = {}
         self.duration_cache: dict[str,float] = {}
+        self.text_elements = []
+        self.clips =[]
 
     def compile(self, source_code: str)->str:
         self.parser.parse_source(source_code=source_code)
         self.state = self.parser.state
         self.timeline = self.parser.timeline
-        
-        assert self.parser.render_settings is not None
-        render_settings = self.parser.render_settings
 
-        clips = self.__generate_clips()
-        layers: dict = self.__build_layers(clips)
+        assert self.parser.render_settings is not None
+        render_settings: RenderSettings= self.parser.render_settings
+
+        self.__generate_state_objects()
+
+        if self.clips is None:
+            raise Exception("No valid clips.")
+        layers: dict = self.__build_layers(
+            clips=self.clips
+        )
         ffmpeg_builder = FFMpegBuilder()
         
         # generates the ffmpeg command
-        filter_complex: str = ffmpeg_builder.build_filter_graph(layers, int(render_settings.x), int(render_settings.y) )
+        filter_complex: str = ffmpeg_builder.build_filter_graph(
+            layers=layers,
+            width=int(render_settings.x),
+            height=int(render_settings.y)
+        )
 
         # Handles text elements
         if (self.text_elements):
-            filter_parts_extra = self.__handle_text(ffmpeg_builder)
+            filter_parts_extra = self.__handle_text(
+                ffmpeg_builder=ffmpeg_builder
+            )
             filter_complex = filter_complex + ";" + ";".join(filter_parts_extra) # Place text filters into ffmpeg graph
 
         # resolves all of the inputs for the ffmpeg command.
@@ -48,56 +65,83 @@ class Compiler:
         final_a:str = ffmpeg_builder.final_audio_label
         # returns the ffmpeg command as a string to reduce side-effects, that way users can compile and to see errors often without generating a whole video.
         return (
-            f"ffmpeg {inputs} "
+            f"ffmpeg -y {inputs} "
             f"-filter_complex \"{filter_complex}\" "
             f"-map \"[{final_v}]\" -map \"[{final_a}]\" "
             f"\"{output_path}\""
         )
     
-    def __generate_clips(self):
+    def __generate_state_objects(self): # I hate this function a lot, does so many things at once but itll do for now.
         """
-        # Generates new clips that can be more easily used by the ffmpeg builder. Essentially combining timeline clips with their state variable counter parts.
+        # Generates new clips, text objects, and audio that can be more easily used by the ffmpeg builder. Essentially combining timeline clips with their state variable counter parts.
         """
-        result: list[ResolvedClip] = []
         self.text_elements = [] # Stores text elements
         for timeline_element in self.timeline:
-            base_start = self.__resolve_start_time(timeline_element)
-            z: int = int(timeline_element.z)
-            state: StateVariable = self.state.get(timeline_element.identifier)
-            if type(state).__name__ == 'TextVariable': # If text variable detected, append to text_elements and continue
-                self.text_elements.append({
-                    "text": state.text,
-                    "start": timeline_element.start_time,
-                    "duration": state.duration,
-                    "z": z
-                })
-                continue
-            cursor = base_start
-            for clip in state.clips:
-                start = float(clip.duration[0]) if clip.duration[0] else 0
-                end = self.__get_media_duration(clip.path) if clip.duration[1] == 'e' else float(clip.duration[1])
-                duration = end -start
-                if (end < start):
-                    raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
-                # Adjust duration if speed effect is applied, so timeline positions are correct
-                for effect in state.effects:
-                    if effect.type == "speed":
-                        speed = effect.param[0] if len(effect.param) > 0 else 1.0
-                        duration = duration / speed 
-                        end = start + duration
-
-                result.append(
-                    ResolvedClip(
-                        path=clip.path,
-                        src_start=start,
-                        src_end=end,
-                        timeline_start=cursor,
-                        z=z,
-                        effects=state.effects
-                    )
+            z = 0
+            try:
+                z: int = int(timeline_element.z)
+            except:
+                raise Exception(f"z value of {timeline_element.identifier} cannot be converted to an integer.")
+            state: StateVariable | None = self.state.get(timeline_element.identifier)
+            if state is None:
+                raise Exception(f"Cannot access the state of {timeline_element.identifier}")
+            if isinstance(state,TextVariable): # If text variable detected, append to text_elements and continue
+                self.__resolve_text_element(
+                    state=state,
+                    timeline_element=timeline_element,
+                    z=z
                 )
-                cursor += duration
-        return result
+            elif isinstance(state,VideoVariable):
+                self.__resolve_clips(
+                    timeline_element=timeline_element,
+                    state=state,
+                    z=z
+                )
+            else:
+                #do audio stuff.
+                pass
+
+    def __resolve_text_element(self,state,timeline_element,z):
+        self.text_elements.append({
+            "text": state.text,
+            "start": timeline_element.start_time,
+            "duration": state.duration,
+            "z": z
+        })
+
+    def __resolve_clips(self,timeline_element, state : VideoVariable,z:int):
+        base_start = self.__resolve_start_time(timeline_element)
+        cursor :float = base_start
+        for clip in state.clips:
+            start = float(clip.duration[0]) if clip.duration[0] else 0
+
+            full_video_duration: float = self.__get_media_duration(path=clip.path)
+            end: float = full_video_duration if clip.duration[1] == 'e' else float(clip.duration[1])
+
+            if end > full_video_duration:
+                raise ValueError(f"{timeline_element.identifier} specified duration is longer than the video duration (use 'e' for inclusion of the whole video).")
+            duration = end - start
+            if (end < start):
+                raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
+            for effect in state.effects:
+                if effect.type == "speed":
+                    speed = effect.param[0] if len(effect.param) > 0 else 1.0
+                    duration = duration / speed
+                    end = start + duration
+            is_audio = False
+            if state.type == 'audio': is_audio = True
+            self.clips.append(
+                ResolvedClip(
+                    path=clip.path,
+                    src_start=start,
+                    src_end=end,
+                    timeline_start=cursor,
+                    z=z,
+                    effects=state.effects,
+                    isAudio=is_audio
+                )
+            )
+            cursor += duration
 
     def __get_media_duration(self, path:str)->float:
         """
@@ -121,7 +165,7 @@ class Compiler:
             text =True
         )
         if result.returncode != 0:
-            raise Exception(f"Cannot extract duration of clip at path {path}.")
+            raise InvalidFileException(f"Cannot extract duration of clip at path {path}.")
         
         duration = float(json.loads(result.stdout)['format']['duration'])
         self.duration_cache[path] = duration
@@ -161,20 +205,25 @@ class Compiler:
         Finds the duration of a state variable
         """
         state = self.state[name]
-        total =0
-        for clip in state.clips:
-            start:float = float(clip.duration[0]) if clip.duration[0] else 0
-            end: float = self.__get_media_duration(clip.path) if clip.duration[1] == "e" else float(clip.duration[1])
-            adjusted = end - start
-            
-            # Adjust duration to account for speed effects
-            for effect in state.effects:
-                if effect.type == "speed":
-                    speed = effect.param[0] if len(effect.param) > 0 else 1.0
-                    adjusted = adjusted / speed
-            total += adjusted
-        return total
-    
+        if isinstance(state, TextVariable):
+            return float(state.duration)
+
+        if isinstance(state, VideoVariable): # this may be similar for audio might be interchangeable
+            total = 0
+            for clip in state.clips:
+                start:float = float(clip.duration[0]) if clip.duration[0] else 0
+                end: float = self.__get_media_duration(clip.path) if clip.duration[1] == "e" else float(clip.duration[1])
+                adjusted = end - start
+
+                for effect in state.effects:
+                    if effect.type == "speed":
+                        speed = effect.param[0] if len(effect.param) > 0 else 1.0
+                        adjusted = adjusted / speed
+                total += adjusted
+            return total
+        # you will need to add an instance check for audio here probably.
+        else:
+            raise Exception("Unknown class type of state.")
 
     def __build_layers(self, clips:list[ResolvedClip]):
         """
@@ -209,25 +258,35 @@ class Compiler:
 
 def main():
     source_code = """
-    video scenery = "C:\\Users\\benbu\\Videos\\IMG_1937.MOV" (0,e)
-    video ben = "C:\\Users\\benbu\\Videos\\IMG_1962.MOV" (0,e)
-    str t_1 = "Hello World, it is a nice day out!" 2
-    str caption_1 = "This is a simple test caption..." 1
+    video karl = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\karl.mkv" (0,4)
+    video scenery1 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben2.MOV" (0, e)
+    video scenery2 = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\ben1.MOV" (0, e)
+    video zach = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\zach.mkv" (3, 6) |> volume(0)
+    audio strike = "C:\\Users\\benbu\\Videos\\DVEL_TEST\\strike_sound_effect.mp3" (0, 4) |> volume(0)
+    str karl_caption = "Here is Karl!" 3
+    str zach_caption = "Here is Zach!" 3
 
     timeline
 
-    ben 0 1
-    t_1 1 1
-    caption_1 3 1
-    scenery after ben 1
+    ian 0 1
+    ian_caption 1 1
+    scenery1 after ian 1
+    zach after scenery1 2
+    zach_caption 6 2
+    scenery2 after zach 2
+    strike 3 3
     
-    render "output.mp4" [1656,1242]
+    render "output.mp4" [1920,1080]
     """
 
     compiler = Compiler()
     command = compiler.compile(source_code)
     print(command)
-    subprocess.run(command, shell=True, check=True)
+    subprocess.run(
+        args=command, 
+        shell=True, 
+        check=True
+    )
 
 
 if __name__ == "__main__":

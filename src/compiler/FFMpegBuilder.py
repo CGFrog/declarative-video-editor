@@ -1,7 +1,6 @@
 from uuid import uuid4
 from src.compiler.Effect import Effect
 from src.compiler.ResolvedClip import ResolvedClip
-from src.compiler.EffectBuilder import EffectBuilder
 
 class FFMpegBuilder:
     def __init__(self):
@@ -9,7 +8,6 @@ class FFMpegBuilder:
         self.next_index: int = 0
         self.final_video_label: str = ""
         self.final_audio_label: str = ""
-        self._effect_builder = EffectBuilder()
 
     def __get_or_create_input_index(self, path: str) -> int:
         """
@@ -39,7 +37,12 @@ class FFMpegBuilder:
         black = self.__build_black_base(width, height, duration, filter_parts)
 
         for z in sorted(layers.keys()):
-            v_out, a_out = self.__build_layer(layers[z], filter_parts)
+            v_out, a_out = self.__build_layer(
+                clips=layers[z], 
+                filter_parts=filter_parts,
+                width=width, 
+                height=height
+            )
             layer_outputs.append((z, v_out, a_out))
 
         # takes all the layer and computes the final video syntax.
@@ -61,7 +64,7 @@ class FFMpegBuilder:
 
     def __build_black_base(self, width: int, height: int, duration: float, filter_parts: list) -> str:
         """
-        Makes the black canvas video for when there are empty space between clips.
+        Makes the black canvas video for wh en there are empty space between clips.
         """
         label = "v_black_base"
         filter_parts.append(
@@ -69,7 +72,7 @@ class FFMpegBuilder:
         )
         return label
 
-    def __build_layer(self, clips : list[ResolvedClip], filter_parts: list) -> tuple[str, str]:
+    def __build_layer(self, clips : list[ResolvedClip], filter_parts: list, width : int, height : int) -> tuple[str, str]:
         """
         Goes through all the videos and audio on a given layer and concatenates them.
         """
@@ -78,7 +81,11 @@ class FFMpegBuilder:
         # Without delaying our videos/audio, they by default start at t=0, which is not always what we want. 
         timeline_start = clips[0].timeline_start
         for clip in clips:
-            video_label, audio_label = self.__build_clip_filters(clip, filter_parts)
+            video_label, audio_label = self.__build_clip_filters(
+                clip=clip, 
+                filter_parts=filter_parts,
+                width=width,
+                height=height)
             stream_nodes.append((video_label, audio_label))
 
         v_concat, a_concat = self.__build_concat(stream_nodes, filter_parts)
@@ -96,8 +103,7 @@ class FFMpegBuilder:
 
         return v_out, a_out
 
-    #
-    def __build_clip_filters(self, clip: ResolvedClip, filter_parts: list) -> tuple[str, str]:
+    def __build_clip_filters(self, clip: ResolvedClip, filter_parts: list, width :int, height : int) -> tuple[str, str]:
         """
         Filters in ffmpeg take in a media and apply some function to that given clip, this function is essentially compiling our DVEL clips into the corresponding FFMpeg clip.
         """
@@ -105,46 +111,67 @@ class FFMpegBuilder:
         uid = uuid4().hex[:6]
         video_label = f"v{index}_{uid}"
         audio_label = f"a{index}_{uid}"
+        duration = clip.src_end - clip.src_start
 
-        # this is where we can add all of our effects to our video
-        video_effect_chain, audio_effect_chain = self.__build_effect_chains(clip.effects)
+        # If the clip is an audio clip, create a transparent video to place it over
+        if clip.isAudio == True:
+            filter_parts.append(
+                f"color=c=black@0.0:size={width}x{height}:duration={duration}:rate=30,"
+                f"format=yuva420p[{video_label}]"
+            )
+        else:
+            # this is where we can add all of our effects to our video
+            effect_chain = self.__build_effect_chain(clip.effects, audio=False)
 
-        filter_parts.append(
-            f"[{index}:v]trim=start={clip.src_start}:end={clip.src_end},"
-            f"setpts=PTS-STARTPTS"
-            f"{video_effect_chain}[{video_label}]"  # effects slot in here naturally
-        )
+            filter_parts.append(
+                f"[{index}:v]trim=start={clip.src_start}:end={clip.src_end},"
+                f"setpts=PTS-STARTPTS,"
+                # we are going to have to normalize each video, unfortunately adds compile time but it be what it be rn.
+                f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
+                f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
+                f"fps=30,"
+                f"format=yuv420p"
+                f"{effect_chain}[{video_label}]"  # effects slot in here naturally
+            )
+
+        # Audio effect chain
+        audio_effect_chain = self.__build_effect_chain(clip.effects, audio=True)
         filter_parts.append(
             f"[{index}:a]atrim=start={clip.src_start}:end={clip.src_end},"
-            f"asetpts=PTS-STARTPTS"
+            # normalize our audio as well here
+            f"asetpts=PTS-STARTPTS,"
+            f"aresample=44100"
             f"{audio_effect_chain}[{audio_label}]"
         )
         return video_label, audio_label
 
-    # Adjusted __build_effect_chain to support 2 streams since the speed effect will need video and audio streams
-    def __build_effect_chains(self, effects: list[Effect]) -> tuple[str, str]:
-        """
-        Splits effects into a video filter chain and an audio filter chain.
-        Speed is the only effect that touches both streams — its video side
-        (setpts) goes in the video chain and its audio side (atempo) goes
-        in the audio chain.
-        """
+    def __build_effect_chain(self, effects: list[Effect], audio: bool) -> str:
         if not effects:
-            return "", ""
-        
-        video_filters = []
-        audio_filters = []
+            return ""
+        parts = [self.__build_effect(e, audio=audio) for e in effects]
+        parts = [p for p in parts if p]
+        if not parts:
+            return ""
+        return "," + ",".join(parts)
 
-        for effect in effects:
-            video_filters.append(self._effect_builder.build(effect))
-            audio_filter = self._effect_builder.get_audio_filter(effect)
-            if audio_filter:
-                audio_filters.append(audio_filter)
-        
-        video_chain = ("," + ",".join(video_filters)) if video_filters else ""
-        audio_chain = ("," + ",".join(audio_filters)) if audio_filters else ""
-        
-        return video_chain, audio_chain
+    def __build_effect(self, effect, audio: bool) -> str:
+        """
+        TODO:
+        Make an EffectBuilder class that generates the effects
+        This does nothing rn.
+        """
+        match effect.type:
+            case "blur":
+                pass
+            case "saturation":
+                pass
+            case "speed":
+                pass
+            case "volume":
+                return f"volume={effect.param[0]}" if audio else ""
+            case _:
+                raise Exception(f"Unknown effect: {effect.type}")
+        return ""
 
     def __build_concat(self, stream_nodes: list, filter_parts: list) -> tuple[str, str]:
         """
@@ -187,7 +214,10 @@ class FFMpegBuilder:
         """
         uid = uuid4().hex[:6]
         out_label = f"v_text_{uid}"
-        end_time = float(timeline_start) + float(duration)
+        try:
+            end_time = float(timeline_start) + float(duration)
+        except ValueError:
+            raise Exception(f"You must explicitly define the start time of the text string:{text}")
 
         filter_parts.append(
             f"[{current_v}]drawtext="
