@@ -19,10 +19,10 @@ class ConsoleView:
         self.main_frame.columnconfigure(0, weight=1)
         self.main_frame.rowconfigure(0, weight=1)
 
-        self.consoleOutput()
-        self.redirectOut()
+        self.__console_output()
+        self.__redirect_Out()
 
-    def consoleOutput(self):
+    def __console_output(self):
         self.console = tk.Text(self.main_frame, bg=Theme.BG, fg="white", wrap="word")
         self.console.grid(row=0, column=0, sticky="nsew")
 
@@ -37,7 +37,7 @@ class ConsoleView:
         self.console.bind("<Return>", self.on_enter)
         self.console.config(yscrollcommand=self.scrollbar.set)
 
-    def redirectOut(self):
+    def __redirect_Out(self):
         self.original_stdout = sys.stdout
         self.original_stderr = sys.stderr
 

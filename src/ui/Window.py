@@ -10,21 +10,21 @@ class Window:
     def __init__(self):
         self.root = tk.Tk()
 
-    def create_window(self):
+    def __create_window(self):
         self.root.title("Declarative Video Editor")
         self.root.geometry("800x600")
-        self.maximize_window()
-        style = self.apply_dark_ttk_theme()
+        self.__maximize_window()
+        style = self.__apply_dark_theme()
         self.root.configure(bg=Theme.BG)
 
         
-    def maximize_window(self):
+    def __maximize_window(self):
         try:
             self.root.state("zoomed")  # Windows
         except:
             self.root.attributes("-zoomed", True)
 
-    def apply_dark_ttk_theme(self):
+    def __apply_dark_theme(self):
         style = ttk.Style()
         style.theme_use("clam")
         thumb = Theme.PANEL
@@ -61,11 +61,11 @@ class Window:
         return style
 
 
-    def create_menu(self):
+    def __create_menu(self):
         self.menu = Menu(self.root, self.editor, on_compile = self.__refresh_timeline)
         self.root.config(menu=self.menu)
 
-    def window_layout(self):
+    def __window_layout(self):
         self.main_pane = tk.PanedWindow(
             self.root,
             orient="horizontal",
@@ -92,7 +92,7 @@ class Window:
         self.bottom_right_frame = tk.Frame(self.right_pane, bg=Theme.PANEL)
         self.right_pane.add(self.bottom_right_frame, minsize=50)
 
-    def text_editor_view(self):
+    def __text_editor_view(self):
         self.left_frame.rowconfigure(0, weight=1)
         self.left_frame.columnconfigure(0, weight=1)
 
@@ -118,14 +118,14 @@ class Window:
         self.timeline_view.layers = layers
         self.timeline_view._draw_timeline()
 
-    def video_display_view(self):
+    def __video_display_view(self):
         self.top_right_frame.rowconfigure(0, weight=1)
         self.top_right_frame.columnconfigure(0, weight=1)
 
         self.video_player = VideoPlayer(self.top_right_frame)
 
 
-    def console_view(self):
+    def __console_view(self):
         self.bottom_right_frame.rowconfigure(0, weight=1)
         self.bottom_right_frame.columnconfigure(0, weight=1)
 
@@ -135,11 +135,11 @@ class Window:
 
 
     def run(self):
-        self.create_window()
-        self.window_layout()
-        self.text_editor_view()
+        self.__create_window()
+        self.__window_layout()
+        self.__text_editor_view()
         self.__timeline_view()
-        self.video_display_view()
-        self.console_view()
-        self.create_menu()
+        self.__video_display_view()
+        self.__console_view()
+        self.__create_menu()
         self.root.mainloop()
