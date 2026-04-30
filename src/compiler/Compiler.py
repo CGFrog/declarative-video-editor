@@ -10,7 +10,7 @@ from src.compiler.VideoVariable import Clip, VideoVariable
 from src.compiler.parser.TimelineElement import TimelineElement
 from src.compiler.FFMpegBuilder import FFMpegBuilder
 from src.compiler.ResolvedClip import ResolvedClip
-from src.compiler.TextVariable import TextVariable
+from src.compiler.CaptionVariable import CaptionVariable
 class Compiler:
     """
     The compiler works by concatenating the videos together on each layer, and overlay the layers on top of each other.
@@ -85,7 +85,7 @@ class Compiler:
             state: StateVariable | None = self.state.get(timeline_element.identifier)
             if state is None:
                 raise Exception(f"Cannot access the state of {timeline_element.identifier}")
-            if isinstance(state,TextVariable): # If text variable detected, append to text_elements and continue
+            if isinstance(state,CaptionVariable): # If text variable detected, append to text_elements and continue
                 self.__resolve_text_element(
                     state=state,
                     timeline_element=timeline_element,
@@ -205,7 +205,7 @@ class Compiler:
         Finds the duration of a state variable
         """
         state = self.state[name]
-        if isinstance(state, TextVariable):
+        if isinstance(state, CaptionVariable):
             return float(state.duration)
 
         if isinstance(state, VideoVariable): # this may be similar for audio might be interchangeable

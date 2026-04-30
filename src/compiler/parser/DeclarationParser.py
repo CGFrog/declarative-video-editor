@@ -5,7 +5,7 @@ from src.compiler.Effect import Effect
 from src.compiler.parser.ParsingUtils import extract_duration, first_of_token, extract_function_parameters
 from src.compiler.parser.Primitive import Primitive
 from src.compiler.parser.ResolvedFunction import ResolvedFunction
-from src.compiler.TextVariable import TextVariable
+from src.compiler.CaptionVariable import CaptionVariable
 
 class DeclarationParser(): 
     def __init__(self): 
@@ -68,7 +68,7 @@ class DeclarationParser():
         value:str = value_token.value
         return value
     
-    def __parse_caption(self,tokens : list[Token])->TextVariable:
+    def __parse_caption(self,tokens : list[Token])->CaptionVariable:
         name_token = tokens[1]
         caption = self.__parse_primitive_string(tokens)
         duration = None
@@ -77,7 +77,7 @@ class DeclarationParser():
                 duration = token.value
         if duration is None:
             raise Exception("Unspecified duration for caption.")
-        return TextVariable(identifier=name_token.value, text=caption, duration=duration)
+        return CaptionVariable(identifier=name_token.value, text=caption, duration=duration)
 
     def __parse_primitive_string(self, tokens : list[Token]):        
         eq_index = first_of_token(tokens, TL.ASSIGN)
