@@ -101,8 +101,6 @@ if __name__=="__main__":
      # TEST2
     parser2 = Parser()
     parser2.parse_source(TEST2)
-    actual2 = parser2.state['v1']
-    expected2 = state2['v1']
     assert parser2.state == state2
     assert parser2.timeline == timeline2
     assert parser2.render_settings == render_settings2
