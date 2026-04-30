@@ -33,7 +33,7 @@ class VideoPlayer:
 
         self.play_button = None
         self.pause_button = None
-        self.load_button = None
+        #self.load_button = None
         self.stop_button = None
 
         self.is_dragging_progress = False
@@ -72,7 +72,7 @@ class VideoPlayer:
         controls_frame.columnconfigure(0, weight=1)
         controls_frame.columnconfigure(1, weight=1)
         controls_frame.columnconfigure(2, weight=1)
-        controls_frame.columnconfigure(3, weight=1)
+        controls_frame.columnconfigure(2, weight=1)
 
         
 
