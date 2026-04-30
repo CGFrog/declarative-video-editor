@@ -36,7 +36,7 @@ labels = {
     # Primitive Variables
     'str': TL.STR,
     'num': TL.NUM,
-    'text': TL.CAPTION
+    'caption': TL.CAPTION
 }
 
 # Import token class
@@ -92,7 +92,7 @@ class Lexer():
         definition: str = ''
         start = self.pos
         self.__forward() # Assumes we enter build definition on some indicator token like "
-        while self.current_char is not None and not self.current_char.isspace() and not self.current_char =='"':
+        while self.current_char is not None and self.current_char != '"':
             definition += self.current_char
             self.__forward()
         self.__forward()
