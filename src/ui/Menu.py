@@ -7,7 +7,7 @@ import subprocess
 class Menu(tk.Menu):
     def __init__(self, parent, text_editor, video_player, on_compile = None):
         super().__init__(parent)
-
+        self.video_player = video_player
         self.text_editor = text_editor
         self.on_compile = on_compile
 
