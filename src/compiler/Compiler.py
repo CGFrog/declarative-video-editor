@@ -25,6 +25,7 @@ class Compiler:
         self.duration_cache: dict[str,float] = {}
         self.text_elements = []
         self.clips =[]
+        self.duration = None
 
     def compile(self, source_code: str)->str:
         self.parser.parse_source(source_code=source_code)
@@ -42,12 +43,13 @@ class Compiler:
             clips=self.clips
         )
         ffmpeg_builder = FFMpegBuilder()
-        
+        self.duration = self.__get_total_duration(self.layers)
         # generates the ffmpeg command
         filter_complex: str = ffmpeg_builder.build_filter_graph(
             layers=self.layers,
             width=int(render_settings.x),
-            height=int(render_settings.y)
+            height=int(render_settings.y),
+            duration=self.duration
         )
 
         # Handles text elements
@@ -142,6 +144,19 @@ class Compiler:
                 )
             )
             cursor += duration
+    
+    def __get_total_duration(self, layers) -> float:
+        """
+        Returns the total duration of the video.
+        """
+        end_times = []
+        
+        for clips in layers.values():
+            for clip in clips:
+                end_times.append(clip.timeline_start + (clip.src_end - clip.src_start))
+        return max(end_times)
+
+
 
     def __get_media_duration(self, path:str)->float:
         """
