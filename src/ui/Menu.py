@@ -3,6 +3,7 @@ import subprocess
 import threading
 from src.compiler.Compiler import Compiler
 import subprocess
+import webbrowser
 
 class Menu(tk.Menu):
     def __init__(self, parent, text_editor, video_player, on_compile = None):
@@ -61,5 +62,4 @@ class Menu(tk.Menu):
         self.text_editor.save_file_as()
 
     def help(self):
-        # Route to documentation
-        print("Routing to documentation...")
+        webbrowser.open("https://github.com/CGFrog/declarative-video-editor/blob/prod/docs/Documentation.md")

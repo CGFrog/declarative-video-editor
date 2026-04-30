@@ -95,19 +95,11 @@ crop(width, height, x_offset, y_offset)
 <p>Where the width and height represent the width and height of the cropped video's area. And the x and y offsets represent the amount of pixels to crop from each axis.</p>
 
 <h4>Volume</h4>
-<p>A measure representing how loud or quiet a piece of audio is.</p>
+<p>A measure representing how loud or quiet a piece of audio is. This works for both video and audio clips.</p>
 
 ```
 volume(x)
 ```
-<p>Where x is equal to the volume of the audio or video clip.</p>
-
-<h4>Noise Filter</h4>
-<p>A tool designed to reduce or eliminate unwanted constant background sounds.</p>
-
-```
-noise_filter(x)
-```
-<p>Where x is the noise filter value.</p>
+<p>Where x is equal to the volume of the audio or video clip. The range is from 0 (muted) to 2 (double the original volume). A value of 1 is equivalent to the original audio/video clip's volume.</p>
 
 <h3>Next: <a href="Timeline.md">Timeline</a></h3>
