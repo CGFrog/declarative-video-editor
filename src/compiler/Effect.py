@@ -9,3 +9,6 @@ class Effect:
         if isinstance(other, Effect):
             return self.type == other.type and self.param == other.param
         return False
+    
+    def __repr__(self)->str:
+        return f"Type: {self.type}\nParams: {self.param}"

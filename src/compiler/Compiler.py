@@ -38,14 +38,14 @@ class Compiler:
 
         if self.clips is None:
             raise Exception("No valid clips.")
-        layers: dict = self.__build_layers(
+        self.layers: dict = self.__build_layers(
             clips=self.clips
         )
         ffmpeg_builder = FFMpegBuilder()
         
         # generates the ffmpeg command
         filter_complex: str = ffmpeg_builder.build_filter_graph(
-            layers=layers,
+            layers=self.layers,
             width=int(render_settings.x),
             height=int(render_settings.y)
         )
@@ -225,6 +225,7 @@ class Compiler:
         else:
             raise Exception("Unknown class type of state.")
 
+
     def __build_layers(self, clips:list[ResolvedClip]):
         """
         Adds video clips to their corresponding layer.
@@ -235,7 +236,6 @@ class Compiler:
         for z in layers:
             layers[z].sort(key=lambda c: c.timeline_start)
         return layers
-    
     def __handle_text(self, ffmpeg_builder):
         """
         If a text element is detected, create text overlay ffmpeg command, add to filter_parts.

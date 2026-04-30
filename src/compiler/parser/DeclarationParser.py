@@ -1,6 +1,6 @@
 from src.compiler.lexer.Token import Token
 from src.compiler.lexer.Token import TokenLabel as TL
-from src.compiler.StateVariable import Clip, StateVariable
+from src.compiler.VideoVariable import Clip, VideoVariable
 from src.compiler.Effect import Effect
 from src.compiler.parser.ParsingUtils import extract_duration, first_of_token, extract_function_parameters
 from src.compiler.parser.Primitive import Primitive
@@ -38,7 +38,7 @@ class DeclarationParser():
             self.line_number += 1
 
 
-    def __parse_media(self, tokens : list[Token])->StateVariable:
+    def __parse_media(self, tokens : list[Token])->VideoVariable:
         """
         When the parser detects a line dedicated to instantiating a media object, parse media determines:
         <ul>
@@ -47,12 +47,12 @@ class DeclarationParser():
             <li> Effects </li>
         </ul>
 
-        returns StateVariable        
+        returns VideoVariable        
         """
         start_of_def: int = first_of_token(tokens, TL.DEFINITION)
         start_of_func: int = first_of_token(tokens,TL.FUNC_COMP)
 
-        return StateVariable(
+        return VideoVariable(
             clips=self.__generate_clips(tokens[start_of_def:start_of_func:]),
             effects=self.__generate_effects(tokens[start_of_func::]),
             type=tokens[0].value
@@ -238,7 +238,6 @@ class DeclarationParser():
         index : int = 0
         clips: list[Clip] = []
         path: str = ""
-    
 
         while index < len(tokens):
             token = tokens[index]
