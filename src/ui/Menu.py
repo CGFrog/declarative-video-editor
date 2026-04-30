@@ -3,6 +3,7 @@ import subprocess
 import threading
 from src.compiler.Compiler import Compiler
 import subprocess
+import re
 
 class Menu(tk.Menu):
     def __init__(self, parent, text_editor, video_player, on_compile = None):
@@ -50,8 +51,14 @@ class Menu(tk.Menu):
             text=True,
             bufsize=1
         )
+
+        #total_duration = something
+
         for line in process.stderr:
-            print(line, end="")
+            t = self.extract_time(line)
+            if t is not None:
+                #progress = (t / total_duration) * 100
+                print(f"Progress: {t:.1f}%")
 
         process.wait()
 
@@ -62,6 +69,13 @@ class Menu(tk.Menu):
 
         print("Rendered DVEL video to " + output_path + ".")
         self.after(0, lambda: self.load_and_play(output_path))
+
+    def extract_time(self, line):
+        match = re.search(r"time=(\d+):(\d+):(\d+\.\d+)", line)
+        if match:
+            h, m, s = match.groups()
+            return int(h) * 3600 + int(m) * 60 + float(s)
+        return None
 
     def load_and_play(self, path):
         self.video_player.load(path)
