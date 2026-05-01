@@ -19,4 +19,9 @@ webcam_footage after intro z=2
 <h3>Layering</h3>
 <p>The "z" parameter donotes the layer where the media should be placed. In the above example, "webcam_footage" is on layer 2, meaning it plays on top of "game_footage".</p>
 
+```
+intro 0 1
+```
+<p>In the above code, the 0 represents the starting point of the video (0 second mark). The 1 represents the layer (layer 1).</p>
+
 <h3>Next: <a href="Commenting.md">Commenting Your Code</a></h3>
