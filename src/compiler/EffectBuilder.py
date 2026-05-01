@@ -5,6 +5,9 @@ class EffectBuilder:
     
     def build(self, effect: Effect) -> str:
 
+        if effect.type == "volume":
+            return ""
+        
         match effect.type:
             case "blur":
                 return self._build_blur(effect)
@@ -29,6 +32,9 @@ class EffectBuilder:
         if effect.type == "speed":
             speed = effect.param[0] if len(effect.param) > 0 else 1.0
             return f"atempo={speed}"
+        if effect.type == "volume":
+            volume = effect.param[0] if len(effect.param) > 0 else 1.0
+            return f"volume={volume}"
         return ""
     
     def _build_blur(self, effect: Effect) -> str:
