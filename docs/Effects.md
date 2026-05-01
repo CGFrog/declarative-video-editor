@@ -54,14 +54,6 @@ blur(x)
 ```
 speed(x)
 ```
-<p>Where x is equal to the speed.</p>
-
-<h4>Transform</h4>
-<p></p>
-
-```
-
-```
 
 <h4>Location</h4>
 <p>The anchor point of the video on the screen, expressed as (x,y) coordinates. You must also define the video resolution (width, height).</p>
