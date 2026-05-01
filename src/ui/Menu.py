@@ -14,7 +14,7 @@ class Menu(tk.Menu):
         file_menu = tk.Menu(self, tearoff=0)
         file_menu.add_command(label="Open (Ctrl+O)", command=self.open)
         file_menu.add_command(label="Save (Ctrl+S)", command=self.save)
-        file_menu.add_command(label="Save As", command=self.save_as)
+        file_menu.add_command(label="Save As (Ctrl+Shift+S)", command=self.save_as)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.quit)
 
