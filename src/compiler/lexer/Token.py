@@ -26,6 +26,7 @@ class TokenLabel(Enum):
     NUM = 23
     FUNC = 24
     CAPTION=25
+    SEMICOLON=26
 
 class Token():
     def __init__(self, key, value, start=-1, end=-1):

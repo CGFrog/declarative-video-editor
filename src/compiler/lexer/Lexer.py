@@ -11,7 +11,8 @@ symbols = {
     ']': TL.RBRACK,
     ',': TL.COMMA,
     '.': TL.PERIOD,
-    ':': TL.COLON
+    ':': TL.COLON,
+    ';': TL.SEMICOLON
 }
 
 # --- Types, effects, and keywords used in our language --- #
