@@ -81,7 +81,7 @@ class Menu(tk.Menu):
 
             eta_str = self.format_time(eta_seconds)
 
-            message = f"Rendering... {progress:.1f}% | ETA: {eta_str}"
+            message = f"Rendering... {progress:.1f}%\nETA: {eta_str}"
 
             self.after(0, lambda msg=message: self.video_player.file_label.config(text=msg))
 

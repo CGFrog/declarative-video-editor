@@ -133,7 +133,7 @@ class VideoPlayer:
 
         self.file_label = tk.Label(
             progress_frame, 
-            text="No video loaded", 
+            text="No video rendered",
             width=20, 
             anchor="w",
             bg=Theme.PANEL,
