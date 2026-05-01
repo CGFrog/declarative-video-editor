@@ -7,7 +7,10 @@ class ConsoleView:
     def __init__(self,parent):
         self.parent = parent
         self.input_callback = None
-        #self.input_start_index = "1.0"
+        self.input_start_index = "1.0"
+    
+    def flush(self):
+        pass
 
     def console_view(self):
         self.main_frame = tk.Frame(self.parent, bg=Theme.BG)
