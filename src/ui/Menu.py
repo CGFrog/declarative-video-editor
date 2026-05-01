@@ -1,5 +1,4 @@
 import tkinter as tk
-import subprocess
 import threading
 from src.compiler.Compiler import Compiler
 import subprocess
@@ -52,13 +51,14 @@ class Menu(tk.Menu):
             bufsize=1
         )
 
-        total_duration = 60 #need to change
+        total_duration = compiler.duration
 
         for line in process.stderr:
             t = self.extract_time(line)
             if t is not None:
                 progress = (t / total_duration) * 100
-                print(f"Progress: {t:.1f}%")
+                #print(f"Progress: {progress:.1f}%")
+                self.video_player.file_label.config(text=f"Rendering... {progress:.1f}%")
 
         process.wait()
 

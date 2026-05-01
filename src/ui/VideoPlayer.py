@@ -183,7 +183,6 @@ class VideoPlayer:
         self.player.stop()
         self.progress_scale.set(0)
         self.time_label.config(text="00:00 / 00:00")
-        #self.file_label.config(text="Stopped")
 
     def on_progress_press(self, event):
         self.is_dragging_progress = True
