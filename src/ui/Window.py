@@ -62,7 +62,7 @@ class Window:
 
 
     def __create_menu(self):
-        self.menu = Menu(self.root, self.editor, self.video_player, on_compile = self.__refresh_timeline)
+        self.menu = Menu(self.root, self.editor, self.video_player, self.console, on_compile = self.__refresh_timeline)
         self.root.config(menu=self.menu)
 
     def __window_layout(self):
@@ -131,7 +131,7 @@ class Window:
 
         self.console = ConsoleView(self.bottom_right_frame)
         self.console.console_view()
-        self.console.set_input_callback(self.console.handle_console_input)
+        #self.console.set_input_callback(self.console.handle_console_input)
 
 
     def run(self):
