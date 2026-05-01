@@ -125,3 +125,6 @@ class Menu(tk.Menu):
 
     def help(self):
         webbrowser.open("https://github.com/CGFrog/declarative-video-editor/blob/prod/docs/Documentation.md")
+
+    def clear_console(self):
+        self.console_view.clear()
