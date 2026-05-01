@@ -62,22 +62,3 @@ class ConsoleView:
         self.console.delete("1.0", "end")
         self.console.config(state="disabled")
         print("Welcome to DVEL!")
-
-    # def set_input_callback(self, callback):
-    #       self.input_callback = callback
-
-    # def on_enter(self, event):
-    #     input_text = self.console.get(self.input_start_index, "end-1c").strip()
-    #
-    #     self.console.insert("end", "\n")
-    #     self.console.see("end")
-    #
-    #     if self.input_callback:
-    #         self.input_callback(input_text)
-    #
-    #     self.input_start_index = self.console.index("end-1c")
-    #
-    #     return "break"
-
-    # def handle_console_input(self, text):
-    #     print(f"You typed: {text}")

@@ -11,7 +11,7 @@ class Window:
         self.root = tk.Tk()
 
     def __create_window(self):
-        self.root.title("Declarative Video Editor")
+        self.root.title("DVEL")
         self.root.geometry("800x600")
         self.__maximize_window()
         style = self.__apply_dark_theme()
@@ -124,15 +124,12 @@ class Window:
 
         self.video_player = VideoPlayer(self.top_right_frame)
 
-
     def __console_view(self):
         self.bottom_right_frame.rowconfigure(0, weight=1)
         self.bottom_right_frame.columnconfigure(0, weight=1)
 
         self.console = ConsoleView(self.bottom_right_frame)
         self.console.console_view()
-        #self.console.set_input_callback(self.console.handle_console_input)
-
 
     def run(self):
         self.__create_window()
