@@ -55,6 +55,7 @@ class Menu(tk.Menu):
 
         for line in process.stderr:
             t = self.extract_time(line)
+            print(line, end="")
             if t is not None:
                 progress = (t / total_duration) * 100
                 #print(f"Progress: {progress:.1f}%")
