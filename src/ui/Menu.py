@@ -12,8 +12,8 @@ class Menu(tk.Menu):
         self.on_compile = on_compile
 
         file_menu = tk.Menu(self, tearoff=0)
-        file_menu.add_command(label="Open", command=self.open)
-        file_menu.add_command(label="Save", command=self.save)
+        file_menu.add_command(label="Open (Ctrl+O)", command=self.open)
+        file_menu.add_command(label="Save (Ctrl+S)", command=self.save)
         file_menu.add_command(label="Save As", command=self.save_as)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.quit)
@@ -52,7 +52,6 @@ class Menu(tk.Menu):
         )
         for line in process.stderr:
             print(line, end="")
-
         process.wait()
 
         if process.returncode != 0:
