@@ -6,11 +6,12 @@ import re
 import time
 
 class Menu(tk.Menu):
-    def __init__(self, parent, text_editor, video_player, on_compile = None):
+    def __init__(self, parent, text_editor, video_player, console_view, on_compile = None):
         super().__init__(parent)
         self.video_player = video_player
         self.text_editor = text_editor
         self.on_compile = on_compile
+        self.console_view = console_view
 
         file_menu = tk.Menu(self, tearoff=0)
         file_menu.add_command(label="Open", command=self.open)
@@ -23,6 +24,7 @@ class Menu(tk.Menu):
         self.add_command(label="Compile", command=self.compile)
         self.add_command(label="Render", command=self.render)
         self.add_command(label="Help", command=self.help)
+        self.add_command(label="Clear Console", command=self.clear_console)
         parent.config(menu=self)
 
     def open(self):
@@ -123,3 +125,6 @@ class Menu(tk.Menu):
     def help(self):
         # Route to documentation
         print("Routing to documentation...")
+
+    def clear_console(self):
+        self.console_view.clear()
