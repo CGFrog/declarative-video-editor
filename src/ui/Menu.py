@@ -3,6 +3,7 @@ import threading
 from src.compiler.Compiler import Compiler
 import subprocess
 import re
+import time
 
 class Menu(tk.Menu):
     def __init__(self, parent, text_editor, video_player, on_compile = None):
@@ -39,9 +40,12 @@ class Menu(tk.Menu):
 
     def render_task(self):
         compiler = Compiler()
+        start_time = time.time()
+
         content = self.text_editor.get_content()
         command = compiler.compile(content)
         output_path = compiler.parser.render_settings.export_path
+
         process: subprocess.Popen[str] = subprocess.Popen(
             command,
             shell=True,
@@ -54,22 +58,50 @@ class Menu(tk.Menu):
         total_duration = compiler.duration
 
         for line in process.stderr:
-            t = self.extract_time(line)
             print(line, end="")
-            if t is not None:
-                progress = (t / total_duration) * 100
-                #print(f"Progress: {progress:.1f}%")
-                self.video_player.file_label.config(text=f"Rendering... {progress:.1f}%")
+
+            t = self.extract_time(line)
+            if t is None or t <= 0:
+                continue
+
+            progress = (t / total_duration) * 100
+
+            elapsed = time.time() - start_time
+            speed = t / elapsed if elapsed > 0 else 0
+
+            remaining_video = total_duration - t
+
+            if speed > 0:
+                eta_seconds = remaining_video / speed
+            else:
+                eta_seconds = 0
+
+            eta_str = self.format_time(eta_seconds)
+
+            message = f"Rendering... {progress:.1f}% | ETA: {eta_str}"
+
+            self.after(0, lambda msg=message: self.video_player.file_label.config(text=msg))
 
         process.wait()
 
         if process.returncode != 0:
             raise subprocess.CalledProcessError(process.returncode, command)
+
         if self.on_compile:
             self.on_compile(compiler.layers)
 
         print("Rendered DVEL video to " + output_path + ".")
         self.after(0, lambda: self.load_and_play(output_path))
+
+    def format_time(self, seconds):
+        seconds = int(seconds)
+        m, s = divmod(seconds, 60)
+        h, m = divmod(m, 60)
+
+        if h > 0:
+            return f"{h}:{m:02}:{s:02}"
+        else:
+            return f"{m:02}:{s:02}"
 
     def extract_time(self, line):
         match = re.search(r"time=(\d+):(\d+):(\d+\.\d+)", line)
