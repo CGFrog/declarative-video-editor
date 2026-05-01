@@ -10,7 +10,7 @@ from src.ui.Theme import Theme
 class VideoPlayer:
     def __init__(self, parent_frame):
         vlc_path = self.get_vlc_path()
-
+        self.has_ended = False
         os.environ["PATH"] = vlc_path + ";" + os.environ.get("PATH", "")
 
         self.instance = vlc.Instance([
@@ -18,6 +18,12 @@ class VideoPlayer:
         ])
 
         self.player = self.instance.media_player_new()
+
+        self.events = self.player.event_manager()
+        self.events.event_attach(
+            vlc.EventType.MediaPlayerEndReached,
+            self.on_end_reached
+        )
 
         self.parent_frame = parent_frame
         self.parent_frame.rowconfigure(0, weight=1)
@@ -101,11 +107,6 @@ class VideoPlayer:
         progress_frame.columnconfigure(1, weight=0)
         progress_frame.columnconfigure(2, weight=0)
 
-        self.progress_scale = ttk.Scale(progress_frame, from_=0, to=1000, orient="horizontal")
-        self.progress_scale.grid(row=0, column=0, sticky="ew", padx=(5, 5))
-
-        self.progress_scale.bind("<Button-1>", self.on_progress_press)
-        self.progress_scale.bind("<ButtonRelease-1>", self.on_progress_release)
 
         self.progress_scale = ttk.Scale(
             progress_frame,
@@ -114,6 +115,11 @@ class VideoPlayer:
             orient="horizontal",
             style="Dark.Horizontal.TScale"
         )
+        self.progress_scale.grid(row=0, column=0, sticky="ew", padx=(5, 5))
+
+
+        self.progress_scale.bind("<Button-1>", self.on_progress_press)
+        self.progress_scale.bind("<ButtonRelease-1>", self.on_progress_release)
 
         self.time_label = tk.Label(
             progress_frame, 
@@ -135,6 +141,18 @@ class VideoPlayer:
         )
         self.file_label.grid(row=0, column=2, sticky="w", padx=(0, 5))
 
+    def on_end_reached(self, event):
+        self.parent_frame.after(0, self._handle_end)
+
+    def _handle_end(self):
+        self.has_ended = True
+        length = self.player.get_length()
+
+        self.progress_scale.set(1000)
+        self.time_label.config(
+            text=f"{self.format_time(length)} / {self.format_time(length)}"
+        )
+        
     def set_video_output(self):
         self.video_widget.update_idletasks()
         window_id = self.video_widget.winfo_id()
@@ -165,16 +183,19 @@ class VideoPlayer:
         if self.player.get_media() is None:
             return
 
+        if self.has_ended:
+            self.player.stop()
+            self.player.set_time(0)
+            self.has_ended = False
+
         self.set_video_output()
         self.player.play()
-        #self.file_label.config(text="Playing")
 
     def pause(self):
         if self.player.get_media() is None:
             return
 
         self.player.pause()
-        #self.file_label.config(text="Paused")
 
     def stop(self):
         if self.player.get_media() is None:
@@ -201,9 +222,9 @@ class VideoPlayer:
         self.is_dragging_progress = False
 
     def update_progress(self):
+        length = self.player.get_length()
+        current_time = self.player.get_time()
         if self.player.get_media() is not None and not self.is_dragging_progress:
-            length = self.player.get_length()
-            current_time = self.player.get_time()
 
             if length > 0 and current_time >= 0:
                 percent = current_time / length

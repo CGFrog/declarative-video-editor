@@ -8,5 +8,4 @@
     <li><a href="Effects.md">Effects</a></li>
     <li><a href="Timeline.md">Timeline</a></li>
     <li><a href="Commenting.md">Commenting</a></li>
-    <li><a href="Samples.md">DVEL Samples</a></li>
 </ul>

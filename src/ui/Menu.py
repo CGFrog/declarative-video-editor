@@ -4,6 +4,7 @@ from src.compiler.Compiler import Compiler
 import subprocess
 import re
 import time
+import webbrowser
 
 class Menu(tk.Menu):
     def __init__(self, parent, text_editor, video_player, console_view, on_compile = None):
@@ -14,9 +15,9 @@ class Menu(tk.Menu):
         self.console_view = console_view
 
         file_menu = tk.Menu(self, tearoff=0)
-        file_menu.add_command(label="Open", command=self.open)
-        file_menu.add_command(label="Save", command=self.save)
-        file_menu.add_command(label="Save As", command=self.save_as)
+        file_menu.add_command(label="Open (Ctrl+O)", command=self.open)
+        file_menu.add_command(label="Save (Ctrl+S)", command=self.save)
+        file_menu.add_command(label="Save As (Ctrl+Shift+S)", command=self.save_as)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.quit)
 
@@ -123,8 +124,4 @@ class Menu(tk.Menu):
         self.text_editor.save_file_as()
 
     def help(self):
-        # Route to documentation
-        print("Routing to documentation...")
-
-    def clear_console(self):
-        self.console_view.clear()
+        webbrowser.open("https://github.com/CGFrog/declarative-video-editor/blob/prod/docs/Documentation.md")
