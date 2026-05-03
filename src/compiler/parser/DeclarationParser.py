@@ -1,3 +1,4 @@
+
 from src.compiler.lexer.Token import Token, TokenLabel
 from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.VideoVariable import Clip, VideoVariable
@@ -14,10 +15,35 @@ class DeclarationParser():
         self.functions: dict = {} # Holds all declared functions from end user and acts as a look-up table
         self.line_number : int = 1
 
+    def join_lines(self, lines_of_tokens: list[list[Token]]) -> list[list[Token]]:
+        """
+        Merges multi-line declarations into single token lists by treating
+        SEMICOLON as the statement terminator rather than newlines.
+        """
+        statements = []
+        current_statement = []
+
+        for line in lines_of_tokens:
+            for token in line:
+                match token.key:
+                    case TL.END_OF_LINE:
+                        continue
+                    case TL.SEMICOLON:
+                        if current_statement:
+                            statements.append(current_statement)
+                            current_statement = []
+                    case _:
+                        current_statement.append(token)
+
+        if current_statement:
+            statements.append(current_statement)
+        return statements
+
     def parse_source(self, lines_of_tokens : list[list[Token]]):
         """
         Takes in a list of lists of tokens and returns the dict of states.
         """
+        lines_of_tokens = self.join_lines(lines_of_tokens)
         for tokens in lines_of_tokens:
             if len(tokens) == 0:
                 continue
@@ -37,6 +63,8 @@ class DeclarationParser():
                     self.primitives.update({tokens[1].value : self.__parse_primitive_number(tokens)})
                 case TL.FUNC:
                     self.functions[tokens[1].value] = self.__parse_func_decl(tokens)
+                case TL.FUNC_COMP:
+                    raise Exception(f"Line {self.line_number}: Unexpected '|>' - did you put a semicolon too early?")
             self.line_number += 1
 
 
