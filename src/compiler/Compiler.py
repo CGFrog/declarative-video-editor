@@ -114,14 +114,22 @@ class Compiler:
     def __resolve_clips(self,timeline_element, state : VideoVariable,z:int):
         base_start = self.__resolve_start_time(timeline_element)
         cursor :float = base_start
+        is_image = False
+        if state.type == "image" : is_image = True
         for clip in state.clips:
             start = float(clip.duration[0]) if clip.duration[0] else 0
-
-            full_video_duration: float = self.__get_media_duration(path=clip.path)
-            end: float = full_video_duration if clip.duration[1] == 'e' else float(clip.duration[1])
-
-            if end > full_video_duration:
-                raise ValueError(f"{timeline_element.identifier} specified duration is longer than the video duration (use 'e' for inclusion of the whole video).")
+            if is_image:
+                if clip.duration[1] == 'e':
+                    raise ValueError(
+                        f"{timeline_element.identifier}: images require explicit duration, 'e' is not valid."
+                    )
+                end = float(clip.duration[1])
+                full_video_duration = end
+            else:
+                full_video_duration: float = self.__get_media_duration(path=clip.path)
+                end: float = full_video_duration if clip.duration[1] == 'e' else float(clip.duration[1])
+                if end > full_video_duration:
+                    raise ValueError(f"{timeline_element.identifier} specified duration is longer than the video duration (use 'e' for inclusion of the whole video).")
             duration = end - start
             if (end < start):
                 raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
@@ -140,7 +148,8 @@ class Compiler:
                     timeline_start=cursor,
                     z=z,
                     effects=state.effects,
-                    is_audio=is_audio
+                    is_audio=is_audio,
+                    is_image=is_image
                 )
             )
             cursor += duration
@@ -225,9 +234,14 @@ class Compiler:
 
         if isinstance(state, VideoVariable): # this may be similar for audio might be interchangeable
             total = 0
+            is_image = False
+            if state.type == 'image': is_image = True
             for clip in state.clips:
                 start:float = float(clip.duration[0]) if clip.duration[0] else 0
-                end: float = self.__get_media_duration(clip.path) if clip.duration[1] == "e" else float(clip.duration[1])
+                if is_image:
+                    end = float(clip.duration[1])
+                else:
+                    end: float = self.__get_media_duration(clip.path) if clip.duration[1] == "e" else float(clip.duration[1])
                 adjusted = end - start
 
                 for effect in state.effects:

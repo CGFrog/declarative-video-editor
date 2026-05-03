@@ -1,5 +1,5 @@
 class ResolvedClip:
-    def __init__(self, path, src_start, src_end, timeline_start, z, effects, is_audio):
+    def __init__(self, path, src_start, src_end, timeline_start, z, effects, is_audio, is_image):
         self.path = path
         self.src_start = src_start
         self.src_end = src_end
@@ -7,3 +7,4 @@ class ResolvedClip:
         self.z = z
         self.effects = effects
         self.is_audio = is_audio
+        self.is_image =is_image
