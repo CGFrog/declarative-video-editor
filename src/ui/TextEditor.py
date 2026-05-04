@@ -245,7 +245,7 @@ class TextEditor:
                 return None
 
     def highlight_syntax(self): #removes existing tags and applies new ones based on current text content and lexer tokens
-        for tag in ["media", "identifier", "number", "definition", "effect", "keyword", "symbol", "func", "num"]:
+        for tag in ["media", "identifier", "number", "definition", "effect", "keyword", "symbol", "func", "num", "str"]:
             self.text_editor.tag_remove(tag, "1.0", "end")
 
         #Get content from editor and split into lines for processing
