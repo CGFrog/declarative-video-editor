@@ -23,7 +23,7 @@ class EffectBuilder:
                 return self._build_rotation(effect)
             case "crop":
                 return self._build_crop(effect)
-            case "colorkey":
+            case "chromakey":
                 return self._build_colorkey(effect)
             case _:
                 raise Exception(f"Unknown effect: {effect.type}")

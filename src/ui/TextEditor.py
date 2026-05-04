@@ -215,6 +215,7 @@ class TextEditor:
         self.text_editor.tag_configure("symbol", foreground=Theme.S_SYMBOL)
         self.text_editor.tag_configure("func", foreground=Theme.S_FUNC)
         self.text_editor.tag_configure("num", foreground=Theme.S_NUM)
+        self.text_editor.tag_configure("str", foreground=Theme.S_STR)
 
     def _get_tag_for_token(self, token): #converts token types from lexer into Tkinter tags
         match token.key:
@@ -234,6 +235,8 @@ class TextEditor:
                 return "func"
             case TL.NUM:
                 return "num"
+            case TL.STR:
+                return "str" 
             case TL.RENDER | TL.TIMELINE | TL.AFTER | TL.START_OF_VID | TL.END_OF_VID:
                 return "keyword"
             case TL.ASSIGN | TL.UNION | TL.LPAREN | TL.RPAREN | TL.LBRACK | TL.RBRACK | TL.COMMA | TL.PERIOD | TL.COLON | TL.FUNC_COMP:
