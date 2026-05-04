@@ -66,6 +66,8 @@ class Compiler:
         final_v:str = ffmpeg_builder.final_video_label
         final_a:str = ffmpeg_builder.final_audio_label
         # returns the ffmpeg command as a string to reduce side-effects, that way users can compile and to see errors often without generating a whole video.
+
+        print("--- Video Successfully Compiled! ---")
         return (
             f"ffmpeg -y {inputs} "
             f"-filter_complex \"{filter_complex}\" "
