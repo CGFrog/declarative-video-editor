@@ -8,6 +8,9 @@ class ConsoleView:
         self.parent = parent
         self.input_callback = None
         self.input_start_index = "1.0"
+    
+    def flush(self):
+        pass
 
     def console_view(self):
         self.main_frame = tk.Frame(self.parent, bg=Theme.BG)
@@ -23,7 +26,7 @@ class ConsoleView:
         self.__redirect_Out()
 
     def __console_output(self):
-        self.console = tk.Text(self.main_frame, bg=Theme.BG, fg="white", wrap="word")
+        self.console = tk.Text(self.main_frame, bg=Theme.BG, fg="white", wrap="word", state="disabled")
         self.console.grid(row=0, column=0, sticky="nsew")
 
         self.scrollbar = ttk.Scrollbar(
@@ -34,7 +37,6 @@ class ConsoleView:
         )
         self.scrollbar.grid(row=0, column=1, sticky="ns")
 
-        self.console.bind("<Return>", self.on_enter)
         self.console.config(yscrollcommand=self.scrollbar.set)
 
     def __redirect_Out(self):
@@ -62,9 +64,10 @@ class ConsoleView:
         
     def write(self, message):
         try:
+            self.console.config(state="normal")
             self.console.insert("end", message)
             self.console.see("end")
-            self.input_start_index = self.console.index("end-1c")
+            self.console.config(state="disabled")
         except Exception:
             self.original_stdout.write(message)
 
@@ -83,3 +86,8 @@ class ConsoleView:
         self.input_start_index = self.console.index("end-1c")
 
         return "break"
+    def clear(self):
+        self.console.config(state="normal")
+        self.console.delete("1.0", "end")
+        self.console.config(state="disabled")
+        print("Welcome to DVEL!")

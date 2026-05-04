@@ -11,8 +11,8 @@ NOTE FOR BRIAN: Used AI to generate these test cases, did not want to do this by
 """
 
 TEST1 = """
-num n1 = 5.0
-video intro = "intro.mp4" (0,e) |> saturation(n1) |> speed(1.5)
+num n1 = 5.0;
+video intro = "intro.mp4" (0,e) |> saturation(n1) |> speed(1.5);
 timeline
 intro 0 1
 render "lets_play.mp4" [1920,1080]
@@ -38,9 +38,9 @@ expected_primitives1 = {"n1": '5.0'}
 
 
 TEST2 = """
-func f(a,b,c) = saturation(a) |> speed(b) |> volume(c)
-video v1 = "v1.mp4" (0,e) |> f(1,2,3)
-video v2 = "v2.mp4" (0,e) |> f(3,1,2)
+func f(a,b,c) = saturation(a) |> speed(b) |> volume(c);
+video v1 = "v1.mp4" (0,e) |> f(1,2,3);
+video v2 = "v2.mp4" (0,e) |> f(3,1,2);
 timeline
 v1 0 1
 v2 0 2

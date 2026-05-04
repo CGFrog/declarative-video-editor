@@ -10,13 +10,15 @@ class FFMpegBuilder:
         self.final_video_label: str = ""
         self.final_audio_label: str = ""
         self._effect_builder = EffectBuilder()
+        self.input_flags: dict[str, str] = {}
 
-    def __get_or_create_input_index(self, path: str) -> int:
+    def __get_or_create_input_index(self, path: str, flags: str = "") -> int:
         """
         Every ffmpeg video in our commands need a unique index to reference them buy. This generates that index or finds the applicable index so we dont have to reload any files.
         """
         if path not in self.input_index:
             self.input_index[path] = self.next_index
+            self.input_flags[path] = flags
             self.next_index += 1
         return self.input_index[path]
 
@@ -25,7 +27,7 @@ class FFMpegBuilder:
         Generates the input line for the ffmpeg command that gets all of our medias.
         """
         sorted_inputs = sorted(self.input_index.items(), key=lambda x: x[1])
-        return " ".join(f'-i "{path}"' for path, _ in sorted_inputs)
+        return " ".join(f'{self.input_flags.get(path, "")} -i "{path}"'.strip() for path, _ in sorted_inputs)
 
     def build_filter_graph(self, layers, width: int, height: int, duration) -> str:
         """
@@ -97,11 +99,20 @@ class FFMpegBuilder:
         """
         Filters in ffmpeg take in a media and apply some function to that given clip, this function is essentially compiling our DVEL clips into the corresponding FFMpeg clip.
         """
-        index = self.__get_or_create_input_index(clip.path)
+        duration = clip.src_end - clip.src_start
+        if clip.is_image:
+            index = self.__get_or_create_input_index(clip.path, flags=f"-loop 1 -t {duration}")
+        else:
+            index = self.__get_or_create_input_index(clip.path)
+
         uid = uuid4().hex[:6]
         video_label = f"v{index}_{uid}"
         audio_label = f"a{index}_{uid}"
-        duration = clip.src_end - clip.src_start
+        
+        if clip.is_image:
+            index = self.__get_or_create_input_index(clip.path, flags=f"-loop 1 -t {duration}")
+        else:
+            index = self.__get_or_create_input_index(clip.path)
 
         # If the clip is an audio clip, create a transparent video to place it over
         if clip.is_audio == True:
@@ -109,6 +120,17 @@ class FFMpegBuilder:
                 f"color=c=black@0.0:size={width}x{height}:duration={duration}:rate=30,"
                 f"format=yuva420p[{video_label}]"
             )
+        elif clip.is_image:
+            effect_chain = self.__build_effect_chain(clip.effects, audio=False)
+            filter_parts.append(
+                f"[{index}:v]"
+                f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
+                f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:color=black@0,"
+                f"fps=30,"
+                f"format=yuva420p"
+                f"{effect_chain}[{video_label}]"
+)
+            
         else:
             # this is where we can add all of our effects to our video
             effect_chain = self.__build_effect_chain(clip.effects, audio=False)
@@ -124,15 +146,21 @@ class FFMpegBuilder:
                 f"{effect_chain}[{video_label}]"  # effects slot in here naturally
             )
 
-        # Audio effect chain
-        audio_effect_chain = self.__build_effect_chain(clip.effects, audio=True)
-        filter_parts.append(
-            f"[{index}:a]atrim=start={clip.src_start}:end={clip.src_end},"
-            # normalize our audio as well here
-            f"asetpts=PTS-STARTPTS,"
-            f"aresample=44100"
-            f"{audio_effect_chain}[{audio_label}]"
-        )
+        if clip.is_image:
+            filter_parts.append(
+                f"aevalsrc=0:duration={duration}:sample_rate=44100[{audio_label}]"
+            )
+        else:
+            # Audio effect chain
+            audio_effect_chain = self.__build_effect_chain(clip.effects, audio=True)
+            filter_parts.append(
+                f"[{index}:a]atrim=start={clip.src_start}:end={clip.src_end},"
+                # normalize our audio as well here
+                f"asetpts=PTS-STARTPTS,"
+                f"aresample=44100"
+                f"{audio_effect_chain}[{audio_label}]"
+            )
+
         return video_label, audio_label
 
     def __build_effect_chain(self, effects: list[Effect], audio: bool) -> str:
