@@ -125,9 +125,12 @@ class Compiler:
             duration = end - start
             if (end < start):
                 raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
-            for effect in state.effects:
-                if effect.type == "speed":
-                    speed = effect.param[0] if len(effect.param) > 0 else 1.0
+            
+            effects = clip.effects if hasattr(clip, 'effects') and clip.effects else state.effects
+
+            for e in effects:
+                if e.type == "speed":
+                    speed = e.param[0] if len(e.param) > 0 else 1.0
                     duration = duration / float(speed)
             is_audio = False
             if state.type == 'audio': is_audio = True
@@ -138,7 +141,7 @@ class Compiler:
                     src_end=end,
                     timeline_start=cursor,
                     z=z,
-                    effects=state.effects,
+                    effects=effects,
                     is_audio=is_audio
                 )
             )

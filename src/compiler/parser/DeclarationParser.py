@@ -267,6 +267,9 @@ class DeclarationParser():
                 case TL.IDENTIFIER:
                     if token.value not in self.state:
                         raise Exception(f"Line {self.line_number}: Undefined variable: '{token.value}'.")
-                    clips.extend(self.state[token.value].clips)
+                    source_var = self.state[token.value]
+                    for clip in source_var.clips:
+                        clip.effects = source_var.effects
+                    clips.extend(source_var.clips)
             index += 1
         return clips
