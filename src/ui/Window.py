@@ -17,6 +17,9 @@ class Window:
         style = self.__apply_dark_theme()
         self.root.configure(bg=Theme.BG)
 
+        self.icon = tk.PhotoImage(file="ui/DVEL_Icon.png")
+        self.root.iconphoto(True, self.icon)
+
         
     def __maximize_window(self):
         try:
@@ -75,7 +78,7 @@ class Window:
         self.main_pane.pack(fill="both", expand=True)
 
         self.left_frame = tk.Frame(self.main_pane,bg=Theme.PANEL)
-        self.main_pane.add(self.left_frame, minsize=200)
+        self.main_pane.add(self.left_frame, minsize=200, width=650)
 
         self.right_pane = tk.PanedWindow(
             self.main_pane,
@@ -87,7 +90,7 @@ class Window:
         self.main_pane.add(self.right_pane, minsize=200)
 
         self.top_right_frame = tk.Frame(self.right_pane, bg=Theme.PANEL)
-        self.right_pane.add(self.top_right_frame, minsize=150)
+        self.right_pane.add(self.top_right_frame, minsize=150, height=300)
 
         self.bottom_right_frame = tk.Frame(self.right_pane, bg=Theme.PANEL)
         self.right_pane.add(self.bottom_right_frame, minsize=50)
