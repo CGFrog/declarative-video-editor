@@ -69,6 +69,11 @@ class EffectBuilder:
         return f"rotate={angle_rad}"
 
     def _build_crop(self, effect: Effect) -> str:
+        """
+        crop(1280, 720)      → crops to 1280x720 from top-left corner
+        crop(1280, 720, 100) → crops to 1280x720 starting at x=100, y=0
+        crop(1280, 720, 100, 50) → crops to 1280x720 starting at x=100, y=50
+        """
         width = effect.param[0] if len(effect.param) > 0 else "iw"
         height = effect.param[1] if len(effect.param) > 1 else "ih"
         x_offset = effect.param[2] if len(effect.param) > 2 else 0 
