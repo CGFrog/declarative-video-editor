@@ -19,4 +19,4 @@ class Theme:
     S_SYMBOL = "#f9ffe0"
     S_FUNC = "#dfff00"
     S_NUM = "#ff8d31"
-    S_STR = "#7dc206"
+    S_STR = "#ff8d31"
