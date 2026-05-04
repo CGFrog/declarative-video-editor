@@ -1,3 +1,4 @@
+
 from src.compiler.lexer.Token import Token, TokenLabel
 from src.compiler.lexer.Token import TokenLabel as TL
 from src.compiler.VideoVariable import Clip, VideoVariable
@@ -14,10 +15,35 @@ class DeclarationParser():
         self.functions: dict = {} # Holds all declared functions from end user and acts as a look-up table
         self.line_number : int = 1
 
+    def join_lines(self, lines_of_tokens: list[list[Token]]) -> list[list[Token]]:
+        """
+        Merges multi-line declarations into single token lists by treating
+        SEMICOLON as the statement terminator rather than newlines.
+        """
+        statements = []
+        current_statement = []
+
+        for line in lines_of_tokens:
+            for token in line:
+                match token.key:
+                    case TL.END_OF_LINE:
+                        continue
+                    case TL.SEMICOLON:
+                        if current_statement:
+                            statements.append(current_statement)
+                            current_statement = []
+                    case _:
+                        current_statement.append(token)
+
+        if current_statement:
+            statements.append(current_statement)
+        return statements
+
     def parse_source(self, lines_of_tokens : list[list[Token]]):
         """
         Takes in a list of lists of tokens and returns the dict of states.
         """
+        lines_of_tokens = self.join_lines(lines_of_tokens)
         for tokens in lines_of_tokens:
             if len(tokens) == 0:
                 continue
@@ -37,6 +63,8 @@ class DeclarationParser():
                     self.primitives.update({tokens[1].value : self.__parse_primitive_number(tokens)})
                 case TL.FUNC:
                     self.functions[tokens[1].value] = self.__parse_func_decl(tokens)
+                case TL.FUNC_COMP:
+                    raise Exception(f"Line {self.line_number}: Unexpected '|>' - did you put a semicolon too early?")
             self.line_number += 1
 
 
@@ -53,6 +81,9 @@ class DeclarationParser():
         """
         start_of_def: int = first_of_token(tokens, TL.DEFINITION)
         start_of_func: int = first_of_token(tokens,TL.FUNC_COMP)
+
+        if start_of_def == len(tokens):
+            start_of_def = first_of_token(tokens, TL.ASSIGN) + 1
 
         return VideoVariable(
             clips=self.__generate_clips(tokens[start_of_def:start_of_func:]),
@@ -233,5 +264,12 @@ class DeclarationParser():
                     duration: list[str] = extract_duration(tokens[index+1:index + rparen+1:])
                     clips.append(Clip(path, duration))
                     index = index + rparen
+                case TL.IDENTIFIER:
+                    if token.value not in self.state:
+                        raise Exception(f"Line {self.line_number}: Undefined variable: '{token.value}'.")
+                    source_var = self.state[token.value]
+                    for clip in source_var.clips:
+                        clip.effects = source_var.effects
+                    clips.extend(source_var.clips)
             index += 1
         return clips

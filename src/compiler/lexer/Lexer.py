@@ -11,7 +11,8 @@ symbols = {
     ']': TL.RBRACK,
     ',': TL.COMMA,
     '.': TL.PERIOD,
-    ':': TL.COLON
+    ':': TL.COLON,
+    ';': TL.SEMICOLON
 }
 
 # --- Types, effects, and keywords used in our language --- #
@@ -24,9 +25,13 @@ labels = {
     'chroma': TL.EFFECT,
     'transform': TL.EFFECT,
     'scale': TL.EFFECT,
+    'location': TL.EFFECT,
+    'rotation': TL.EFFECT,
+    'crop': TL.EFFECT,
     'noise_filter': TL.EFFECT,
     'volume': TL.EFFECT,
     'speed': TL.EFFECT,
+    'chromakey': TL.EFFECT,
 
     'timeline': TL.TIMELINE,
     'after': TL.AFTER,
