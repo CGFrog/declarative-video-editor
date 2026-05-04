@@ -213,6 +213,8 @@ class TextEditor:
         self.text_editor.tag_configure("effect", foreground=Theme.S_EFFECT)
         self.text_editor.tag_configure("keyword", foreground=Theme.S_KEYWORD)
         self.text_editor.tag_configure("symbol", foreground=Theme.S_SYMBOL)
+        self.text_editor.tag_configure("func", foreground=Theme.S_FUNC)
+        self.text_editor.tag_configure("num", foreground=Theme.S_NUM)
 
     def _get_tag_for_token(self, token): #converts token types from lexer into Tkinter tags
         match token.key:
@@ -228,6 +230,10 @@ class TextEditor:
                 return "definition"
             case TL.EFFECT:
                 return "effect"
+            case TL.FUNC:
+                return "func"
+            case TL.NUM:
+                return "num"
             case TL.RENDER | TL.TIMELINE | TL.AFTER | TL.START_OF_VID | TL.END_OF_VID:
                 return "keyword"
             case TL.ASSIGN | TL.UNION | TL.LPAREN | TL.RPAREN | TL.LBRACK | TL.RBRACK | TL.COMMA | TL.PERIOD | TL.COLON | TL.FUNC_COMP:
@@ -236,7 +242,7 @@ class TextEditor:
                 return None
 
     def highlight_syntax(self): #removes existing tags and applies new ones based on current text content and lexer tokens
-        for tag in ["media", "identifier", "number", "definition", "effect", "keyword", "symbol"]:
+        for tag in ["media", "identifier", "number", "definition", "effect", "keyword", "symbol", "func", "num"]:
             self.text_editor.tag_remove(tag, "1.0", "end")
 
         #Get content from editor and split into lines for processing

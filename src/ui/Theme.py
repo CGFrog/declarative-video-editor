@@ -17,3 +17,5 @@ class Theme:
     S_EFFECT = "#dcdcaa"
     S_KEYWORD = "#569cd6"
     S_SYMBOL = "#f9ffe0"
+    S_FUNC = "#dfff00"
+    S_NUM = "#ff8d31"
