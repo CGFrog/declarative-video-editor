@@ -134,6 +134,7 @@ class Compiler:
             if (end < start):
                 raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
             
+            # I think this will break, probably meant state.effects?
             effects = clip.effects if hasattr(clip, 'effects') and clip.effects else state.effects
 
             for e in effects:
