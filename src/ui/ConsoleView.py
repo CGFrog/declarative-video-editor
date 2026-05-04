@@ -90,4 +90,15 @@ class ConsoleView:
         self.console.config(state="normal")
         self.console.delete("1.0", "end")
         self.console.config(state="disabled")
-        print("Welcome to DVEL!")
+        print(r"""
+▓█████▄ ██▒   █▓▓█████  ██▓    
+▒██▀ ██▌▓██░   █▒▓█   ▀ ▓██▒    
+░██   █▌ ▓██  █▒░▒███   ▒██░    
+░▓█▄   ▌  ▒██ █░░▒▓█  ▄ ▒██░    
+░▒████▓   ▒▀█░  ░▒████▒░██████▒
+▒▒▓  ▒   ░ ▐░  ░░ ▒░ ░░ ▒░▓  ░
+░ ▒  ▒   ░ ░░   ░ ░  ░░ ░ ▒  ░
+░ ░  ░     ░░     ░     ░ ░   
+░         ░     ░  ░    ░  ░
+░          ░                   
+                """)
