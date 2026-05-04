@@ -114,11 +114,9 @@ class Compiler:
     def __resolve_clips(self,timeline_element, state : VideoVariable,z:int):
         base_start = self.__resolve_start_time(timeline_element)
         cursor :float = base_start
-        is_image = False
-        if state.type == "image" : is_image = True
         for clip in state.clips:
             start = float(clip.duration[0]) if clip.duration[0] else 0
-            if is_image:
+            if state.type == "image":
                 if clip.duration[1] == 'e':
                     raise ValueError(
                         f"{timeline_element.identifier}: images require explicit duration, 'e' is not valid."
@@ -149,7 +147,7 @@ class Compiler:
                     z=z,
                     effects=state.effects,
                     is_audio=is_audio,
-                    is_image=is_image
+                    is_image=state.type == 'image'
                 )
             )
             cursor += duration
@@ -234,11 +232,9 @@ class Compiler:
 
         if isinstance(state, VideoVariable): # this may be similar for audio might be interchangeable
             total = 0
-            is_image = False
-            if state.type == 'image': is_image = True
             for clip in state.clips:
                 start:float = float(clip.duration[0]) if clip.duration[0] else 0
-                if is_image:
+                if state.type == 'image':
                     end = float(clip.duration[1])
                 else:
                     end: float = self.__get_media_duration(clip.path) if clip.duration[1] == "e" else float(clip.duration[1])

@@ -125,11 +125,11 @@ class FFMpegBuilder:
             filter_parts.append(
                 f"[{index}:v]"
                 f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
-                f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
+                f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:color=black@0,"
                 f"fps=30,"
-                f"format=yuv420p"
+                f"format=yuva420p"
                 f"{effect_chain}[{video_label}]"
-            ) 
+)
             
         else:
             # this is where we can add all of our effects to our video
