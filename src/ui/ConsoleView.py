@@ -49,8 +49,19 @@ class ConsoleView:
         sys.stdout = self
         sys.stderr = self
 
-        print("Welcome to DVEL!")
-
+        print(r"""
+        ▓█████▄ ██▒   █▓▓█████  ██▓    
+        ▒██▀ ██▌▓██░   █▒▓█   ▀ ▓██▒    
+        ░██   █▌ ▓██  █▒░▒███   ▒██░    
+        ░▓█▄   ▌  ▒██ █░░▒▓█  ▄ ▒██░    
+        ░▒████▓   ▒▀█░  ░▒████▒░██████▒
+        ▒▒▓  ▒   ░ ▐░  ░░ ▒░ ░░ ▒░▓  ░
+        ░ ▒  ▒   ░ ░░   ░ ░  ░░ ░ ▒  ░
+        ░ ░  ░     ░░     ░     ░ ░   
+        ░         ░     ░  ░    ░  ░
+        ░          ░                   
+        """)
+        
     def write(self, message):
         try:
             self.console.config(state="normal")
@@ -60,6 +71,21 @@ class ConsoleView:
         except Exception:
             self.original_stdout.write(message)
 
+    def set_input_callback(self, callback):
+        self.input_callback = callback
+
+    def on_enter(self, event):
+        input_text = self.console.get(self.input_start_index, "end-1c").strip()
+
+        self.console.insert("end", "\n")
+        self.console.see("end")
+
+        if self.input_callback:
+            self.input_callback(input_text)
+
+        self.input_start_index = self.console.index("end-1c")
+
+        return "break"
     def clear(self):
         self.console.config(state="normal")
         self.console.delete("1.0", "end")

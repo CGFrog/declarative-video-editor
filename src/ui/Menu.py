@@ -55,6 +55,7 @@ class Menu(tk.Menu):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            encoding='utf-8',
             bufsize=1
         )
 
