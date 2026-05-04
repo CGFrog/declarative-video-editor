@@ -77,8 +77,20 @@ class Window:
         )
         self.main_pane.pack(fill="both", expand=True)
 
-        self.left_frame = tk.Frame(self.main_pane,bg=Theme.PANEL)
-        self.main_pane.add(self.left_frame, minsize=200, width=650)
+        self.left_pane = tk.PanedWindow(
+            self.main_pane,
+            orient="vertical",
+            sashrelief="raised",
+            showhandle=True,
+            bg=Theme.PANEL,
+        )
+        self.main_pane.add(self.left_pane, minsize=200)
+
+        self.top_left_frame = tk.Frame(self.left_pane ,bg=Theme.PANEL)
+        self.left_pane.add(self.top_left_frame, minsize=200, width=650, height=400)
+
+        self.bottom_left_frame = tk.Frame(self.left_pane ,bg=Theme.PANEL)
+        self.left_pane.add(self.bottom_left_frame, minsize=200)
 
         self.right_pane = tk.PanedWindow(
             self.main_pane,
@@ -96,14 +108,14 @@ class Window:
         self.right_pane.add(self.bottom_right_frame, minsize=50)
 
     def __text_editor_view(self):
-        self.left_frame.rowconfigure(0, weight=1)
-        self.left_frame.columnconfigure(0, weight=1)
+        self.top_left_frame.rowconfigure(0, weight=1)
+        self.top_left_frame.columnconfigure(0, weight=1)
 
-        self.editor = TextEditor(self.left_frame)
+        self.editor = TextEditor(self.top_left_frame)
         self.editor.TextEditorView()
     
     def __timeline_view(self):
-        self.timeline_view = TimelineView(self.left_frame, {}, scale=10)
+        self.timeline_view = TimelineView(self.bottom_left_frame, {}, scale=10)
         self.timeline_view._enable_timeline(row=1, column=0)
         self.timeline_view.canvas.bind("<Configure>", lambda e: self.timeline_view._draw_timeline())
     
