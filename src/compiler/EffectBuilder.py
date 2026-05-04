@@ -46,7 +46,7 @@ class EffectBuilder:
         return f"hue=s={saturation}"
     
     def _build_speed(self, effect: Effect) -> str:
-        speed = effect.param[0] if len(effect.param) > 0 else 1.0
+        speed = float(effect.param[0]) if len(effect.param) > 0 else 1.0
         if not (0.5 <= speed <= 2.0):
             raise Exception(f"Speed must be between 0.5 and 2.0, got {speed}")
         pts_factor = round(1.0 / speed, 6)

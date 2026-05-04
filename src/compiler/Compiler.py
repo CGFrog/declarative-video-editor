@@ -125,11 +125,13 @@ class Compiler:
             duration = end - start
             if (end < start):
                 raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
-            for effect in state.effects:
-                if effect.type == "speed":
-                    speed = effect.param[0] if len(effect.param) > 0 else 1.0
+            
+            effects = clip.effects if hasattr(clip, 'effects') and clip.effects else state.effects
+
+            for e in effects:
+                if e.type == "speed":
+                    speed = e.param[0] if len(e.param) > 0 else 1.0
                     duration = duration / float(speed)
-                    end = start + duration
             is_audio = False
             if state.type == 'audio': is_audio = True
             self.clips.append(
@@ -139,7 +141,7 @@ class Compiler:
                     src_end=end,
                     timeline_start=cursor,
                     z=z,
-                    effects=state.effects,
+                    effects=effects,
                     is_audio=is_audio
                 )
             )
@@ -153,7 +155,13 @@ class Compiler:
         
         for clips in layers.values():
             for clip in clips:
-                end_times.append(clip.timeline_start + (clip.src_end - clip.src_start))
+                duration = clip.src_end - clip.src_start
+                speed = 1.0
+                for effect in clip.effects:
+                    if effect.type == "speed" and len(effect.param) > 0:
+                        speed = float(effect.param[0])
+                adjusted_duration = duration / speed
+                end_times.append(clip.timeline_start + adjusted_duration)
         return max(end_times)
 
 
