@@ -64,7 +64,7 @@ class EffectBuilder:
         return f"scale=iw*{pct}:ih*{pct}"
 
     def _build_rotation(self, effect: Effect) -> str:
-        angle_deg = effect.param[0] if len(effect.param) > 0 else 0.0
+        angle_deg = float(effect.param[0]) if len(effect.param) > 0 else 0.0
         angle_rad = round(angle_deg * math.pi / 180, 6)
         return f"rotate={angle_rad}"
 
