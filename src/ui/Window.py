@@ -131,7 +131,6 @@ class Window:
 
         self.console = ConsoleView(self.bottom_right_frame)
         self.console.console_view()
-        self.console.set_input_callback(self.console.handle_console_input)
 
 
     def run(self):

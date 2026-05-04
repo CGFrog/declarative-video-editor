@@ -47,8 +47,19 @@ class ConsoleView:
         sys.stdout = self
         sys.stderr = self
 
-        print("Welcome to DVEL!")
-
+        print(r"""
+        ▓█████▄ ██▒   █▓▓█████  ██▓    
+        ▒██▀ ██▌▓██░   █▒▓█   ▀ ▓██▒    
+        ░██   █▌ ▓██  █▒░▒███   ▒██░    
+        ░▓█▄   ▌  ▒██ █░░▒▓█  ▄ ▒██░    
+        ░▒████▓   ▒▀█░  ░▒████▒░██████▒
+        ▒▒▓  ▒   ░ ▐░  ░░ ▒░ ░░ ▒░▓  ░
+        ░ ▒  ▒   ░ ░░   ░ ░  ░░ ░ ▒  ░
+        ░ ░  ░     ░░     ░     ░ ░   
+        ░         ░     ░  ░    ░  ░
+        ░          ░                   
+        """)
+        
     def write(self, message):
         try:
             self.console.insert("end", message)
@@ -72,6 +83,3 @@ class ConsoleView:
         self.input_start_index = self.console.index("end-1c")
 
         return "break"
-
-    def handle_console_input(self, text):
-        print(f"You typed: {text}")
