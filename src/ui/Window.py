@@ -17,7 +17,7 @@ class Window:
         style = self.__apply_dark_theme()
         self.root.configure(bg=Theme.BG)
 
-        self.icon = tk.PhotoImage(file="ui/DVEL_Icon.png")
+        self.icon = tk.PhotoImage(file="src/ui/DVEL_Icon.png")
         self.root.iconphoto(True, self.icon)
 
         
