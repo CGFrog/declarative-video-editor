@@ -82,6 +82,9 @@ class DeclarationParser():
         start_of_def: int = first_of_token(tokens, TL.DEFINITION)
         start_of_func: int = first_of_token(tokens,TL.FUNC_COMP)
 
+        if start_of_def == len(tokens):
+            start_of_def = first_of_token(tokens, TL.ASSIGN) + 1
+
         return VideoVariable(
             clips=self.__generate_clips(tokens[start_of_def:start_of_func:]),
             effects=self.__generate_effects(tokens[start_of_func::]),
@@ -261,5 +264,9 @@ class DeclarationParser():
                     duration: list[str] = extract_duration(tokens[index+1:index + rparen+1:])
                     clips.append(Clip(path, duration))
                     index = index + rparen
+                case TL.IDENTIFIER:
+                    if token.value not in self.state:
+                        raise Exception(f"Line {self.line_number}: Undefined variable: '{token.value}'.")
+                    clips.extend(self.state[token.value].clips)
             index += 1
         return clips
