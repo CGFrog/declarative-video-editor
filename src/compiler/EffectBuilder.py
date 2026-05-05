@@ -2,12 +2,9 @@ import math
 from src.compiler.Effect import Effect
 
 class EffectBuilder:
-    
     def build(self, effect: Effect) -> str:
-
         if effect.type == "volume":
             return ""
-        
         match effect.type:
             case "blur":
                 return self._build_blur(effect)
@@ -25,6 +22,16 @@ class EffectBuilder:
                 return self._build_crop(effect)
             case "colorkey":
                 return self._build_colorkey(effect)
+            case "denoise":
+                return self._build_denoise()
+            case "bc":
+                return self._build_brightness_and_contrast(effect)
+            case "gamma":
+                return self._build_gamma(effect)
+            case "sharpness":
+                return self._build_sharpen(effect)
+            case "flip":
+                return self._build_flip(effect)
             case _:
                 raise Exception(f"Unknown effect: {effect.type}")
 
@@ -80,3 +87,23 @@ class EffectBuilder:
         similarity = effect.param[1] if len(effect.param) > 1 else 0.3
         blend = effect.param[2] if len(effect.param) > 2 else 0.1
         return f"colorkey={color}:{similarity}:{blend}"
+    
+    def _build_brightness_and_contrast(self, effect : Effect)->str:
+        brightness=effect.param[0] if len(effect.param)>0 else 0
+        contrast = effect.param[1] if len(effect.param) > 1 else 1
+        return f"eq=brightness={brightness}:contrast={contrast}"
+
+    def _build_gamma(self, effect:Effect) -> str:
+        gamma = effect.param[0] if len(effect.param) > 0 else 1
+        return f"eq=gamma={gamma}"
+    
+    def _build_sharpen(self, effect: Effect) -> str:
+        amount = effect.param[0] if len(effect.param) > 0 else 1
+        return f"unsharp=5:5:{amount}:3:3:0"
+    
+    def _build_flip(self, effect) -> str:
+        return "hflip" if effect.param[0] == 'h' else "vflip"
+
+    def _build_denoise(self) -> str:
+        return "hqdn3d"
+    
