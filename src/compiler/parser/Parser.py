@@ -1,16 +1,16 @@
-from src.compiler.StateVariable import StateVariable
-from src.compiler.lexer.Lexer import Lexer
-from src.compiler.parser.DeclarationParser import DeclarationParser
-from src.compiler.lexer.Token import Token
-from src.compiler.lexer.Token import TokenLabel as TL
-from src.compiler.StateVariable import StateVariable
-from src.compiler.VideoVariable import Clip,VideoVariable
-from src.compiler.parser.TimelineElement import TimelineElement
-from src.compiler.parser.RenderSettings import RenderSettings
-from src.compiler.CaptionVariable import CaptionVariable
+from compiler.StateVariable import StateVariable
+from compiler.lexer.Lexer import Lexer
+from compiler.parser.DeclarationParser import DeclarationParser
+from compiler.lexer.Token import Token
+from compiler.lexer.Token import TokenLabel as TL
+from compiler.StateVariable import StateVariable
+from compiler.VideoVariable import Clip,VideoVariable
+from compiler.parser.TimelineElement import TimelineElement
+from compiler.parser.RenderSettings import RenderSettings
+from compiler.CaptionVariable import CaptionVariable
 
 
-from src.compiler.parser.TimelineParser import TimelineParser
+from compiler.parser.TimelineParser import TimelineParser
 class Parser():
     def __init__(self):
         self.state: dict[str,StateVariable | CaptionVariable] = {} # Holds all media variables, i.e. videos, audio, and images, as well as their attributes such as effects applied and durations.

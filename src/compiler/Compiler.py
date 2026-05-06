@@ -1,16 +1,18 @@
 from collections import defaultdict
 import json
+import os
+import sys
 from plistlib import InvalidFileException
 import subprocess
 from typing import Dict, List
-from src.compiler.parser.RenderSettings import RenderSettings
-from src.compiler.parser.Parser import Parser
-from src.compiler.StateVariable import StateVariable
-from src.compiler.VideoVariable import Clip, VideoVariable
-from src.compiler.parser.TimelineElement import TimelineElement
-from src.compiler.FFMpegBuilder import FFMpegBuilder
-from src.compiler.ResolvedClip import ResolvedClip
-from src.compiler.CaptionVariable import CaptionVariable
+from compiler.parser.RenderSettings import RenderSettings
+from compiler.parser.Parser import Parser
+from compiler.StateVariable import StateVariable
+from compiler.VideoVariable import Clip, VideoVariable
+from compiler.parser.TimelineElement import TimelineElement
+from compiler.FFMpegBuilder import FFMpegBuilder
+from compiler.ResolvedClip import ResolvedClip
+from compiler.CaptionVariable import CaptionVariable
 class Compiler:
     """
     The compiler works by concatenating the videos together on each layer, and overlay the layers on top of each other.
@@ -69,11 +71,19 @@ class Compiler:
 
         print("--- Video Successfully Compiled! ---")
         return (
-            f"ffmpeg -y {inputs} "
+            f"{self.get_ffmpeg_path()} -y {inputs} "
             f"-filter_complex \"{filter_complex}\" "
             f"-map \"[{final_v}]\" -map \"[{final_a}]\" "
             f"\"{output_path}\""
         )
+
+    def get_ffmpeg_path(self):
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath('.')
+
+        return os.path.join(base_path, 'ffmpeg', 'ffmpeg.exe')
     
     def __generate_state_objects(self): # I hate this function a lot, does so many things at once but itll do for now.
         """

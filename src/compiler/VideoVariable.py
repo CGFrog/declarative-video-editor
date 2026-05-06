@@ -1,6 +1,6 @@
-from src.compiler.StateVariable import StateVariable
+from compiler.StateVariable import StateVariable
 
-from src.compiler.Effect import Effect
+from compiler.Effect import Effect
 
 class Clip:
     def __init__(self, path : str, duration : list[str]):

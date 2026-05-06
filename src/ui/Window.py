@@ -1,11 +1,14 @@
 import tkinter as tk
-from src.ui.TextEditor import TextEditor
-from src.ui.VideoPlayer import VideoPlayer
-from src.ui.ConsoleView import ConsoleView
-from src.ui.Menu import Menu
-from src.ui.TimelineView import TimelineView
-from src.ui.Theme import Theme
+from ui.TextEditor import TextEditor
+from ui.VideoPlayer import VideoPlayer
+from ui.ConsoleView import ConsoleView
+from ui.Menu import Menu
+from ui.TimelineView import TimelineView
+from ui.Theme import Theme
 from tkinter import ttk
+import os
+import sys
+
 class Window:
     def __init__(self):
         self.root = tk.Tk()
@@ -17,9 +20,16 @@ class Window:
         style = self.__apply_dark_theme()
         self.root.configure(bg=Theme.BG)
 
-        self.icon = tk.PhotoImage(file="src/ui/DVEL_Icon.png")
+        self.icon = tk.PhotoImage(file=self.resource_path("ui/DVEL_Icon.png"))
         self.root.iconphoto(True, self.icon)
 
+    def resource_path(self, relative_path):
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
         
     def __maximize_window(self):
         try:

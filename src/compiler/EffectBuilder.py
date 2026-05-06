@@ -1,5 +1,5 @@
 import math
-from src.compiler.Effect import Effect
+from compiler.Effect import Effect
 
 class EffectBuilder:
     def build(self, effect: Effect) -> str:

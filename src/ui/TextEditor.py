@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from src.compiler.lexer.Lexer import Lexer
-from src.compiler.lexer.Token import TokenLabel as TL
-from src.ui.Theme import Theme
+from compiler.lexer.Lexer import Lexer
+from compiler.lexer.Token import TokenLabel as TL
+from ui.Theme import Theme
 from tkinter import ttk
 
 # blue window in left half of screen with text editor.

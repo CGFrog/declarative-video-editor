@@ -1,7 +1,7 @@
 from uuid import uuid4
-from src.compiler.Effect import Effect
-from src.compiler.ResolvedClip import ResolvedClip
-from src.compiler.EffectBuilder import EffectBuilder
+from compiler.Effect import Effect
+from compiler.ResolvedClip import ResolvedClip
+from compiler.EffectBuilder import EffectBuilder
 
 class FFMpegBuilder:
     def __init__(self):

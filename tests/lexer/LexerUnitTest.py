@@ -1,7 +1,7 @@
 import sys
-from src.compiler.lexer.Lexer import Lexer
-from src.compiler.lexer.Token import Token
-from src.compiler.lexer.Token import TokenLabel as TL
+from compiler.lexer.Lexer import Lexer
+from compiler.lexer.Token import Token
+from compiler.lexer.Token import TokenLabel as TL
 test1 = 'video intro = "intro.mp4" (0,e) |> saturation(3) |> speed(1.5) % video intro'
 expected1 = [
     Token(TL.MEDIA, 'video'),

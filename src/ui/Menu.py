@@ -1,6 +1,6 @@
 import tkinter as tk
 import threading
-from src.compiler.Compiler import Compiler
+from compiler.Compiler import Compiler
 import subprocess
 import re
 import time

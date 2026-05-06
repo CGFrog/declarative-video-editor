@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from src.ui.Theme import Theme
+from ui.Theme import Theme
 import sys
 
 class ConsoleView:

@@ -1,5 +1,5 @@
-from src.compiler.Effect import Effect
-from src.compiler.EffectBuilder import EffectBuilder
+from compiler.Effect import Effect
+from compiler.EffectBuilder import EffectBuilder
 
 builder = EffectBuilder()
 

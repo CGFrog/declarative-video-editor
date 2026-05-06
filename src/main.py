@@ -1,4 +1,4 @@
-from src.ui.Window import Window
+from ui.Window import Window
 
 
 def main()->None:

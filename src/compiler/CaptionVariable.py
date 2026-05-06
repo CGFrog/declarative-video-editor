@@ -1,4 +1,4 @@
-from src.compiler.StateVariable import StateVariable
+from compiler.StateVariable import StateVariable
 
 
 class CaptionVariable(StateVariable):

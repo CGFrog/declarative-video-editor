@@ -1,12 +1,12 @@
 
-from src.compiler.lexer.Token import Token, TokenLabel
-from src.compiler.lexer.Token import TokenLabel as TL
-from src.compiler.VideoVariable import Clip, VideoVariable
-from src.compiler.Effect import Effect
-from src.compiler.parser.ParsingUtils import extract_duration, first_of_token, extract_function_parameters
-from src.compiler.parser.Primitive import Primitive
-from src.compiler.parser.ResolvedFunction import ResolvedFunction
-from src.compiler.CaptionVariable import CaptionVariable
+from compiler.lexer.Token import Token, TokenLabel
+from compiler.lexer.Token import TokenLabel as TL
+from compiler.VideoVariable import Clip, VideoVariable
+from compiler.Effect import Effect
+from compiler.parser.ParsingUtils import extract_duration, first_of_token, extract_function_parameters
+from compiler.parser.Primitive import Primitive
+from compiler.parser.ResolvedFunction import ResolvedFunction
+from compiler.CaptionVariable import CaptionVariable
 
 class DeclarationParser(): 
     def __init__(self): 

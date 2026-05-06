@@ -1,8 +1,8 @@
-from src.compiler.lexer.Token import Token
-from src.compiler.lexer.Token import TokenLabel as TL
-from src.compiler.parser.ParsingUtils import first_of_token, extract_function_parameters
-from src.compiler.parser.TimelineElement import TimelineElement
-from src.compiler.parser.RenderSettings import RenderSettings
+from compiler.lexer.Token import Token
+from compiler.lexer.Token import TokenLabel as TL
+from compiler.parser.ParsingUtils import first_of_token, extract_function_parameters
+from compiler.parser.TimelineElement import TimelineElement
+from compiler.parser.RenderSettings import RenderSettings
 class TimelineParser:
     def __init__(self):
         self.timeline_elements: list[TimelineElement] = []

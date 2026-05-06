@@ -1,21 +1,42 @@
 import tkinter as tk
-import vlc
 import os
 import sys
+import ctypes
 from tkinter import filedialog
 from tkinter import ttk
-
-from src.ui.Theme import Theme
+from ui.Theme import Theme
 
 class VideoPlayer:
+    def resource_path(self, relative_path):
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
+
     def __init__(self, parent_frame):
-        vlc_path = self.get_vlc_path()
+        vlc_path = self.resource_path("vlc")
+
+        libvlc_path = os.path.join(vlc_path, "libvlc.dll")
+        plugins_path = os.path.join(vlc_path, "plugins")
+
+        if hasattr(os, "add_dll_directory"):
+            os.add_dll_directory(vlc_path)
+
+        os.environ["VLC_PLUGIN_PATH"] = plugins_path
+        os.environ["PYTHON_VLC_LIB_PATH"] = libvlc_path
+
         self.has_ended = False
-        os.environ["PATH"] = vlc_path + ";" + os.environ.get("PATH", "")
+        #os.environ["PATH"] = vlc_path + ";" + os.environ.get("PATH", "")
+
+        import vlc
 
         self.instance = vlc.Instance([
-            f"--plugin-path={os.path.join(vlc_path, 'plugins')}"
+            f"--plugin-path={plugins_path}"
         ])
+
+        print("VLC Instance:", self.instance)
 
         self.player = self.instance.media_player_new()
 
@@ -50,9 +71,9 @@ class VideoPlayer:
         if getattr(sys, 'frozen', False):
             base_path = sys._MEIPASS
         else:
-            base_path = os.path.dirname(__file__)
+            base_path = os.path.abspath('.')
 
-        return os.path.join(base_path, "vlc")
+        return os.path.join(base_path, 'vlc')
 
     def __create_button(self, controls_frame,text, command):
         return tk.Button(

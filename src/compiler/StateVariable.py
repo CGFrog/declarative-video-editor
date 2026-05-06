@@ -1,4 +1,4 @@
-from src.compiler.Effect import Effect
+from compiler.Effect import Effect
 
 class StateVariable:
     def __init__(self, type=""):

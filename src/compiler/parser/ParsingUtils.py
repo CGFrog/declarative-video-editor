@@ -1,6 +1,6 @@
-from src.compiler.lexer.Token import TokenLabel as TL
-from src.compiler.lexer.Token import Token
-from src.compiler.parser.Primitive import Primitive
+from compiler.lexer.Token import TokenLabel as TL
+from compiler.lexer.Token import Token
+from compiler.parser.Primitive import Primitive
 
 def extract_duration(tokens: list[Token])-> list[str]:
     """
