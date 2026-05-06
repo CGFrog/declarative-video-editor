@@ -9,7 +9,7 @@
 
 <h2>Steps to Install Required Dependencies</h2>
 <h3>1. FFmpeg</h3>
-<p>Go to <a href="https://www.gyan.dev/ffmpeg/builds/" target="_blank">https://www.gyan.dev/ffmpeg/builds/</a> and download the following .zip:</p>
+<p>Go to <a href="https://www.gyan.dev/ffmpeg/builds/">https://www.gyan.dev/ffmpeg/builds/</a> and download the following .zip:</p>
 
 ```
 ffmpeg-8.0.1-essentials_build.zip
@@ -36,7 +36,7 @@ pip install ffmpeg-python
 ```
 
 <h3>2. VLC Media Player</h3>
-<p>Go to <a href="https://apps.microsoft.com/detail/XPDM1ZW6815MQM?hl=en-US&gl=US&ocid=pdpshare" target="_blank">VLC (Microsoft Store)</a> and click "Download".</p>
+<p>Go to <a href="https://apps.microsoft.com/detail/XPDM1ZW6815MQM?hl=en-US&gl=US&ocid=pdpshare">VLC (Microsoft Store)</a> and click "Download".</p>
 <p>Once it is downloaded, open the command line and run the following command:</p>
 
 ```
@@ -52,7 +52,7 @@ pip install tkinter
 <p>Now all dependencies are installed and you are ready to use DVEL!</p>
 
 <h2>Running The Application</h2>
-<p>To run DVEL, simply clone the repository and install all dependencies listed above. Then run the following command:</p>
+<p>To run DVEL, simply clone the repository and install all dependencies listed above. Then run the following command from the repository root:</p>
 
 ```
 python -m src.main
