@@ -15,18 +15,18 @@
 ffmpeg-8.0.1-essentials_build.zip
 ```
 <p>Extract the .zip file adn remember the location:</p>
-<img src="ffmpeg_step1.png" alt="step1" width="35%">
-<img src="ffmpeg_step2.png" alt="step2" width="25%">
+<img src="images/ffmpeg_step1.png" alt="step1" width="35%">
+<img src="images/ffmpeg_step2.png" alt="step2" width="25%">
 <br><br>
 <p>Next, open your system environment variables:</p>
-<img src="ffmpeg_step3.png" alt="step3" width="45%">
-<img src="ffmpeg_step4.png" alt="step4" width="50%">
+<img src="images/ffmpeg_step3.png" alt="step3" width="45%">
+<img src="images/ffmpeg_step4.png" alt="step4" width="50%">
 <br><br>
 <p>Double click on the "path" variable:</p>
-<img src="ffmpeg_step5.png" alt="step5" width="45%">
+<img src="images/ffmpeg_step5.png" alt="step5" width="45%">
 <br><br>
 <p>Create a new PATH variable, enter the path to the /bin folder inside of the .zip you installed earlier.</p>
-<img src="ffmpeg_step6.png" alt="step6" width="45%">
+<img src="images/ffmpeg_step6.png" alt="step6" width="45%">
 <br><br>
 <p>Click "OK"</p>
 <p>Open the command line and enter the following command:</p>
@@ -37,6 +37,11 @@ pip install ffmpeg-python
 
 <h3>2. VLC Media Player</h3>
 <p>Go to <a href="https://apps.microsoft.com/detail/XPDM1ZW6815MQM?hl=en-US&gl=US&ocid=pdpshare">VLC (Microsoft Store)</a> and click "Download".</p>
+<p>Once it is downloaded, open the command line and run the following command:</p>
+
+```
+pip install python-vlc
+```
 
 <h3>3. Tkinter</h3>
 <p>Simply run the following command in the command line:</p>
