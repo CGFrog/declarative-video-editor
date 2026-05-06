@@ -115,9 +115,9 @@ class TimelineView:
     
     def __get_clip_color(self, clip):
         if clip.is_audio:
-            return "green"
-        if clip.is_image:
             return "red"
+        if clip.is_image:
+            return "green"
         return "blue"
     
     def __draw_clips(self, content_height, content_width):
