@@ -9,12 +9,12 @@
 
 <h2>Steps to Install Required Dependencies</h2>
 <h3>1. FFmpeg</h3>
-<p>Go to <a href="https://www.gyan.dev/ffmpeg/builds/">https://www.gyan.dev/ffmpeg/builds/</a> and download the following .zip:</p>
+<p>Go to <a href="https://www.gyan.dev/ffmpeg/builds/" target="_blank">https://www.gyan.dev/ffmpeg/builds/</a> and download the following .zip:</p>
 
 ```
 ffmpeg-8.0.1-essentials_build.zip
 ```
-<p>Extract the .zip file adn remember the location:</p>
+<p>Extract the .zip file and remember the location:</p>
 <img src="images/ffmpeg_step1.png" alt="step1" width="35%">
 <img src="images/ffmpeg_step2.png" alt="step2" width="25%">
 <br><br>
@@ -36,7 +36,7 @@ pip install ffmpeg-python
 ```
 
 <h3>2. VLC Media Player</h3>
-<p>Go to <a href="https://apps.microsoft.com/detail/XPDM1ZW6815MQM?hl=en-US&gl=US&ocid=pdpshare">VLC (Microsoft Store)</a> and click "Download".</p>
+<p>Go to <a href="https://apps.microsoft.com/detail/XPDM1ZW6815MQM?hl=en-US&gl=US&ocid=pdpshare" target="_blank">VLC (Microsoft Store)</a> and click "Download".</p>
 <p>Once it is downloaded, open the command line and run the following command:</p>
 
 ```
