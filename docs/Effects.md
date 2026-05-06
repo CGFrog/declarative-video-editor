@@ -11,7 +11,6 @@
     <li>Scale</li>
     <li>Crop</li>
     <li>Volume</li>
-    <li>Noise Filter</li>
 </ul>
 
 <p>Effects are declared while defining a media variable or after one is defined.</p>
@@ -19,13 +18,13 @@
 <h3>Defining Effects While Declaring Media Variables:</h3>
 
 ```
-video v_1 = "cool_video.mp4" (0,e) |> blur(5) |> saturation(5)
+video v_1 = "cool_video.mp4" (0,e) |> blur(5) |> saturation(5);
 ```
 
 <h3>Defining Effects on Previously Declared Media Variables:</h3>
 
 ```
-v_1 = |> blur(5) |> saturation(5)
+v_1 = |> blur(5) |> saturation(5);
 ```
 
 <p>In either case, the effect is applied by entering the name with any values inside of parenthesis, separated by commas (if there are multiple values).</p>
