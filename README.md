@@ -12,3 +12,9 @@ There are several clear advantages of this methodology:
   <li> Edit large amounts of videos in a single batch </li>
 </ul>
 </p>
+
+<h2>Important Guides:</h2>
+<ul>
+  <li><a href="docs/Setup.md">Install / Setup Guide</a></li>
+  <li><a href="docs/Documentation.md">Language Documentation</a></li>
+</ul>
