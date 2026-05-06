@@ -14,7 +14,7 @@
 ```
 ffmpeg-8.0.1-essentials_build.zip
 ```
-<p>Extract the .zip file adn remember the location:</p>
+<p>Extract the .zip file and remember the location:</p>
 <img src="images/ffmpeg_step1.png" alt="step1" width="35%">
 <img src="images/ffmpeg_step2.png" alt="step2" width="25%">
 <br><br>
@@ -52,7 +52,7 @@ pip install tkinter
 <p>Now all dependencies are installed and you are ready to use DVEL!</p>
 
 <h2>Running The Application</h2>
-<p>To run DVEL, simply clone the repository and install all dependencies listed above. Then run the following command:</p>
+<p>To run DVEL, simply clone the repository and install all dependencies listed above. Then run the following command from the repository root:</p>
 
 ```
 python -m src.main
