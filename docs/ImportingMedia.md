@@ -3,7 +3,7 @@
 <p>DVEL supports the following media types:</p>
 <ul>
     <li>Videos (.mp4, .mov, .avi, and most other modern and legacy formats.)</li>
-    <li>Images (.jpeg, .png, .gif, and more other standard and professional image formats.)</li>
+    <li>Images (.jpeg, .png, .gif, and most other standard and professional image formats.)</li>
     <li>Audio (.mp3, .wav, and most other audio formats.)</li>
 </ul>
 
