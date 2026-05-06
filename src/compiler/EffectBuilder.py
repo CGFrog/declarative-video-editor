@@ -60,11 +60,18 @@ class EffectBuilder:
         return f"pad={resolution_w}:{resolution_h}:{x}:{y}"
 
     def _build_scale(self, effect: Effect) -> str:
-        pct = float(effect.param[0]) if len(effect.param) > 0 else 1.0
-        if pct < 1.0:
-            return f"scale=iw*{pct}:ih*{pct},pad=iw/{pct}:ih/{pct}:(ow-iw)/2:(oh-ih)/2"
+        if len(effect.param) >= 2:
+            x = float(effect.param[0])
+            y = float(effect.param[1])
+        elif len(effect.param) == 1:
+            x = y = float(effect.param[0])
         else:
-            return f"scale=iw*{pct}:ih*{pct}"
+            x = y = 1.0
+
+        if x < 1.0 or y < 1.0:
+            return f"scale=iw*{x}:ih*{y},pad=iw/{x}:ih/{y}:(ow-iw)/2:(oh-ih)/2"
+        else:
+            return f"scale=iw*{x}:ih*{y}"
     
     def _build_rotation(self, effect: Effect) -> str:
         angle_deg = float(effect.param[0]) if len(effect.param) > 0 else 0.0
