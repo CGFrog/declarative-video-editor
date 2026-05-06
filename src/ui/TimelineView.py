@@ -113,6 +113,13 @@ class TimelineView:
             )
             self.y_axis.create_line(0, y, Y_WIDTH, y, fill="gray40")
     
+    def __get_clip_color(self, clip):
+        if clip.is_audio:
+            return "green"
+        if clip.is_image:
+            return "red"
+        return "blue"
+    
     def __draw_clips(self, content_height, content_width):
         for z, clips in self.layers.items():
             y = content_height - (z + 1) * (HEIGHT + PADDING) - PADDING
@@ -121,7 +128,8 @@ class TimelineView:
             for clip in clips:
                 x1 = clip.timeline_start * self.scale
                 x2 = x1 + (clip.src_end - clip.src_start) * self.scale
-                self.canvas.create_rectangle(x1, y + 5, x2, y + 45, fill="blue")
+                fill = self.__get_clip_color(clip)
+                self.canvas.create_rectangle(x1, y + 5, x2, y + 45, fill=fill)
                 #would be better to have label be the name of video in code 
                 label = os.path.splitext(os.path.basename(clip.path))[0]
                 self.canvas.create_text(x1 + 4, y + 25, text=label, fill="white", anchor="w", font=("Courier", 9))
