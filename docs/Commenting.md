@@ -13,4 +13,4 @@ game_footage after intro 1 % The game footage plays after the intro
 ```
 <p>DVEL also allows comments on the same line as previous code. Again, these comments are still denoted by the percentage ( % ) symbol.</p>
 
-<h3>Next: <a href="Documentation.md">Documentation</a></h3>
+<h3>Next: <a href="Errors.md">Common Errors</a></h3>

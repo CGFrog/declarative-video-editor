@@ -8,4 +8,5 @@
     <li><a href="Effects.md">Effects</a></li>
     <li><a href="Timeline.md">Timeline</a></li>
     <li><a href="Commenting.md">Commenting</a></li>
+    <li><a href="Errors.md">Common Errors<a></li>
 </ul>
