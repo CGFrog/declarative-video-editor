@@ -20,7 +20,7 @@ There are several clear advantages of this methodology:
 </ul>
 
 <h2>How to run DVEL:</h2>
-<p>First, Install all <a href="Setup.md">dependencies</a>. Then from the project root, run the following command:</p>
+<p>First, Install all <a href="docs/Setup.md">dependencies</a>. Then from the project root, run the following command:</p>
 
 ```
 python -m src.main
