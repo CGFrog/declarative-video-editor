@@ -42,6 +42,6 @@ caption caption1 = "This is a caption." 4;
 str caption_text = "Here is text for my caption.";
 caption caption_display = caption_text 4;
 ```
-<p>The above example shows a string and caption being declared separatly, with the string assigned to the captions value. The caption's duration is 4 seconds.</p>
+<p>The above example shows a string and caption being declared separately, with the string assigned to the captions value. The caption's duration is 4 seconds.</p>
 
 <h3>Next: <a href="Operations.md">Operations</a></h3>
