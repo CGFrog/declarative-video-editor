@@ -195,15 +195,11 @@ class DeclarationParser():
                     if func_name not in self.functions:
                         raise Exception(f"Line {self.line_number}: Unknown function '{func_name}'.")
                     func = self.functions[func_name]
-
                     right_paren = first_of_token(tokens[index:], TL.RPAREN)
-
                     # Extract the raw arguments between the ( and )
                     raw_args = extract_function_parameters(tokens[index+1:index+right_paren])
-                    
                     # Resolve arguments against self.primitives in case any are variables e.g. f(Var1, 2, 3)
                     resolved_args = self.resolve_params(raw_args, self.primitives)
-                    
                     # Validate argument count matches parameter count
                     if len(resolved_args) != len(func.params):
                         raise Exception(
@@ -212,12 +208,10 @@ class DeclarationParser():
                         )
                     # Create a temporary local dict pairing each parameter name with its argument value
                     local_vars = dict(zip(func.params, resolved_args))
-                    
                     # Evaluate the function body using local_vars and collect the resulting effects
                     expanded_effects = self.__generate_effects_with_local_vars(func.body, local_vars)
                     effects.extend(expanded_effects)
                     index += right_paren
-
             index+=1
         effects.reverse()
         return effects
