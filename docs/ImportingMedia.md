@@ -39,8 +39,8 @@ caption caption1 = "This is a caption." 4;
 <p>In the above example, the 4 represents the caption being displayed for 4 seconds.</p>
 
 ```
-str caption_text = "Here is text for my caption."
-caption caption_display = caption_text 4
+str caption_text = "Here is text for my caption.";
+caption caption_display = caption_text 4;
 ```
 <p>The above example shows a string and caption being declared separatly, with the string assigned to the captions value. The caption's duration is 4 seconds.</p>
 
