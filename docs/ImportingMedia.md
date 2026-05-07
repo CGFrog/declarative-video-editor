@@ -17,9 +17,10 @@
 <h3>Examples</h3>
 
 ```
-video intro = "intro.mp4" (0,e) |> saturation(3) 
-                                |> speed(1.5);
-audio music = "music.mp3" (0,e) |> volume(2);
+video intro = "intro.mp4" (0,e)
+    |> saturation(3) 
+    |> speed(1.5);
+audio music = "music.mp3" (0,e)|> volume(2);
 image logo = "logo.png" (0,e);
 ```
 
