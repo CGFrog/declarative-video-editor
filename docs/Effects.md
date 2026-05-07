@@ -11,6 +11,7 @@
     <li>Scale</li>
     <li>Crop</li>
     <li>Volume</li>
+    <li>Chroma Key</li>
 </ul>
 
 <p>Effects are declared while defining a media variable or after one is defined.</p>
@@ -92,5 +93,12 @@ crop(width, height, x_offset, y_offset)
 volume(x)
 ```
 <p>Where x is equal to the volume of the audio or video clip. The range is from 0 (muted) to 2 (double the original volume). A value of 1 is equivalent to the original audio/video clip's volume.</p>
+
+<h4>Chroma Key</h4>
+<p> Create an alpha mask using a string of a HEX color </p>
+
+```
+chromakey(<hex-color>, <similarity>, <blend>)
+```
 
 <h3>Next: <a href="Timeline.md">Timeline</a></h3>
