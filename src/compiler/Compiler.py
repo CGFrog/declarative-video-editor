@@ -145,7 +145,7 @@ class Compiler:
                     src_end=end,
                     timeline_start=cursor,
                     z=z,
-                    effects=state.effects,
+                    effects=effects,
                     is_audio=state.type == 'audio',
                     is_image=state.type == 'image'
                 )
