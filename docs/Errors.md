@@ -6,6 +6,10 @@
 <h3>"Cannot access the state of [identifier]"</h3>
 <p>This error means that you used an identifier in your timeline that was not declared properly. Double check your media import declarations and ensure all identifiers are named correctly and match what is used in your timeline.</p>
 
-<h3></h3>
+<h3>"Error generating effect [effect]"</effect></h3>
+Either the effect written does not exist or insufficient function parameters were given.
 
+<h3> "No render settings specified" </h3>
+
+Ensure that `render [x,y];` is specified correctly
 <h3>Next: <a href="Documentation.md">Documentation</a></h3>

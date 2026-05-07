@@ -1,3 +1,4 @@
+<img src="docs/images/DVEL_Logo.png" alt="logo" width="20%">
 <h1>
   Declarative Video Editor Language
 </h1>
@@ -18,3 +19,12 @@ There are several clear advantages of this methodology:
   <li><a href="docs/Setup.md">Install / Setup Guide</a></li>
   <li><a href="docs/Documentation.md">Language Documentation</a></li>
 </ul>
+
+<h2>How to run DVEL:</h2>
+<p>First, Install all <a href="docs/Setup.md">dependencies</a>. Then from the project root, run the following command:</p>
+
+```
+python -m src.main
+```
+<h2>DVEL User Interface:</h2>
+<img width="1919" height="1020" alt="Screenshot 2026-05-06 194144" src="https://github.com/user-attachments/assets/3ae38c8a-1360-46ee-bcb0-7db07f0b073c" />
