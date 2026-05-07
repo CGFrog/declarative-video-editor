@@ -135,7 +135,7 @@ class Compiler:
                 raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
             
             # I think this will break, probably meant state.effects?
-            effects = clip.effects if hasattr(clip, 'effects') and clip.effects else state.effects
+            effects = clip.effects if clip.effects else state.effects
 
             for e in effects:
                 if e.type == "speed":
@@ -150,7 +150,7 @@ class Compiler:
                     src_end=end,
                     timeline_start=cursor,
                     z=z,
-                    effects=state.effects,
+                    effects=effects,
                     is_audio=is_audio,
                     is_image=state.type == 'image'
                 )
