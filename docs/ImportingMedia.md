@@ -3,22 +3,24 @@
 <p>DVEL supports the following media types:</p>
 <ul>
     <li>Videos (.mp4, .mov, .avi, and most other modern and legacy formats.)</li>
-    <li>Images (.jpeg, .png, .gif, and more other standard and professional image formats.)</li>
+    <li>Images (.jpeg, .png, .gif, and most other standard and professional image formats.)</li>
     <li>Audio (.mp3, .wav, and most other audio formats.)</li>
 </ul>
 
 <h3>Use the following format to import media</h3>
+<p>Pro tip: Don't forget the semicolon after each declaration line! DVEL supports multi-line declarations!</p>
 
 ```
-<type> <name> = <filepath> <duration> <effects>
+<type> <name> = <filepath> <duration> <effects>;
 ```
 
 <h3>Examples</h3>
 
 ```
-video intro = "intro.mp4" (0,e) |> saturation(3) |> speed(1.5)
-audio music = "music.mp3" (0,e) |> volume(2) |> noise_filter(-60)
-image logo = "logo.png" (0,e)
+video intro = "intro.mp4" (0,e) |> saturation(3) 
+                                |> speed(1.5);
+audio music = "music.mp3" (0,e) |> volume(2);
+image logo = "logo.png" (0,e);
 ```
 
 <h2>Other Types</h2>

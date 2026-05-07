@@ -20,7 +20,7 @@ class EffectBuilder:
                 return self._build_rotation(effect)
             case "crop":
                 return self._build_crop(effect)
-            case "colorkey":
+            case "chromakey":
                 return self._build_colorkey(effect)
             case "denoise":
                 return self._build_denoise()
@@ -91,15 +91,30 @@ class EffectBuilder:
         return f"pad={resolution_w}:{resolution_h}:{x}:{y}"
 
     def _build_scale(self, effect: Effect) -> str:
-        pct = effect.param[0] if len(effect.param) > 0 else 1.0
-        return f"scale=iw*{pct}:ih*{pct}"
+        if len(effect.param) >= 2:
+            x = float(effect.param[0])
+            y = float(effect.param[1])
+        elif len(effect.param) == 1:
+            x = y = float(effect.param[0])
+        else:
+            x = y = 1.0
 
+        if x < 1.0 or y < 1.0:
+            return f"scale=iw*{x}:ih*{y},pad=iw/{x}:ih/{y}:(ow-iw)/2:(oh-ih)/2"
+        else:
+            return f"scale=iw*{x}:ih*{y}"
+    
     def _build_rotation(self, effect: Effect) -> str:
-        angle_deg = effect.param[0] if len(effect.param) > 0 else 0.0
+        angle_deg = float(effect.param[0]) if len(effect.param) > 0 else 0.0
         angle_rad = round(angle_deg * math.pi / 180, 6)
         return f"rotate={angle_rad}"
 
     def _build_crop(self, effect: Effect) -> str:
+        """
+        crop(1280, 720)      → crops to 1280x720 from top-left corner
+        crop(1280, 720, 100) → crops to 1280x720 starting at x=100, y=0
+        crop(1280, 720, 100, 50) → crops to 1280x720 starting at x=100, y=50
+        """
         width = effect.param[0] if len(effect.param) > 0 else "iw"
         height = effect.param[1] if len(effect.param) > 1 else "ih"
         x_offset = effect.param[2] if len(effect.param) > 2 else 0 
