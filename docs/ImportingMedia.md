@@ -44,4 +44,4 @@ caption caption_display = caption_text 4;
 ```
 <p>The above example shows a string and caption being declared separately, with the string assigned to the captions value. The caption's duration is 4 seconds.</p>
 
-<h3>Next: <a href="Operations.md">Operations</a></h3>
+<h3>Next: <a href="PrimitiveTypes.md">Primitive Types</a></h3>

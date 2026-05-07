@@ -4,6 +4,7 @@
 <ul>
     <li><a href="Setup.md">Install / Setup</a></li>
     <li><a href="ImportingMedia.md">Importing Media</a></li>
+    <li><a href="PrimitiveTypes.md">Primitive Types</a></li>
     <li><a href="Operations.md">Operations</a></li>
     <li><a href="Effects.md">Effects</a></li>
     <li><a href="Timeline.md">Timeline</a></li>
