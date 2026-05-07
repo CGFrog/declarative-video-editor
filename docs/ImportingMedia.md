@@ -33,8 +33,8 @@ image logo = "logo.png" (0,e);
 <h3>Examples</h3>
 
 ```
-str text1 = "Hello World."
-caption caption1 = "This is a caption." 4
+str text1 = "Hello World.";
+caption caption1 = "This is a caption." 4;
 ```
 <p>In the above example, the 4 represents the caption being displayed for 4 seconds.</p>
 
