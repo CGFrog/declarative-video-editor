@@ -43,7 +43,7 @@ labels = {
     'highpass': TL.EFFECT,
     'afadein' : TL.EFFECT,
     "delay" : TL.EFFECT,
-    "silrem" : TL.EFFECT,
+    "noise_filter" : TL.EFFECT,
     'timeline': TL.TIMELINE,
     'after': TL.AFTER,
     'render': TL.RENDER,

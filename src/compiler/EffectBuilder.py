@@ -2,72 +2,83 @@ import math
 from src.compiler.Effect import Effect
 
 class EffectBuilder:
+    # Speed is used in both
+    ONLY_AUDIO_EFFECTS = {"volume","normalize","pan","lowpass","highpass","afadein","delay","noise_filter"}
+    ONLY_VIDEO_EFFECTS = {"blur", "saturation", "location", "scale", "rotation", "crop", "chromakey", "denoise","bc","sharpness","flip"}
     def build(self, effect: Effect) -> str:
-        if effect.type == "volume":
+        if effect.type in self.ONLY_AUDIO_EFFECTS:
             return ""
-        match effect.type:
-            case "blur":
-                return self._build_blur(effect)
-            case "saturation":
-                return self._build_saturation(effect)
-            case "speed":
-                return self._build_speed(effect)
-            case "location":
-                return self._build_location(effect)
-            case "scale":
-                return self._build_scale(effect)
-            case "rotation":
-                return self._build_rotation(effect)
-            case "crop":
-                return self._build_crop(effect)
-            case "chromakey":
-                return self._build_colorkey(effect)
-            case "denoise":
-                return self._build_denoise()
-            case "bc":
-                return self._build_brightness_and_contrast(effect)
-            case "gamma":
-                return self._build_gamma(effect)
-            case "sharpness":
-                return self._build_sharpen(effect)
-            case "flip":
-                return self._build_flip(effect)
-            case _:
-                raise Exception(f"Unknown effect: {effect.type}")
-
+        try:
+            match effect.type:
+                case "blur":
+                    return self._build_blur(effect)
+                case "saturation":
+                    return self._build_saturation(effect)
+                case "speed":
+                    return self._build_speed(effect)
+                case "location":
+                    return self._build_location(effect)
+                case "scale":
+                    return self._build_scale(effect)
+                case "rotation":
+                    return self._build_rotation(effect)
+                case "crop":
+                    return self._build_crop(effect)
+                case "chromakey":
+                    return self._build_colorkey(effect)
+                case "denoise":
+                    return self._build_denoise()
+                case "bc":
+                    return self._build_brightness_and_contrast(effect)
+                case "gamma":
+                    return self._build_gamma(effect)
+                case "sharpness":
+                    return self._build_sharpen(effect)
+                case "flip":
+                    return self._build_flip(effect)
+                case _:
+                    raise Exception(f"Unknown effect: {effect.type}")
+        except Exception as e:
+            raise Exception(f"Error generating effects: {effect.type}\n{e}")
+        
     def get_audio_filter(self, effect: Effect) -> str:
         effect_type : str = effect.type
-        match effect_type:
-            case "speed":
-                speed = effect.param[0] if len(effect.param) > 0 else 1.0
-                return f"atempo={speed}"
-            case "volume":
-                volume = effect.param[0] if len(effect.param) > 0 else 1.0
-                return f"volume={volume}"
-            case "normalize":
-                return "loudnorm"
-            case "pan":
-                left = effect.param[0] if len(effect.param) > 0 else 1
-                right = effect.param[1] if len(effect.param) > 1 else 1
-                return f"pan=stereo|c0={left}*c0|c1={right}*c1"
-            case "lowpass":
-                freq = effect.param[0] if len(effect.param) > 0 else 300
-                return f"lowpass=f={freq}"
-            case "highpass":
-                freq = effect.param[0] if len(effect.param) > 0 else 3000
-                return f"highpass=f={freq}"
-            case "afadein":
-                d = effect.param[0] if len(effect.param) > 0 else 1
-                return f"afade=t=in:st=0:d={d}"
-            case "delay":
-                ms = int(effect.param[0]) if len(effect.param) > 0 else 500
-                return f"adelay={ms}|{ms}"
-            case "silrem":
-                thresh = effect.param[0]
-                return f"silenceremove=start_periods=1:start_duration=0.5:start_threshold={thresh}dB"
-            case _:
-                return ""
-    
+        if effect_type in self.ONLY_VIDEO_EFFECTS:
+            return ""
+        try:
+            match effect_type:
+                case "speed":
+                    speed = effect.param[0] if len(effect.param) > 0 else 1.0
+                    return f"atempo={speed}"
+                case "volume":
+                    volume = effect.param[0] if len(effect.param) > 0 else 1.0
+                    return f"volume={volume}"
+                case "normalize":
+                    return "loudnorm"
+                case "pan":
+                    left = effect.param[0] if len(effect.param) > 0 else 1
+                    right = effect.param[1] if len(effect.param) > 1 else 1
+                    return f"pan=stereo|c0={left}*c0|c1={right}*c1"
+                case "lowpass":
+                    freq = effect.param[0] if len(effect.param) > 0 else 300
+                    return f"lowpass=f={freq}"
+                case "highpass":
+                    freq = effect.param[0] if len(effect.param) > 0 else 3000
+                    return f"highpass=f={freq}"
+                case "afadein":
+                    d = effect.param[0] if len(effect.param) > 0 else 1
+                    return f"afade=t=in:st=0:d={d}"
+                case "delay":
+                    ms = int(effect.param[0]) if len(effect.param) > 0 else 500
+                    return f"adelay={ms}|{ms}"
+                case "noise_filter":
+                    thresh = effect.param[0]
+                    return f"silenceremove=start_periods=1:start_duration=0.5:start_threshold={thresh}dB"
+                case _:
+                    raise Exception(f"Unknown effect {effect.type}")
+        except Exception as e:
+            raise Exception(f"Error generating effects: {effect.type}\n {e}")
+        
     def _build_blur(self, effect: Effect) -> str:
         radius = effect.param[0] if len(effect.param) > 0 else 5
         return f"boxblur={radius}:1"
@@ -98,7 +109,6 @@ class EffectBuilder:
             x = y = float(effect.param[0])
         else:
             x = y = 1.0
-
         if x < 1.0 or y < 1.0:
             return f"scale=iw*{x}:ih*{y},pad=iw/{x}:ih/{y}:(ow-iw)/2:(oh-ih)/2"
         else:
@@ -110,11 +120,6 @@ class EffectBuilder:
         return f"rotate={angle_rad}"
 
     def _build_crop(self, effect: Effect) -> str:
-        """
-        crop(1280, 720)      → crops to 1280x720 from top-left corner
-        crop(1280, 720, 100) → crops to 1280x720 starting at x=100, y=0
-        crop(1280, 720, 100, 50) → crops to 1280x720 starting at x=100, y=50
-        """
         width = effect.param[0] if len(effect.param) > 0 else "iw"
         height = effect.param[1] if len(effect.param) > 1 else "ih"
         x_offset = effect.param[2] if len(effect.param) > 2 else 0 

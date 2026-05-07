@@ -101,9 +101,6 @@ class Compiler:
                     state=state,
                     z=z
                 )
-            else:
-                #do audio stuff.
-                pass
 
     def __resolve_text_element(self,state,timeline_element,z):
         self.text_elements.append({
@@ -141,8 +138,6 @@ class Compiler:
                 if e.type == "speed":
                     speed = e.param[0] if len(e.param) > 0 else 1.0
                     duration = duration / float(speed)
-            is_audio = False
-            if state.type == 'audio': is_audio = True
             self.clips.append(
                 ResolvedClip(
                     path=clip.path,
@@ -151,7 +146,7 @@ class Compiler:
                     timeline_start=cursor,
                     z=z,
                     effects=effects,
-                    is_audio=is_audio,
+                    is_audio=state.type == 'audio',
                     is_image=state.type == 'image'
                 )
             )

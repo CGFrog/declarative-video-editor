@@ -58,32 +58,23 @@ class Menu(tk.Menu):
             encoding='utf-8',
             bufsize=1
         )
-
         total_duration = compiler.duration
 
         for line in process.stderr:
             print(line, end="")
-
             t = self.extract_time(line)
             if t is None or t <= 0:
                 continue
-
             progress = (t / total_duration) * 100
-
             elapsed = time.time() - start_time
             speed = t / elapsed if elapsed > 0 else 0
-
             remaining_video = total_duration - t
-
             if speed > 0:
                 eta_seconds = remaining_video / speed
             else:
                 eta_seconds = 0
-
             eta_str = self.format_time(eta_seconds)
-
             message = f"Rendering... {progress:.1f}%\nETA: {eta_str}"
-
             self.after(0, lambda msg=message: self.video_player.file_label.config(text=msg))
 
         process.wait()
@@ -101,7 +92,6 @@ class Menu(tk.Menu):
         seconds = int(seconds)
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
-
         if h > 0:
             return f"{h}:{m:02}:{s:02}"
         else:

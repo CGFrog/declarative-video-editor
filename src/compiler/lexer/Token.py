@@ -35,7 +35,6 @@ class Token():
         self.start : int = start
         self.end : int = end
 
-
     def toString(self):
         return f"({self.key}, {self.value})"
     
