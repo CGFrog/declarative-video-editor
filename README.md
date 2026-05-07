@@ -27,4 +27,4 @@ There are several clear advantages of this methodology:
 python -m src.main
 ```
 <h2>DVEL User Interface:</h2>
-<img width="1919" height="1021" alt="Screenshot 2026-05-06 192333" src="https://github.com/user-attachments/assets/60bbe608-84c3-4c03-b590-4f3a2e6d4f5e" />
+<img width="1919" height="1020" alt="Screenshot 2026-05-06 194144" src="https://github.com/user-attachments/assets/3ae38c8a-1360-46ee-bcb0-7db07f0b073c" />
