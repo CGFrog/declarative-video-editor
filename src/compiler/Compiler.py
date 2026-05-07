@@ -132,7 +132,7 @@ class Compiler:
                 raise Exception(f"Clip {clip.path} ({start},{end}) cannot have negative duration.")
             
             # I think this will break, probably meant state.effects?
-            effects = clip.effects if clip.effects else state.effects
+            effects = state.effects
 
             for e in effects:
                 if e.type == "speed":
