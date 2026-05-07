@@ -27,7 +27,6 @@ image logo = "logo.png" (0,e);
 <h2>Other Types</h2>
 <p>DVEL supports the following declarations as well:</p>
 <ul>
-    <li>Primitive types (integer and string)</li>
     <li>Captions (simple text placed at the bottom-center of the screen)</li>
 </ul>
 
