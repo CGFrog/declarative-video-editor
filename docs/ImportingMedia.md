@@ -27,7 +27,7 @@ image logo = "logo.png" (0,e);
 <p>DVEL supports the following declarations as well:</p>
 <ul>
     <li>Captions (simple text placed at the bottom-center of the screen)</li>
-</ul>git 
+</ul>
 
 <h3>Examples</h3>
 
