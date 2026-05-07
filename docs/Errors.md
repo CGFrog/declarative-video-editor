@@ -10,5 +10,6 @@
 Either the effect written does not exist or insufficient function parameters were given.
 
 <h3> "No render settings specified" </h3>
+
 Ensure that `render [x,y];` is specified correctly
 <h3>Next: <a href="Documentation.md">Documentation</a></h3>
