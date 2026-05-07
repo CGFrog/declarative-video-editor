@@ -18,3 +18,10 @@ There are several clear advantages of this methodology:
   <li><a href="docs/Setup.md">Install / Setup Guide</a></li>
   <li><a href="docs/Documentation.md">Language Documentation</a></li>
 </ul>
+
+<h2>How to run DVEL</h2>
+<p>First, Install all <a href="Setup.mc">dependencies</a>. Then from the project root, run the following command:</p>
+
+```
+python -m src.main
+```
