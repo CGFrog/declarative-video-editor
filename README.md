@@ -1,3 +1,4 @@
+<img src="docs/images/DVEL_Logo.png" alt="logo" width="20%">
 <h1>
   Declarative Video Editor Language
 </h1>
