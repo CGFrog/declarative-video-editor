@@ -101,4 +101,14 @@ volume(x)
 chromakey(<hex-color>, <similarity>, <blend>)
 ```
 
+<h4> Flips </h4>
+To flip a video we can use:
+```
+flip("h") OR flip("v")
+```
+
+<h4> Sharpen </h4>
+```
+sharpness(<amount>)
+```
 <h3>Next: <a href="Timeline.md">Timeline</a></h3>
