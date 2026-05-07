@@ -36,13 +36,37 @@ class EffectBuilder:
                 raise Exception(f"Unknown effect: {effect.type}")
 
     def get_audio_filter(self, effect: Effect) -> str:
-        if effect.type == "speed":
-            speed = effect.param[0] if len(effect.param) > 0 else 1.0
-            return f"atempo={speed}"
-        if effect.type == "volume":
-            volume = effect.param[0] if len(effect.param) > 0 else 1.0
-            return f"volume={volume}"
-        return ""
+        effect_type : str = effect.type
+        match effect_type:
+            case "speed":
+                speed = effect.param[0] if len(effect.param) > 0 else 1.0
+                return f"atempo={speed}"
+            case "volume":
+                volume = effect.param[0] if len(effect.param) > 0 else 1.0
+                return f"volume={volume}"
+            case "normalize":
+                return "loudnorm"
+            case "pan":
+                left = effect.param[0] if len(effect.param) > 0 else 1
+                right = effect.param[1] if len(effect.param) > 1 else 1
+                return f"pan=stereo|c0={left}*c0|c1={right}*c1"
+            case "lowpass":
+                freq = effect.param[0] if len(effect.param) > 0 else 300
+                return f"lowpass=f={freq}"
+            case "highpass":
+                freq = effect.param[0] if len(effect.param) > 0 else 3000
+                return f"highpass=f={freq}"
+            case "afadein":
+                d = effect.param[0] if len(effect.param) > 0 else 1
+                return f"afade=t=in:st=0:d={d}"
+            case "delay":
+                ms = int(effect.param[0]) if len(effect.param) > 0 else 500
+                return f"adelay={ms}|{ms}"
+            case "silrem":
+                thresh = effect.param[0]
+                return f"silenceremove=start_periods=1:start_duration=0.5:start_threshold={thresh}dB"
+            case _:
+                return ""
     
     def _build_blur(self, effect: Effect) -> str:
         radius = effect.param[0] if len(effect.param) > 0 else 5

@@ -35,6 +35,7 @@ class Menu(tk.Menu):
         content = self.text_editor.get_content()
         compiler = Compiler()
         command = compiler.compile(content)
+        print(command)
         if self.on_compile:
             self.on_compile(compiler.layers)
 
