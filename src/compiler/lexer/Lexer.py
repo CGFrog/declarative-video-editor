@@ -48,7 +48,6 @@ labels = {
     'after': TL.AFTER,
     'render': TL.RENDER,
     'func': TL.FUNC,
-
     # Primitive Variables
     'str': TL.STR,
     'num': TL.NUM,

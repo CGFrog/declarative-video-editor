@@ -61,7 +61,9 @@ class ConsoleView:
 ░         ░     ░  ░    ░  ░
 ░          ░                   
         """)
-        
+        print("Ensure that you have ffmpeg is installed: https://ffmpeg.org/ffmpeg.html")
+        print("Ensure that you have VLC is installed: https://images.videolan.org/vlc/")
+
     def write(self, message):
         try:
             self.console.config(state="normal")
