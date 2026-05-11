@@ -121,6 +121,7 @@ class FFMpegBuilder:
                 f"format=yuva420p[{video_label}]"
             )
         elif clip.is_image:
+            print(f"CLIP: {clip.timeline_start}")
             effect_chain = self.__build_effect_chain(clip.effects, audio=False)
             filter_parts.append(
                 f"[{index}:v]"

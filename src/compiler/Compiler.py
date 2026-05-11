@@ -1,5 +1,6 @@
 from collections import defaultdict
 import json
+from pathlib import Path
 from plistlib import InvalidFileException
 import subprocess
 from typing import Dict, List
@@ -67,10 +68,15 @@ class Compiler:
         final_a:str = ffmpeg_builder.final_audio_label
         # returns the ffmpeg command as a string to reduce side-effects, that way users can compile and to see errors often without generating a whole video.
 
+        filter_path = Path("filters.txt").resolve()
+
+        with open(filter_path, "w", encoding="utf-8") as f:
+            f.write(filter_complex)
+
         print("--- Video Successfully Compiled! ---")
         return (
             f"ffmpeg -y {inputs} "
-            f"-filter_complex \"{filter_complex}\" "
+            f"-filter_complex_script filters.txt "
             f"-map \"[{final_v}]\" -map \"[{final_a}]\" "
             f"\"{output_path}\""
         )
