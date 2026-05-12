@@ -5,7 +5,8 @@
 <h5>
 Originally developed for COMPSCI 476 - Software Engineering at UW-Whitewater (Spring 2026)  
 </h5>
-
+<h6>
+</h6>
 <p>
 The goal of this project is to create a "Markup" style language that specializes in video editing. This language is not intended for use by artists but rather for fields where videos are edited to meet a repeatable, objective design standard. An online course may need an introductory slide before each video. Instead of repeatedly making the same edit to different video files, we can design a script that will make the same consistent video structure.
 
@@ -32,3 +33,10 @@ python -m src.main
 ```
 <h2>DVEL User Interface:</h2>
 <img width="1919" height="1020" alt="Screenshot 2026-05-06 194144" src="https://github.com/user-attachments/assets/3ae38c8a-1360-46ee-bcb0-7db07f0b073c" />
+
+
+
+
+<h5>  
+Created by Cameron Aron, Ben Burie, Ian Cooper, Kyle Kocourek, Jordan Shmidt, and Rogelio Torres. 
+</h5>
