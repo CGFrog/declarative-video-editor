@@ -3,6 +3,10 @@
   Declarative Video Editor Language
 </h1>
 <p>
+Originally developed for COMPSCI 476 - Software Engineering at UW-Whitewater (Spring 2026)  
+</p>
+
+<p>
 The goal of this project is to create a "Markup" style language that specializes in video editing. This language is not intended for use by artists but rather for fields where videos are edited to meet a repeatable, objective design standard. An online course may need an introductory slide before each video. Instead of repeatedly making the same edit to different video files, we can design a script that will make the same consistent video structure.
 
 There are several clear advantages of this methodology:
